@@ -5,5 +5,6 @@ export const getURL = {
     view_Synopsis_URL: "https://testtrace.karco.in/Uploads/Synopsis",
     video_poster_URL: "https://testtrace.karco.in/videos/poster",
     VideoView_baseURL : "https://api.spotlightr.com/api/videos",
-    vooKey: "DFckqdC6mQy9lKNVNtFkYKH80"
+    vooKey: "DFckqdC6mQy9lKNVNtFkYKH80",
+    KPI_base_URL: "https://trace.karco.in/api/AppKPI",
 }

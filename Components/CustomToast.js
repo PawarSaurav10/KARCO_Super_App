@@ -8,7 +8,6 @@ import { Animated, Button, Image, Text, View } from "react-native";
 // };
 
 const CustomToast = (props) => {
-    console.log(props,"props");
     const opacity = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -43,7 +42,6 @@ const CustomToast = (props) => {
                 ],
                 margin: 10,
                 marginBottom: 5,
-                // backgroundColor: "white",
                 padding: 10,
                 borderRadius: 4,
                 shadowColor: "black",

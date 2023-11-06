@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, useColorScheme, BackHandler, StatusBar, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView, Dimensions, Alert } from 'react-native'
+import { View, Text, useColorScheme, BackHandler, StatusBar, TouchableOpacity, Image, StyleSheet, ScrollView, Dimensions, Alert } from 'react-native'
 import { useNavigation, useIsFocused } from '@react-navigation/core';
 import { getCompanyUserData } from '../../../Utils/getScreenVisisted';
 import axios from 'axios';
@@ -21,6 +21,7 @@ import DownDoubleIcon from "../../../Images/down-arrow.png"
 import NoDataFoundIcon from "../../../Images/empty-box.png"
 import KPIHomeScreenLoader from '../../../Components/KPIHomeScreenLoader';
 import { CheckConnectivity } from '../../../Utils/isInternetConnected';
+import { getURL } from '../../../baseUrl';
 
 const HomeScreen = () => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -113,12 +114,12 @@ const HomeScreen = () => {
                 backAction,
             )
 
-            axios.get(`https://trace.karco.in/api/AppKPI/GetOverallPercByCompanyId?companyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
+            axios.get(`${getURL.KPI_base_URL}/GetOverallPercByCompanyId?companyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
                 .then((res) => {
                     setTotalPercentage(res.data)
                 })
 
-            axios.get(`https://trace.karco.in/api/AppKPI/GetIndividualPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
+            axios.get(`${getURL.KPI_base_URL}/GetIndividualPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
                 .then((res) => {
                     setOverAllData({
                         KVAvg: res.data.KVAvg,
@@ -135,7 +136,7 @@ const HomeScreen = () => {
                     // setIsLoading(false)
                 })
 
-            axios.get(`https://trace.karco.in/api/AppKPI/GetTopBottomPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
+            axios.get(`${getURL.KPI_base_URL}/GetTopBottomPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
                 .then((res) => {
                     let topPerformanceData = res.data.TopPerformer
                     let botttomPerformanceData = res.data.BottomPerformer
@@ -145,7 +146,7 @@ const HomeScreen = () => {
                     setBottomPerformance(arryBottmPerformance)
                 })
 
-            axios.get(`https://trace.karco.in/api/AppKPI/GetSummaryDataByCompanyId?companyId=${userLoginData.companyId}`)
+            axios.get(`${getURL.KPI_base_URL}/GetSummaryDataByCompanyId?companyId=${userLoginData.companyId}`)
                 .then((res) => {
                     let temp30Data = []
                     res.data.ChartFor30.map((aa) => {
@@ -176,7 +177,7 @@ const HomeScreen = () => {
                     setDay90LineData(temp90Data)
                 })
 
-            axios.get(`https://trace.karco.in/api/AppKPI/GetTrainigOverdueByCompanyId?companyId=${userLoginData.companyId}`)
+            axios.get(`${getURL.KPI_base_URL}/GetTrainigOverdueByCompanyId?companyId=${userLoginData.companyId}`)
                 .then((res) => {
                     setDueData({
                         tenDays: JSON.parse(res.data.TenDays),
@@ -188,7 +189,7 @@ const HomeScreen = () => {
                     })
                 })
 
-            axios.get(`https://trace.karco.in/api/AppKPI/GetImportExportReportByCompanyId?companyId=${userLoginData.companyId}`)
+            axios.get(`${getURL.KPI_base_URL}/GetImportExportReportByCompanyId?companyId=${userLoginData.companyId}`)
                 .then((res) => {
                     setImportExportData({
                         ImportDays: res.data.ImportDays,
@@ -411,8 +412,8 @@ const HomeScreen = () => {
                                                                 <Image source={NoDataFoundIcon} style={{ width: 40, height: 40, marginBottom: 8 }} />
                                                                 <Text style={{ fontSize: 16, fontWeight: "bold", color: "#004C6B" }}>{aa}</Text>
                                                             </View>
-                                                        )}
-
+                                                        )
+                                                    }
                                                 </>
                                             )
                                         })}
@@ -439,7 +440,6 @@ const HomeScreen = () => {
                                                     return (
                                                         <Image source={ArrowDown} style={{ width: 10, height: 10 }} />
                                                     )
-
                                                 }}
                                                 dropdownIconPosition="right"
                                                 defaultValue={selectedDays === "" ? "30 Days" : selectedDays}
@@ -538,9 +538,14 @@ const HomeScreen = () => {
                                             }}
                                             domainPadding={{ x: 20, y: 20 }}
                                         >
-                                            <VictoryLabel text="Percentage (%)" x={180} y={20} textAnchor="middle" style={{
-                                                fontSize: 14, padding: 24, fontWeight: "bold"
-                                            }}
+                                            <VictoryLabel
+                                                text="Percentage (%)"
+                                                x={180}
+                                                y={20}
+                                                textAnchor="middle"
+                                                style={{
+                                                    fontSize: 14, padding: 24, fontWeight: "bold"
+                                                }}
                                             />
                                             <VictoryAxis
                                                 dependentAxis
