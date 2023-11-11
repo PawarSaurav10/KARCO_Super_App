@@ -20,8 +20,9 @@ import TopDoubleIcon from "../../../Images/up-arrow.png"
 import DownDoubleIcon from "../../../Images/down-arrow.png"
 import NoDataFoundIcon from "../../../Images/empty-box.png"
 import KPIHomeScreenLoader from '../../../Components/KPIHomeScreenLoader';
-import { CheckConnectivity } from '../../../Utils/isInternetConnected';
 import { getURL } from '../../../baseUrl';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from "@react-native-community/netinfo";
 
 const HomeScreen = () => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -74,10 +75,10 @@ const HomeScreen = () => {
 
     const logOut = async () => {
         await AsyncStorage.removeItem("screen_visited")
-        await AsyncStorage.removeItem("userData_")
+        await AsyncStorage.removeItem("userCompanyData_")
         navigation.reset({
             index: 0,
-            routes: [{ name: "Home" }],
+            routes: [{ name: "Login" }],
         })
     }
 
@@ -88,12 +89,30 @@ const HomeScreen = () => {
                 onPress: () => null,
                 style: 'cancel',
             },
-            {
-                text: 'YES', onPress: () => logOut()
-            },
+            { text: 'YES', onPress: () => logOut() },
         ]);
         return true;
     };
+    const CheckConnectivity = () => {
+        // For Android devices
+        if (Platform.OS === "android") {
+            NetInfo.fetch().then(xx => {
+                if (xx.isConnected) {
+                    // Alert.alert("You are online!");
+                } else {
+                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
+                        {
+                            text: 'OK', onPress: () =>
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: "Home" }],
+                                })
+                        },
+                    ]);
+                }
+            });
+        }
+    }
 
     useEffect(() => {
         CheckConnectivity()
@@ -136,12 +155,15 @@ const HomeScreen = () => {
                     // setIsLoading(false)
                 })
 
-            axios.get(`${getURL.KPI_base_URL}/GetTopBottomPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
+            axios.get(`${getURL.KPI_base_URL}/GetTopBottomPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? 1 : 2}`)
                 .then((res) => {
                     let topPerformanceData = res.data.TopPerformer
                     let botttomPerformanceData = res.data.BottomPerformer
                     let arryTopPerformance = topPerformanceData.split(",")
                     let arryBottmPerformance = botttomPerformanceData.split(",")
+                    console.log(res.data.TopPerformer, arryTopPerformance, "arryTopPerformance")
+                    console.log(res.data.BottomPerformer, arryBottmPerformance, "arryBottmPerformance")
+
                     setTopPerformance(arryTopPerformance)
                     setBottomPerformance(arryBottmPerformance)
                 })

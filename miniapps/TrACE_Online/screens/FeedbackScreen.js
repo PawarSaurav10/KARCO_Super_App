@@ -11,7 +11,7 @@ import Rater2 from "../../../Images/raters3.png"
 import axios from 'axios';
 import { getUserData, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
 import { useIsFocused } from '@react-navigation/native';
-import { CheckConnectivity } from "../../../Utils/isInternetConnected"
+// import { CheckConnectivity } from "../../../Utils/isInternetConnected"
 import Header from '../../../Components/Header';
 import CloseIcon from "../../../Images/close.png"
 import BackIcon from "../../../Images/left-arrow.png"
@@ -19,11 +19,12 @@ import { getURL } from "../../../baseUrl"
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import SubmitIcon from "../../../Images/submit.png"
 import CustomButton from '../../../Components/CustomButton';
-// import { TourGuideZone, useTourGuideController } from 'rn-tourguide';
+import NetInfo from "@react-native-community/netinfo";
 
 const FeedbackScreen = ({ navigation, route }) => {
-    // const { start, canStart, stop, eventEmitter } = useTourGuideController()
     const isFocused = useIsFocused();
+    const [viewWarnings, setViewWarnings] = useState(false)
+    const [viewWarningsImp, setViewWarningsImp] = useState(false)
     const presentationData = [
         {
             key: 1,
@@ -139,41 +140,6 @@ const FeedbackScreen = ({ navigation, route }) => {
     const [isVisibleModal, setIsVisibleModal] = useState(false)
     const [orientation, setOrientation] = useState()
 
-    // useEffect(() => {
-    //     if (canStart) {
-    //         getAppLaunched().then((res) => {
-    //             console.log(res, "Feedback res")
-    //             if (res && res.code === "VIDEODTL" || res.code === "ASSESS") {
-    //                 start() // 👈 test if you can start otherwise nothing will happen
-    //             }
-    //         })
-    //     }
-    // }, [canStart]) // 👈 don't miss it!
-
-    // const handleOnStart = () => console.log('start feedback')
-    // const handleOnStop = () => console.log('stop feedback')
-    // const handleOnStepChange = () => console.log(`stepChange feedback`)
-
-    // useEffect(() => {
-    //     eventEmitter.on('start', handleOnStart)
-    //     eventEmitter.on('stop', () => { // When the tour for that screen ends, replace to the next screen if it exists.
-    //         let data = null
-    //         data = {
-    //             code: "FEEDBACK",
-    //             screenVisited: "IsVisited",
-    //         }
-    //         // console.log(data, "data called")
-    //         setAppLaunched(data)
-    //     })
-    //     eventEmitter.on('stepChange', handleOnStepChange)
-
-    //     return () => {
-    //         eventEmitter.off('start', handleOnStart)
-    //         eventEmitter.off('stop', handleOnStop)
-    //         eventEmitter.off('stepChange', handleOnStepChange)
-    //     }
-    // }, [])
-
     /**
     * Returns true if the screen is in portrait mode
     */
@@ -213,6 +179,27 @@ const FeedbackScreen = ({ navigation, route }) => {
         return true;
     };
 
+    const CheckConnectivity = () => {
+        // For Android devices
+        if (Platform.OS === "android") {
+            NetInfo.fetch().then(xx => {
+                if (xx.isConnected) {
+                    // Alert.alert("You are online!");
+                } else {
+                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
+                        {
+                            text: 'OK', onPress: () =>
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: "Home" }],
+                                })
+                        },
+                    ]);
+                }
+            });
+        }
+    }
+
     async function fetchResultData() {
         CheckConnectivity()
         if (userLoginData.userId !== null) {
@@ -242,14 +229,6 @@ const FeedbackScreen = ({ navigation, route }) => {
         } else {
             setOrientation("landscape")
         }
-        // getUserData().then((res) => {
-        //     setUserLoginData({
-        //         userId: res.userId,
-        //         password: res.password,
-        //         crewId: res.crewId,
-        //         vesselId: res.vesselId,
-        //     })
-        // });
         getUserData_1().then((res) => {
             setUserLoginData({
                 userId: res.userData.EmployeeId,
@@ -278,7 +257,30 @@ const FeedbackScreen = ({ navigation, route }) => {
 
     const Percentage = (100 * resultData ?.Scores ?.ObtainedMarks) / resultData ?.Scores ?.TotalMarks;
 
+    function validateString(string) {
+        let strRegex = new RegExp(/^[a-zA-Z0-9\(\)\-\]\[\?\.\,\!\s*]+$/);
+        let result = strRegex.test(string);
+        if (result) {
+            setViewWarnings(false)
+        } else {
+            setViewWarnings(true)
+        }
+    }
+
+    function validateString1(string) {
+        let strRegex = new RegExp(/^[a-zA-Z0-9\(\)\-\]\[\?\.\,\!\s*]+$/);
+        let result = strRegex.test(string);
+        if (result) {
+            setViewWarningsImp(false)
+        } else {
+            setViewWarningsImp(true)
+        }
+    }
+
     const onSubmitClick = () => {
+        console.log(feedbackFormData.Relevant_Part_Dtl, feedbackFormData.Improvement_Dtl)
+        validateString(feedbackFormData.Relevant_Part_Dtl);
+        validateString1(feedbackFormData.Improvement_Dtl);
         let data = {
             CBT_Assesment: null,
             Video_qty: null,
@@ -365,7 +367,6 @@ const FeedbackScreen = ({ navigation, route }) => {
             PartCourse: tempData.PartCourse,
             ToBeImproved: tempData.ToBeImproved
         })
-        console.log(getURL.base_URL, JSON.stringify(tempSaveData), route.params.videoPassword, route.params.Id, userLoginData.crewId, userLoginData.companyId, "tempData")
         if (
             (tempData.CBTOverAll != "") &&
             tempData.CBTAssessment != null &&
@@ -382,7 +383,6 @@ const FeedbackScreen = ({ navigation, route }) => {
             try {
                 axios.get(`${getURL.base_URL}/AppFeedback/SaveFeedbackActivity?FeedbackData=${JSON.stringify(tempSaveData)}&VideoId=${route.params.Id}&username=${userLoginData.userId}&password=${route.params.videoPassword}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}&CompanyId=${userLoginData.companyId}`)
                     .then((res) => {
-                        console.log(res, "res")
                         if (res.status === 200) {
                             Alert.alert("Success", "Thank You for Your Feedback", [{
                                 text: 'OK', onPress: () => navigation.replace("Online_Home")
@@ -435,7 +435,6 @@ const FeedbackScreen = ({ navigation, route }) => {
                     <View>
                         {presentationFormdata.map((xx, idx) => {
                             return (
-                                // <TourGuideZone zone={1}>
                                 <View key={idx} style={styles.questionContainer}>
                                     <View style={{ flexDirection: "row" }}>
                                         <Text style={{ color: "white" }}>{idx + 1}. {xx.title} </Text><Text style={{ color: "red" }}>*</Text>
@@ -529,7 +528,6 @@ const FeedbackScreen = ({ navigation, route }) => {
                                         />
                                     </View>
                                 </View>
-                                // {/* </TourGuideZone> */ }
                             )
                         })}
                     </View>
@@ -540,7 +538,6 @@ const FeedbackScreen = ({ navigation, route }) => {
                     <View>
                         {courseObjtFormData.map((xx, idx) => {
                             return (
-                                // <TourGuideZone zone={2}>
                                 <View key={idx} style={styles.questionContainer}>
                                     <View style={{ flexDirection: "row" }}>
                                         <Text style={{ width: 250, color: "white" }}>{idx + 1}. {xx.title} </Text><Text style={{ color: "red" }}>*</Text>
@@ -576,7 +573,6 @@ const FeedbackScreen = ({ navigation, route }) => {
                                         />
                                     </View>
                                 </View>
-                                // {/* </TourGuideZone> */ }
                             )
                         })}
                     </View>
@@ -652,14 +648,24 @@ const FeedbackScreen = ({ navigation, route }) => {
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>
                             <Text style={{ color: "white" }}>1. What was the most relevant part of the course ? </Text>
                             <CustomInput value={feedbackFormData.Relevant_Part_Dtl} textColor={COLORS.white} onChangeText={(value) => {
+                                setViewWarnings(false)
                                 setFeedbackFormData({ ...feedbackFormData, Relevant_Part_Dtl: value === null ? "" : value })
                             }} />
+                            {
+                                feedbackFormData.Relevant_Part_Dtl !== "" && viewWarnings === true &&
+                                <Text style={{ color: "red", fontSize: 12, fontWeight: "bold" }}>Must Contains Aplhanumeric charcters eg:a-z A-Z 0-9 () - ? . , ! * []</Text>
+                            }
                         </View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6, }}>
                             <Text style={{ color: "white" }}>2. Which part might be improved and why ? </Text>
-                            <CustomInput value={feedbackFormData.Improvement_Dtl} textColor={COLORS.white} onChangeText={(value) => {
+                            <CustomInput inputMode={"text"} value={feedbackFormData.Improvement_Dtl} textColor={COLORS.white} onChangeText={(value) => {
+                                setViewWarningsImp(false)
                                 setFeedbackFormData({ ...feedbackFormData, Improvement_Dtl: value === null ? "" : value })
                             }} />
+                            {
+                                feedbackFormData.Improvement_Dtl !== "" && viewWarningsImp === true &&
+                                <Text style={{ color: "#c43a31", fontSize: 12, fontWeight: "bold" }}>Must Contains Aplhanumeric charcters eg:a-z A-Z 0-9 () - ? . , ! * []</Text>
+                            }
                         </View>
                     </View>
                     <View style={styles.titleContainer}>
@@ -685,7 +691,6 @@ const FeedbackScreen = ({ navigation, route }) => {
                             />
                         </View>
                     </View>
-                    {/* <TourGuideZone zone={3} text="Hello world"> */}
                     <CustomButton
                         label={"View Result Detail"}
                         containerStyle={{
@@ -701,8 +706,6 @@ const FeedbackScreen = ({ navigation, route }) => {
                         }}
                         labelStyle={{ color: COLORS.white, fontSize: 14, textTransform: "uppercase", borderBottomWidth: 2, borderBottomColor: COLORS.white }}
                     />
-                    {/* </TourGuideZone> */}
-                    {/* <TourGuideZone zone={4} text="Hello world"> */}
                     <CustomIconButton
                         label={"SUBMIT"}
                         containerStyle={{
@@ -723,7 +726,6 @@ const FeedbackScreen = ({ navigation, route }) => {
                             marginRight: 10
                         }}
                     />
-                    {/* </TourGuideZone> */}
                 </View>
                 <Modal
                     animationType="slide"
@@ -740,52 +742,23 @@ const FeedbackScreen = ({ navigation, route }) => {
                             backgroundColor: 'rgba(0,0,0,0.6)',
                         }}>
                         <View style={{
-                            height: orientation === "landscape" ? "85%" : '40%',
+                            maxHeight: "85%",
+                            // height: orientation === "landscape" ? "85%" : '40%',
                             marginTop: 'auto',
                         }}>
-                            <View style={styles.footer}>
-                                <View style={{ flexDirection: "row", paddingHorizontal: 24, paddingTop: 24, paddingBottom: 14, justifyContent: "space-between", alignItems: "center" }}>
-                                    <View style={{ flex: 0.9, alignItems: "flex-start" }}>
-                                        <Text style={styles.headerText}>{resultData ?.videoInfo ?.VideoName}</Text>
-                                    </View>
-                                    <TouchableOpacity
-                                        style={{ flex: 0.1, alignItems: "flex-end" }}
-                                        onPress={() => {
-                                            setIsVisibleModal(!isVisibleModal);
-                                        }}>
-                                        <Image source={CloseIcon} style={{ width: 16, height: 16 }} />
-                                    </TouchableOpacity>
-                                </View>
-
-                                {/* Line Divider */}
-                                <View
-                                    style={{
-                                        height: 2,
-                                        marginVertical: SIZES.height > 800 ? SIZES.radius : 0,
-                                        marginLeft: SIZES.radius,
-                                        marginRight: SIZES.radius,
-                                        backgroundColor: COLORS.lightGray1,
-                                    }}
-                                />
-                                <View style={{ marginBottom: 14, paddingHorizontal: 14 }}>
-                                    <View style={{ justifyContent: "space-between", alignItems: "flex-end", flexDirection: "row", paddingBottom: 10 }}>
-                                        <View style={{ margin: 4 }}>
-                                            <Text style={{
-                                                fontSize: 34,
-                                                fontWeight: "bold",
-                                                color: Percentage > 70 ? "green"
-                                                    : Percentage > 50 ? "#edc700"
-                                                        : Percentage < 50 ? "red"
-                                                            : "red"
+                            <ScrollView>
+                                <View style={styles.footer}>
+                                    <View style={{ flexDirection: "row", paddingHorizontal: 24, paddingTop: 24, paddingBottom: 14, justifyContent: "space-between", alignItems: "center" }}>
+                                        <View style={{ flex: 0.9, alignItems: "flex-start" }}>
+                                            <Text style={styles.headerText}>{resultData ?.videoInfo ?.VideoName}</Text>
+                                        </View>
+                                        <TouchableOpacity
+                                            style={{ flex: 0.1, alignItems: "flex-end" }}
+                                            onPress={() => {
+                                                setIsVisibleModal(!isVisibleModal);
                                             }}>
-                                                {parseFloat(Percentage).toFixed(0)}%
-                                            </Text>
-                                            <Text style={{ fontSize: 22, fontWeight: "600", color: COLORS.darkBlue }}>Total Percentage</Text>
-                                        </View>
-                                        <View style={{ alignItems: 'flex-end', margin: 6 }}>
-                                            <Text style={{ fontSize: 20, fontWeight: "bold", color: COLORS.darkBlue }}>{resultData ?.Scores ?.ObtainedMarks} / {resultData ?.Scores ?.TotalMarks}</Text>
-                                            <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.darkBlue }}>Marks Obtained</Text>
-                                        </View>
+                                            <Image source={CloseIcon} style={{ width: 16, height: 16 }} />
+                                        </TouchableOpacity>
                                     </View>
 
                                     {/* Line Divider */}
@@ -794,51 +767,76 @@ const FeedbackScreen = ({ navigation, route }) => {
                                             height: 2,
                                             marginVertical: SIZES.height > 800 ? SIZES.radius : 0,
                                             marginLeft: SIZES.radius,
+                                            marginRight: SIZES.radius,
                                             backgroundColor: COLORS.lightGray1,
                                         }}
                                     />
+                                    <View style={{ marginBottom: 14, paddingHorizontal: 14 }}>
+                                        <View style={{ justifyContent: "space-between", alignItems: "flex-end", flexDirection: "row", paddingBottom: 10 }}>
+                                            <View style={{ margin: 4 }}>
+                                                <Text style={{
+                                                    fontSize: 34,
+                                                    fontWeight: "bold",
+                                                    color: Percentage > 70 ? "green"
+                                                        : Percentage > 50 ? "#edc700"
+                                                            : Percentage < 50 ? "red"
+                                                                : "red"
+                                                }}>
+                                                    {parseFloat(Percentage).toFixed(0)}%
+                                            </Text>
+                                                <Text style={{ fontSize: 22, fontWeight: "600", color: COLORS.darkBlue }}>Total Percentage</Text>
+                                            </View>
+                                            <View style={{ alignItems: 'flex-end', margin: 6 }}>
+                                                <Text style={{ fontSize: 20, fontWeight: "bold", color: COLORS.darkBlue }}>{resultData ?.Scores ?.ObtainedMarks} / {resultData ?.Scores ?.TotalMarks}</Text>
+                                                <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.darkBlue }}>Marks Obtained</Text>
+                                            </View>
+                                        </View>
 
-                                    {/* <View style={{ padding: 8, borderWidth: 2, margin: 4, borderRadius: 6, width: 150, justifyContent: "center", alignItems: "center" }}>
-                                            <Text style={{ fontSize: 22, fontWeight: "bold", color: COLORS.darkBlue }}>17</Text>
-                                            <Text style={{ fontSize: 16, fontWeight: "600", color: COLORS.darkBlue }}>Total Questions</Text>
-                                        </View> */}
-                                    <View style={{ marginVertical: 20, flexDirection: "row", justifyContent: "center" }}>
-                                        <View style={styles.totalAnsweredContainer}>
-                                            <View style={{ flexDirection: "row", marginBottom: 6 }}>
-                                                <Text style={styles.totalAnswerText}>{resultData ?.Scores ?.WAcorrect}</Text>
-                                                <Text style={styles.outOfText}>/ {resultData ?.Scores ?.WA}</Text>
+                                        {/* Line Divider */}
+                                        <View
+                                            style={{
+                                                height: 2,
+                                                marginVertical: SIZES.height > 800 ? SIZES.radius : 0,
+                                                marginLeft: SIZES.radius,
+                                                backgroundColor: COLORS.lightGray1,
+                                            }}
+                                        />
+                                        <View style={{ marginVertical: 20, flexDirection: "row", justifyContent: "center" }}>
+                                            <View style={styles.totalAnsweredContainer}>
+                                                <View style={{ flexDirection: "row", marginBottom: 6 }}>
+                                                    <Text style={styles.totalAnswerText}>{resultData ?.Scores ?.WAcorrect}</Text>
+                                                    <Text style={styles.outOfText}>/ {resultData ?.Scores ?.WA}</Text>
+                                                </View>
+                                                <View>
+                                                    <Text style={{ fontSize: 16, color: COLORS.white2, }}>A Weightage</Text>
+                                                </View>
                                             </View>
-                                            <View>
-                                                <Text style={{ fontSize: 16, color: COLORS.white2, }}>A Weightage</Text>
+                                            <View style={styles.totalAnsweredContainer}>
+                                                <View style={{ flexDirection: "row", marginBottom: 6 }}>
+                                                    <Text style={styles.totalAnswerText}>{resultData ?.Scores ?.WBcorrect}</Text>
+                                                    <Text style={styles.outOfText}>/ {resultData ?.Scores ?.WB}</Text>
+                                                </View>
+                                                <View>
+                                                    <Text style={{ fontSize: 16, color: COLORS.white2, }}>B Weightage</Text>
+                                                </View>
                                             </View>
-                                        </View>
-                                        <View style={styles.totalAnsweredContainer}>
-                                            <View style={{ flexDirection: "row", marginBottom: 6 }}>
-                                                <Text style={styles.totalAnswerText}>{resultData ?.Scores ?.WBcorrect}</Text>
-                                                <Text style={styles.outOfText}>/ {resultData ?.Scores ?.WB}</Text>
-                                            </View>
-                                            <View>
-                                                <Text style={{ fontSize: 16, color: COLORS.white2, }}>B Weightage</Text>
-                                            </View>
-                                        </View>
-                                        <View style={styles.totalAnsweredContainer}>
-                                            <View style={{ flexDirection: "row", marginBottom: 6 }}>
-                                                <Text style={styles.totalAnswerText}>{resultData ?.Scores ?.WCcorrect}</Text>
-                                                <Text style={styles.outOfText}>/ {resultData ?.Scores ?.WC}</Text>
-                                            </View>
-                                            <View>
-                                                <Text style={{ fontSize: 16, color: COLORS.white2, }}>C Weightage</Text>
+                                            <View style={styles.totalAnsweredContainer}>
+                                                <View style={{ flexDirection: "row", marginBottom: 6 }}>
+                                                    <Text style={styles.totalAnswerText}>{resultData ?.Scores ?.WCcorrect}</Text>
+                                                    <Text style={styles.outOfText}>/ {resultData ?.Scores ?.WC}</Text>
+                                                </View>
+                                                <View>
+                                                    <Text style={{ fontSize: 16, color: COLORS.white2, }}>C Weightage</Text>
+                                                </View>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
-                            </View>
+                            </ScrollView>
                         </View>
                     </View>
                 </Modal>
             </ScrollView>
-            {/* </>
-            )} */}
         </View>
     )
 }

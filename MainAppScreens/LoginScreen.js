@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, ActivityIndicator, ScrollView, Image, StyleSheet } from 'react-native'
+import { View, Text, ActivityIndicator, ScrollView, Image, StyleSheet, Platform, Alert } from 'react-native'
 import { useTogglePasswordVisibility } from '../CustomHooks/useTogglePasswordVisibility';
 import { useIsFocused } from '@react-navigation/native';
 import CustomInput from '../Components/CustomInput';
@@ -13,7 +13,8 @@ import axios from 'axios';
 import { saveCompanyDataToStorage, setScreenVisited, saveUserDataToStorage, setOnlineScreenVisited } from '../Utils/getScreenVisisted';
 import { getURL } from '../baseUrl';
 import LoginScreenLoader from "../Components/LoginScreenLoader"
-import { CheckConnectivity } from "../Utils/isInternetConnected"
+import NetInfo from "@react-native-community/netinfo";
+// import NetworkUtils, { CheckConnectivity } from "../Utils/isInternetConnected"
 
 const LoginScreen = ({ navigation, route }) => {
     const { passwordVisibility, rightIcon, handlePasswordVisibility } = useTogglePasswordVisibility();
@@ -23,6 +24,27 @@ const LoginScreen = ({ navigation, route }) => {
         password: ""
     })
     const [isLoading, setIsLoading] = useState(false)
+
+    const CheckConnectivity = () => {
+        // For Android devices
+        if (Platform.OS === "android") {
+            NetInfo.fetch().then(xx => {
+                if (xx.isConnected) {
+                    // Alert.alert("You are online!");
+                } else {
+                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
+                        {
+                            text: 'OK', onPress: () =>
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: "Home" }],
+                                })
+                        },
+                    ]);
+                }
+            });
+        }
+    }
 
     useEffect(() => {
         if (isFocused) {
@@ -36,6 +58,7 @@ const LoginScreen = ({ navigation, route }) => {
 
     const onHandleLoginClick = () => {
         // if (isConnected) {
+        CheckConnectivity()
         if (loginData.userId !== "" && loginData.password !== "") {
             setIsLoading(true)
             try {
@@ -66,14 +89,13 @@ const LoginScreen = ({ navigation, route }) => {
                             if (response.data.CrewListId > 0) {
                                 setIsLoading(true)
                                 saveUserDataToStorage(response.data, loginData.password.trimStart("").trimEnd(""))
-                                let data = [];
-                                data.push({
-                                    code: "SIGNIN",
-                                    isVisited: true,
-                                    screenName: "LoginScreen",
-                                });
-                                console.log(data, "sceen")
-                                setOnlineScreenVisited(data);
+                                // let data = [];
+                                // data.push({
+                                //     code: "SIGNIN",
+                                //     isVisited: true,
+                                //     screenName: "LoginScreen",
+                                // });
+                                setOnlineScreenVisited("Yes");
                                 navigation.reset({
                                     index: 0,
                                     routes: [{ name: "Online_Home" }],

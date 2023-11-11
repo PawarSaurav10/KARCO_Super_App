@@ -23,6 +23,7 @@ import { getURL } from "../../../baseUrl"
 
 
 const VideoDetailScreen = ({ navigation, route }) => {
+    console.log(route.params.type)
     const isFocused = useIsFocused()
     const [videoDetail, setVideoDetail] = useState(null)
     const [fileContent, setFileContent] = useState(null)
@@ -33,16 +34,18 @@ const VideoDetailScreen = ({ navigation, route }) => {
         isHide: false
     })
     const [directory, setDirectory] = useState([]);
-    const [isView, setIsView] = useState(false)
-    const [isLoading, setIsLoading] = useState(true)
+    const [isView, setIsView] = useState(route.params.type === "Downloads" ? false : true)
+    const [isLoading, setIsLoading] = useState(route.params.type === "Downloads" ? false : true)
 
 
     function CheckConnectivity() {
+        setIsLoading(false)
         // For Android devices
         if (route.params.type !== "Downloads") {
             if (Platform.OS === "android") {
                 NetInfo.fetch().then(xx => {
                     if (xx.isConnected) {
+                        setIsView(false)
                         // Alert.alert("You are online!");
                     } else {
                         setIsView(true)
@@ -64,10 +67,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
             "connectionChange",
             this.handleFirstConnectivityChange
         );
-        if (isConnected === false) {
-            setIsView(true)
-        } else {
-            Alert.alert("You are online!");
+        if (route.params.type !== "Downloads") {
+            if (isConnected === false) {
+                setIsView(true)
+            } else {
+                setIsView(false)
+                Alert.alert("You are online!");
+            }
         }
     };
 
@@ -86,10 +92,11 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     setIsLoading(false)
                 })
         }
-    }, [route.params.type === null])
+    }, [route.params.type !== "Downloads", isFocused])
 
     useEffect(() => {
         if (route.params.type === "Downloads") {
+            // CheckConnectivity()
             RNFetchBlob.fs.readStream(route.params.data.path, 'utf8')
                 .then((stream) => {
                     setFileContent(stream.path);
@@ -98,12 +105,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     stream.onData((chunk) => {
                         data += chunk
                     })
-                    stream.onEnd(() => {
-                        console.log(data)
-                    })
+                    stream.onEnd(() => { })
                 });
         }
-
     }, [route.params.type === "Downloads"]);
 
     useEffect(() => {
@@ -114,7 +118,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 await ReactNativeBlobUtil.fs
                     .lstat(docPath)
                     .then(response => {
-                        console.log(response, "response")
                         setDirectory(response);
                     })
                     .catch(error => console.error(error));
@@ -140,6 +143,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 })
                 .then((res) => {
                     // if (res.status) {
+                    // setToastHide(false)
                     setToastHide(true)
                     setMessage({ message: "Your Video is Downloaded", icon: DownloadedIcon, isHide: true })
                 })
@@ -151,8 +155,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
     }
 
     const htmlContent = `
-            <video width="100%" height="100%" controls controlsList="nodownload" preload="auto" autoplay>
-                <source src="${videoDetail ?.originalFileURL}" type="video/mp4">
+            <video width="100%" height="100%" controls controlsList="nodownload" preload="auto">
+                <source src="${videoDetail && videoDetail.originalFileURL}" type="video/mp4">
             </video>
       `;
 
@@ -185,13 +189,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 <Image source={BackIcon} style={{ width: 20, height: 20 }} />
                             </TouchableOpacity>
                         }
-                        title={route.params.type !== "Downloads" ? (videoDetail && videoDetail.name) : route.params.data.filename}
+                        title={route.params.type !== "Downloads" ? (videoDetail && videoDetail.name) : (route.params.data.filename).slice(0, -4)}
                     />
                     <ScrollView
                         contentInsetAdjustmentBehavior="automatic"
                     >
-                        <View style={{ width: Dimensions.get('screen').width, height: 240 }}>
-                            <WebView allowFileAccess={true} source={{ html: route.params.type !== "Downloads" ? htmlContent : htmlDownloadContent }} mediaPlaybackRequiresUserAction={false} allowsFullscreenVideo={true} minimumFontSize={30} />
+                        <View style={{ width: Dimensions.get('screen').width, height: 220 }}>
+                            <WebView allowFileAccess={true} source={{ html: route.params.type !== "Downloads" ? htmlContent : htmlDownloadContent }} mediaPlaybackRequiresUserAction={route.params.type === "Downloads" ? false : true} allowsFullscreenVideo={true} minimumFontSize={30} />
                         </View>
                         <View style={{ margin: 20 }}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -209,7 +213,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                                 width: 16,
                                             }} source={CalendarIcon} />
                                         </View>
-                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(videoDetail ?.created).format("DD MMM YYYY")}</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(videoDetail && videoDetail.created).format("DD MMM YYYY")}</Text>
                                     </View>
                                 </View>
                             }
@@ -258,7 +262,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     }}
                     message={message.message}
                     onHide={() => {
-                        message.isHide;
+                        setToastHide(!toastHide)
                     }}
                 />
             }

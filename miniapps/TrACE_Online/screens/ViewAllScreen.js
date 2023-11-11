@@ -13,7 +13,8 @@ import Header from '../../../Components/Header';
 import BackIcon from "../../../Images/left-arrow.png"
 import ListViewCard from '../../../Components/ListViewCard';
 import GridViewCard from '../../../Components/GridViewCard';
-import { CheckConnectivity } from "../../../Utils/isInternetConnected"
+// import { CheckConnectivity } from "../../../Utils/isInternetConnected"
+import NetInfo from "@react-native-community/netinfo";
 
 const ViewAllScreen = ({ navigation, route }) => {
     const [searchedTodoVideoData, setSearchedTodoVideoData] = useState([])
@@ -45,6 +46,21 @@ const ViewAllScreen = ({ navigation, route }) => {
             );
         });
     }, [orientation])
+
+    const CheckConnectivity = () => {
+        // For Android devices
+        if (Platform.OS === "android") {
+            NetInfo.fetch().then(xx => {
+                if (xx.isConnected) {
+                    // Alert.alert("You are online!");
+                } else {
+                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
+                        { text: 'OK', onPress: () => navigation.replace("Home") },
+                    ]);
+                }
+            });
+        }
+    }
 
     useEffect(() => {
         CheckConnectivity()

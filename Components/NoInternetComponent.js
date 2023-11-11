@@ -21,7 +21,7 @@ const NoInternetComponent = () => {
                         marginVertical: 8,
                     }}
                     onPress={() => {
-                        navigation.navigate("Downloads")
+                        navigation.replace("Downloads")
                     }}
                     labelStyle={{ color: COLORS.white, fontSize: 12, textTransform: "uppercase" }} />
             </View>

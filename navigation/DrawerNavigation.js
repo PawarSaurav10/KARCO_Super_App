@@ -117,6 +117,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
     }, [appName === "TrACE Online"])
 
     const OnlinelogOut = async () => {
+        await AsyncStorage.removeItem("online_screen_visited")
         await AsyncStorage.removeItem("userData")
         navigation.reset({
             index: 0,
@@ -169,10 +170,10 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                         </TouchableOpacity>
                         <View>
                             <Text style={{ color: COLORS.white, fontSize: 20, textAlign: "left", marginBottom: 2 }}>
-                                {userProfileData ?.Name}
+                                {userProfileData && userProfileData.Name}
                             </Text>
                             <Text style={{ color: COLORS.gray2, fontSize: 14, textAlign: "left" }}>
-                                {userProfileData ?.EmailId}
+                                {userProfileData && userProfileData.EmailId}
                             </Text>
                         </View>
                     </View>
@@ -353,7 +354,6 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
 };
 
 const DrawerNew = ({ selectedTab, setSelectedTab, route }) => {
-    console.log(route.params, "route")
     const [progress, setProgress] = React.useState(new Animated.Value(0));
 
     return (

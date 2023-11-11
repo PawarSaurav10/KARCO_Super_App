@@ -8,23 +8,24 @@ import { Animated, Button, Image, Text, View } from "react-native";
 // };
 
 const CustomToast = (props) => {
+    console.log(props.onHide)
     const opacity = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         Animated.sequence([
             Animated.timing(opacity, {
                 toValue: 1,
-                duration: 500,
+                duration: 1000,
                 useNativeDriver: true,
             }),
             Animated.delay(3000),
             Animated.timing(opacity, {
                 toValue: 0,
-                duration: 500,
+                duration: 1000,
                 useNativeDriver: true,
             }),
         ]).start(() => {
-            props.onHide();
+            props.onHide()
         });
     }, []);
 

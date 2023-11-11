@@ -1,26 +1,21 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export async function setOnlineScreenVisited(screenData) {
-    console.log(screenData,"screenData")
-    AsyncStorage.setItem(
+    await AsyncStorage.setItem(
         "online_screen_visited",
-        JSON.stringify({
-            data: [...screenData],
-        })
+        screenData
     );
 }
 
 export function getOnlineScreenVisited() {
     return new Promise(async (resolve, reject) => {
         await AsyncStorage.getItem("online_screen_visited")
-            .then((value) => JSON.parse(value))
-            .then((res) => {
-                if (res && res.data) {
-                    resolve(res.data);
-                    // console.log(res.data, "res.data");
+            .then((value) => (value))
+            .then((response) => {
+                if (response) {
+                    resolve(response);
                 } else {
-                    resolve([]);
-                    // console.log(data, "data");
+                    resolve(null);
                 }
             })
             .catch((err) => reject(err));

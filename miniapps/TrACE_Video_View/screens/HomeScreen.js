@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, ScrollView } from 'react-native'
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, ScrollView, BackHandler, RefreshControl } from 'react-native'
 import CalendarIcon from "../../../Images/calendar.png"
 import { COLORS, SIZES } from '../../../Constants/theme';
 import axios from 'axios';
@@ -22,11 +22,21 @@ const HomeScreen = () => {
     const [searchedVideoData, setSearchedVideoData] = useState([])
     const [searchedVideo, setSearchedVideo] = useState("")
 
+    const backAction = () => {
+        // setSelectedTab("Home")
+        navigation.reset({
+            index: 0,
+            routes: [{ name: "Home" }],
+        });
+        return true;
+    };
+
     function CheckConnectivity() {
         // For Android devices
         if (Platform.OS === "android") {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
+                    setIsView(false)
                     // Alert.alert("You are online!");
                 } else {
                     setIsLoading(false)
@@ -51,9 +61,22 @@ const HomeScreen = () => {
             setIsLoading(false)
             setIsView(true)
         } else {
-            Alert.alert("You are online!");
+            setIsView(false)
+            // Alert.alert("You are online!");
         }
     };
+
+    const onRefresh = async () => {
+        setIsLoading(true);
+        CheckConnectivity()
+        axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
+            .then((res) => {
+                setVideoList(res.data.videos.data)
+                setIsLoading(false)
+            })
+    };
+
+
 
 
 
@@ -65,6 +88,11 @@ const HomeScreen = () => {
                     setVideoList(res.data.videos.data)
                     setIsLoading(false)
                 })
+            const backHandler = BackHandler.addEventListener(
+                'hardwareBackPress',
+                backAction,
+            );
+            return () => backHandler.remove();
         }
     }, [isFocused])
 
@@ -93,110 +121,123 @@ const HomeScreen = () => {
                 />
             }
             {!isLoading &&
-                <View>
-                    <View style={{ margin: 10, padding: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                        <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
-                            <TouchableOpacity
-                                style={{ marginRight: 8, justifyContent: "flex-start" }}
-                                onPress={() => console.log("object")}
-                            >
-                                <Image source={MenuIcon} style={{ width: 24, height: 24 }} />
-                            </TouchableOpacity>
-                            <Image
-                                style={{
-                                    height: 40,
-                                    width: 40,
-                                    marginRight: 6
-                                }}
-                                source={AvatarImg}
-                            />
-                            <View style={{ marginLeft: 10, }}>
-                                <Text
-                                    style={{
-                                        fontSize: 18,
-                                        fontWeight: "bold",
-                                        color: COLORS.primary
-                                    }}
-                                    numberOfLines={1}
+                <ScrollView
+                    contentInsetAdjustmentBehavior="automatic"
+                    refreshControl={
+                        <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
+                    }>
+                    <View>
+
+
+                        <View style={{ margin: 10, padding: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                            <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
+                                <TouchableOpacity
+                                    style={{ marginRight: 8, justifyContent: "flex-start" }}
+                                    onPress={() => console.log("object")}
                                 >
-                                    KARCO
+                                    <Image source={MenuIcon} style={{ width: 24, height: 24 }} />
+                                </TouchableOpacity>
+                                <Image
+                                    style={{
+                                        height: 40,
+                                        width: 40,
+                                        marginRight: 6
+                                    }}
+                                    source={AvatarImg}
+                                />
+                                <View style={{ marginLeft: 10, }}>
+                                    <Text
+                                        style={{
+                                            fontSize: 18,
+                                            fontWeight: "bold",
+                                            color: COLORS.primary
+                                        }}
+                                        numberOfLines={1}
+                                    >
+                                        KARCO
                                 </Text>
+                                </View>
+                            </View>
+                            <View style={[styles.icon_container, styles.shadowProp]}>
+                                <Image style={styles.icon} source={NotificationIcon} />
                             </View>
                         </View>
-                        <View style={[styles.icon_container, styles.shadowProp]}>
-                            <Image style={styles.icon} source={NotificationIcon} />
-                        </View>
-                    </View>
 
-                    {/* Search Input */}
-                    {!isView &&
-                        < View >
-                            <View style={{ margin: 8, padding: 8, }}>
-                                <CustomSearch
-                                    label={"Search Videos"}
-                                    style={{ fontSize: 20 }}
-                                    value={searchedVideo}
-                                    onChangeText={(value) => {
-                                        setSearchedVideo(value)
-                                    }}
-                                />
-                            </View >
-                        </View>
-                    }
-                    {!isView &&
-                        <ScrollView
-                            contentInsetAdjustmentBehavior="automatic"
-                            nestedScrollEnabled={true}
-                        >
-                            <View style={{ marginHorizontal: 6 }}>
-                                <FlatList
-                                    data={searchedVideo !== "" ? searchedVideoData : videoList}
-                                    keyExtractor={item => item.id}
-                                    showsHorizontalScrollIndicator={false}
-                                    renderItem={({ item, index }) => (
-                                        <TouchableOpacity
-                                            key={index}
-                                            onPress={() => {
-                                                navigation.navigate("Video Detail", item.id)
-                                                CheckConnectivity()
-                                            }}
-                                        >
-                                            <View style={{ flexDirection: "row", padding: 10, alignItems: "center" }}>
-                                                <View style={{ flex: 0.28 }}>
-                                                    <Image source={{ uri: item.thumbnail }} style={{ height: 80, width: 80, borderRadius: 10, objectFit: "cover" }} />
-                                                </View>
-                                                <View style={{ flex: 0.72 }}>
-                                                    <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{item.name}</Text>
-                                                    <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 6 }}>
-                                                        <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
-                                                            <Image style={{
-                                                                height: 16,
-                                                                width: 16,
-                                                            }} source={CalendarIcon} />
+                        {/* Search Input */}
+                        {!isView &&
+                            < View >
+                                <View style={{ margin: 8, padding: 8, }}>
+                                    <CustomSearch
+                                        label={"Search Videos"}
+                                        style={{ fontSize: 20 }}
+                                        value={searchedVideo}
+                                        onChangeText={(value) => {
+                                            setSearchedVideo(value)
+                                        }}
+                                    />
+                                </View >
+                            </View>
+                        }
+
+                        {!isView &&
+                            <ScrollView
+                                contentInsetAdjustmentBehavior="automatic"
+                                nestedScrollEnabled={true}
+                            // refreshControl={
+                            //     <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
+                            // }
+                            >
+                                <View style={{ marginHorizontal: 6 }}>
+                                    <FlatList
+                                        data={searchedVideo !== "" ? searchedVideoData : videoList}
+                                        keyExtractor={item => item.id}
+                                        showsHorizontalScrollIndicator={false}
+                                        renderItem={({ item, index }) => (
+                                            <TouchableOpacity
+                                                key={index}
+                                                onPress={() => {
+                                                    navigation.navigate("Video Detail", item.id)
+                                                    CheckConnectivity()
+                                                }}
+                                            >
+                                                <View style={{ flexDirection: "row", padding: 10, alignItems: "center" }}>
+                                                    <View style={{ flex: 0.28 }}>
+                                                        <Image source={{ uri: item.thumbnail }} style={{ height: 80, width: 80, borderRadius: 10, objectFit: "cover" }} />
+                                                    </View>
+                                                    <View style={{ flex: 0.72 }}>
+                                                        <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{item.name}</Text>
+                                                        <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 6 }}>
+                                                            <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
+                                                                <Image style={{
+                                                                    height: 16,
+                                                                    width: 16,
+                                                                }} source={CalendarIcon} />
+                                                            </View>
+                                                            <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(item.created).format("DD MMM YYYY")}</Text>
                                                         </View>
-                                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(item.created).format("DD MMM YYYY")}</Text>
                                                     </View>
                                                 </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    height: 2,
-                                                    marginVertical: SIZES.height > 800 ? SIZES.radius : 0,
-                                                    marginHorizontal: SIZES.radius,
-                                                    backgroundColor: COLORS.lightGray1,
-                                                }}
-                                            />
-                                        </TouchableOpacity>
-                                    )}
-                                />
-                            </View>
-                        </ScrollView>}
-
-                </View>
+                                                <View
+                                                    style={{
+                                                        height: 2,
+                                                        marginVertical: SIZES.height > 800 ? SIZES.radius : 0,
+                                                        marginHorizontal: SIZES.radius,
+                                                        backgroundColor: COLORS.lightGray1,
+                                                    }}
+                                                />
+                                            </TouchableOpacity>
+                                        )}
+                                    />
+                                </View>
+                            </ScrollView>
+                        }
+                        {isView === true && (
+                            <NoInternetComponent />
+                        )}
+                    </View>
+                </ScrollView>
             }
-            {isView === true && (
-                <NoInternetComponent />
-            )}
+
         </View>
     )
 }

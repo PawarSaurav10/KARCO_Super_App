@@ -17,17 +17,16 @@ const OnlineNavigation = ({ route }) => {
     const [initialRoute, setInitialRoute] = useState()
     useEffect(() => {
         getOnlineScreenVisited().then((res) => {
-            console.log(res.length > 0, "sad")
-            if (res.length > 0 && res.filter((xx) => xx.code === "ONBOARD")) {
-                if (res.length > 0 && res.filter((xx) => xx.code === "SIGNIN")) {
-                    setInitialRoute("Login")
-                } else {
-                    setInitialRoute("Online_Home")
-                }
+            console.log(res,"res")
+            // if (res.length > 0 && res.filter((xx) => xx.code === "ONBOARD")) {
+            if (res === null) {
+                setInitialRoute("Login")
             } else {
-                console.log("object")
-                setInitialRoute("OnBoarding");
+                setInitialRoute("Online_Home")
             }
+            // } else {
+            //     setInitialRoute("OnBoarding");
+            // }
         });
     }, [])
     return (
@@ -51,7 +50,7 @@ const OnlineNavigation = ({ route }) => {
                     <Online.Screen name={"AssessmentNew"} component={AssessmentScreen} />
                     <Online.Screen name={"Feedback Form"} component={FeedbackScreen} />
                     <Online.Screen name={"View All"} component={ViewAllScreen} />
-                    <Online.Screen name={"OnBoarding"} component={OnBoardingScreen} />
+                    {/* <Online.Screen name={"OnBoarding"} component={OnBoardingScreen} /> */}
                 </Online.Navigator>
             )}
         </>

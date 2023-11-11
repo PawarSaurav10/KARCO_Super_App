@@ -8,15 +8,12 @@ import PDFViewer from '../../../Components/PDFViewer';
 import { useIsFocused } from '@react-navigation/native';
 import Header from '../../../Components/Header';
 import BackIcon from "../../../Images/left-arrow.png"
-// import AssessmentScreenLoader from '../../../Components/AssessmentScreenLoader';
 import { getURL } from "../../../baseUrl"
 import AssessmentScreenLoader from '../../../Components/AssessmentScreenLoader';
-import { CheckConnectivity } from '../../../Utils/isInternetConnected';
-// import { TourGuideZone, useTourGuideController } from 'rn-tourguide';
+import NetInfo from "@react-native-community/netinfo";
 
 
 const AssessmentScreen = ({ navigation, route }) => {
-    // const { start, canStart, stop, eventEmitter } = useTourGuideController()
     const isFocused = useIsFocused()
     const [playVideo, setPlayVideo] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState("")
@@ -30,57 +27,6 @@ const AssessmentScreen = ({ navigation, route }) => {
     const [assessmentData, setAssessmentData] = useState(null)
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [orientation, setOrientation] = useState()
-
-    // useEffect(() => {
-    //     if (canStart) {
-    //         getAppLaunched().then((res) => {
-    //             console.log(res, "home res")
-    //             if (res && res.code === "VIDEODTL") {
-    //                 start() // 👈 test if you can start otherwise nothing will happen
-    //             }
-    //         })
-    //     }
-    // }, [canStart]) // 👈 don't miss it!
-
-    // const handleOnStart = () => console.log('start assess')
-    // const handleOnStop = () => console.log('stop assess')
-    // const handleOnStepChange = () => console.log(`stepChange assess`)
-
-    // useEffect(() => {
-    //     eventEmitter.on('start', handleOnStart)
-    //     eventEmitter.on('stop', () => { // When the tour for that screen ends, replace to the next screen if it exists.
-    //         let data = null
-    //         data = {
-    //             code: "ASSESS",
-    //             screenVisited: "IsVisited",
-    //         }
-    //         // console.log(data, "data called")
-    //         setAppLaunched(data)
-    //     })
-    //     eventEmitter.on('stepChange', handleOnStepChange)
-
-    //     return () => {
-    //         eventEmitter.off('start', handleOnStart)
-    //         eventEmitter.off('stop', handleOnStop)
-    //         eventEmitter.off('stepChange', handleOnStepChange)
-    //     }
-    // }, [])
-
-    /**
-    * Returns true if the screen is in portrait mode
-    */
-    const isPortrait = () => {
-        const dim = Dimensions.get('screen');
-        return dim.height >= dim.width;
-    };
-
-    // /**
-    //  * Returns true of the screen is in landscape mode
-    //  */
-    // const isLandscape = () => {
-    //     const dim = Dimensions.get('screen');
-    //     return dim.width >= dim.height;
-    // };
 
     useEffect(() => {
         // Event Listener for orientation changes
@@ -102,6 +48,27 @@ const AssessmentScreen = ({ navigation, route }) => {
         ]);
         return true;
     };
+
+    const CheckConnectivity = () => {
+        // For Android devices
+        if (Platform.OS === "android") {
+            NetInfo.fetch().then(xx => {
+                if (xx.isConnected) {
+                    // Alert.alert("You are online!");
+                } else {
+                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
+                        {
+                            text: 'OK', onPress: () =>
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: "Home" }],
+                                })
+                        },
+                    ]);
+                }
+            });
+        }
+    }
 
     async function fetchOnlineAssessmentData() {
         CheckConnectivity()
@@ -134,14 +101,6 @@ const AssessmentScreen = ({ navigation, route }) => {
                 setOrientation("landscape")
             }
             CheckConnectivity()
-            // getUserData().then((res) => {
-            //     setUserLoginData({
-            //         userId: res.userId,
-            //         password: res.password,
-            //         crewId: res.crewId,
-            //         vesselId: res.vesselId,
-            //     })
-            // });
             getUserData_1().then((res) => {
                 setUserLoginData({
                     userId: res.userData.EmployeeId,
@@ -228,7 +187,6 @@ const AssessmentScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        console.log("useeffect called")
         if (isFocused) {
             setIsLoading(true)
             const backHandler = BackHandler.addEventListener(
@@ -253,14 +211,12 @@ const AssessmentScreen = ({ navigation, route }) => {
                 {initialData !== null &&
                     <>
                         <Text style={{ fontSize: 18, fontWeight: "600", textAlign: "left", marginBottom: 20, color: COLORS.darkBlue }}>{initialData ?.Question}</Text>
-                        {/* <TourGuideZone text="Click on this Button to view PDF" zone={4} maskOffset={1} > */}
                         <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "A" ? COLORS.primary : COLORS.white2 }]}
                             onPress={() => {
                                 onOptionClick("A", initialData, questionIndex)
                             }}>
                             <Text style={[styles.options_text, { color: selectedOptions == "A" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionA}</Text>
                         </TouchableOpacity>
-                        {/* </TourGuideZone> */}
                         <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "B" ? COLORS.primary : COLORS.white2 }]}
                             onPress={() => {
                                 onOptionClick("B", initialData, questionIndex)
@@ -345,9 +301,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                                             </View>
                                         </View>
                                     </View>
-                                    {/* <TourGuideZone zone={1} text="Hello world"> */}
                                     <QuestionCard initialData={questionToShow} questionIndex={currentQuestion + 1} />
-                                    {/* </TourGuideZone> */}
                                 </View>
                                 {playVideo == true &&
                                     <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200, marginBottom: 40 }}>

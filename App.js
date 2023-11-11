@@ -8,31 +8,21 @@
 import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
-  StyleSheet,
-  Text,
   useColorScheme,
-  View,
 } from 'react-native';
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from './MainAppScreens/HomeScreen';
-import MainNavigation from './miniapps/TrACE_KPI/navigations/MainNavigation';
-import OnlineNavigation from './miniapps/TrACE_Online/navigations/OnlineNavigation';
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware, compose } from './node_modules/redux';
-import thunk from './node_modules/redux-thunk';
+import { createStore, applyMiddleware, compose } from 'redux';
+import thunk from 'redux-thunk';
 import rootReducer from './store/rootReducer';
-import OnBoardingScreen from './MainAppScreens/OnBoardingScreen';
 import { getScreenVisited } from './Utils/getOnBoardingScreenVisited';
 import { TourGuideProvider } from "rn-tourguide"
-import VideoNavigation from './miniapps/TrACE_Video_View/navigation/VideoNavigation';
-
-const Main = createStackNavigator();
+import { COLORS } from './Constants/theme';
+import MainAppNavigation from './navigation/MainAppNavigation';
 
 const middleware = [thunk];
 const composeEnhancer = window.__REDUX_DEVTOOLS_ENTENSION_COMPOSE__ || compose;
@@ -49,6 +39,7 @@ function App() {
 
   useEffect(() => {
     getScreenVisited().then((res) => {
+      console.log(res,"sad")
       if (res === null) {
         setInitialRoute("OnBoardingScreen")
       } else {
@@ -63,6 +54,12 @@ function App() {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const style = {
+    backgroundColor: COLORS.primary,
+    textColor: COLORS.primary,
+    color: COLORS.primary
+  }
+
   return (
     <Provider store={store}>
       <SafeAreaView
@@ -72,20 +69,10 @@ function App() {
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
           backgroundColor={backgroundStyle.backgroundColor}
         />
-        <TourGuideProvider {...{ borderRadius: 8, verticalOffset: 24, maskOffset: 24 }}>
+        <TourGuideProvider {...{ borderRadius: 8, verticalOffset: 24, maskOffset: 24, color: COLORS.primary,wrapperStyle: style }}>
           <NavigationContainer>
             {initialRoute &&
-              <Main.Navigator
-                screenOptions={{
-                  headerShown: false,
-                }}
-                initialRouteName={initialRoute}>
-                <Main.Screen name="OnBoardingScreen" component={OnBoardingScreen} />
-                <Main.Screen name="Home" component={HomeScreen} />
-                <Main.Screen name="KPI_Navigation" component={MainNavigation} />
-                <Main.Screen name="Online_Navigation" component={OnlineNavigation} />
-                <Main.Screen name="VideoNav_Navigation" component={VideoNavigation} />
-              </Main.Navigator>
+              <MainAppNavigation initialRoute={initialRoute} />
             }
           </NavigationContainer>
         </TourGuideProvider>
@@ -93,24 +80,5 @@ function App() {
     </Provider>
   );
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;

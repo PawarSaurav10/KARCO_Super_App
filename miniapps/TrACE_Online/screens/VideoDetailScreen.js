@@ -17,16 +17,9 @@ import VideoScreenLoader from '../../../Components/VideoScreenLoader';
 import Pdf from 'react-native-pdf';
 import CloseIcon from "../../../Images/close.png"
 import { getURL } from "../../../baseUrl"
-import { CheckConnectivity } from "../../../Utils/isInternetConnected"
-// import { useTourGuideController, TourGuideZone } from 'rn-tourguide';
+import NetInfo from "@react-native-community/netinfo";
 
 const VideoDetailScreen = ({ navigation, route }) => {
-    // const {
-    //     canStart, // a boolean indicate if you can start tour guide
-    //     start, // a function to start the tourguide
-    //     stop, // a function  to stopping it
-    //     eventEmitter, // an object for listening some events
-    // } = useTourGuideController()
     const isFocused = useIsFocused();
     const [videoType, setVideoType] = useState("")
     const [isLoading, setIsLoading] = useState(true)
@@ -45,55 +38,11 @@ const VideoDetailScreen = ({ navigation, route }) => {
         return true;
     };
 
-    // useEffect(() => {
-    //     if (canStart) {
-    //         getAppLaunched().then((res) => {
-    //             if (res && res.code === "HOME") {
-    //                 console.log("this start")
-    //                 start() // 👈 test if you can start otherwise nothing will happen
-    //             }
-    //         })
-    //     }
-    // }, [canStart])
-
-    // const handleOnStart = () => console.log('video start')
-    // const handleOnStop = () => console.log('video stop')
-    // const handleOnStepChange = () => console.log(`video stepChange`)
-
-    // useEffect(() => {
-    //     eventEmitter.on('start', handleOnStart)
-    //     eventEmitter.on('stop', () => { // When the tour for that screen ends, replace to the next screen if it exists.
-    //         let data = null
-    //         data = {
-    //             code: "VIDEODTL",
-    //             screenVisited: "IsVisited",
-    //         }
-    //         setAppLaunched(data)
-    //     })
-    //     eventEmitter.on('stepChange', handleOnStepChange)
-
-    //     return () => {
-    //         eventEmitter.off('start', handleOnStart)
-    //         eventEmitter.off('stop', handleOnStop)
-    //         eventEmitter.off('stepChange', handleOnStepChange)
-    //     }
-    // }, [canStart])
-
-    /**
-    * Returns true if the screen is in portrait mode
-    */
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
         return dim.height >= dim.width;
     };
 
-    // /**
-    //  * Returns true of the screen is in landscape mode
-    //  */
-    // const isLandscape = () => {
-    //     const dim = Dimensions.get('screen');
-    //     return dim.width >= dim.height;
-    // };
 
     useEffect(() => {
         // Event Listener for orientation changes
@@ -104,6 +53,27 @@ const VideoDetailScreen = ({ navigation, route }) => {
         });
     }, [orientation])
 
+    const CheckConnectivity = () => {
+        // For Android devices
+        if (Platform.OS === "android") {
+            NetInfo.fetch().then(xx => {
+                if (xx.isConnected) {
+                    // Alert.alert("You are online!");
+                } else {
+                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
+                        {
+                            text: 'OK', onPress: () =>
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: "Home" }],
+                                })
+                        },
+                    ]);
+                }
+            });
+        }
+    }
+
     useEffect(() => {
         if (isFocused) {
             const dim = Dimensions.get('screen');
@@ -112,7 +82,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
             } else {
                 setOrientation("landscape")
             }
-            CheckConnectivity()
+            // CheckConnectivity()
             getUserData_1().then((res) => {
                 setUserLoginData({
                     userId: res.userData.EmployeeId,
@@ -257,7 +227,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 <View style={{ borderWidth: 1, borderColor: COLORS.darkBlue, width: "100%", marginVertical: 8 }}></View>
                                 {route.params.ModuleType == "Circular"
                                     ?
-                                    // <TourGuideZone text="Click on this Button to view PDF" zone={1} maskOffset={1} >
                                     <CustomIconButton
                                         label={"View PDF"}
                                         icon={ViewIcon}
@@ -277,9 +246,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             borderRadius: 5,
                                         }}
                                         iconStyle={{ marginRight: 6 }} />
-                                    // </TourGuideZone>
                                     :
-                                    // <TourGuideZone text="Click on this Button to view full video" zone={1} maskOffset={1} >
                                     <CustomIconButton
                                         label={(videoType == "" || videoType == "PROMOKEY") ? "View Full Video" : "View Promo Video"}
                                         icon={ViewIcon}
@@ -303,10 +270,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             borderRadius: 5,
                                         }}
                                         iconStyle={{ marginRight: 6 }} />
-                                    // </TourGuideZone>
                                 }
                                 {route.params.AssessmentStatus == "Pending" &&
-                                    // <TourGuideZone text="This Button shows the list of videos todo" zone={2} maskOffset={1} >
                                     <CustomIconButton
                                         label={"Take Assessment"}
                                         icon={AssesmentIcon}
@@ -331,11 +296,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             borderRadius: 5,
                                         }}
                                         iconStyle={{ marginRight: 6 }} />
-                                    // </TourGuideZone>
                                 }
-                        
+
                                 {route.params.AssessmentStatus == "Continue" &&
-                                    // <TourGuideZone text="This Button shows the list of videos todo" zone={2} maskOffset={1} >
                                     <CustomIconButton
                                         label={"Continue Assessment"}
                                         icon={AssesmentIcon}
@@ -351,11 +314,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             borderRadius: 5,
                                         }}
                                         iconStyle={{ marginRight: 6 }} />
-                                    // </TourGuideZone>
                                 }
 
                                 {route.params.AssessmentStatus == "Feedback" &&
-                                    // <TourGuideZone text="This Button shows the list of videos todo" zone={2} maskOffset={1} >
                                     <CustomIconButton
                                         label={"Give Feedback"}
                                         icon={AssesmentIcon}
@@ -371,7 +332,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             borderRadius: 5,
                                         }}
                                         iconStyle={{ marginRight: 6 }} />
-                                    // </TourGuideZone>
                                 }
                             </View>
                             <Modal

@@ -31,8 +31,7 @@ import ListViewCard from '../../../Components/ListViewCard';
 import MenuIcon from "../../../Images/menu.png"
 import { getURL } from "../../../baseUrl"
 import HomePageLoader from '../../../Components/HomePageLoader';
-import { CheckConnectivity } from "../../../Utils/isInternetConnected"
-// import { TourGuideZone, useTourGuideController } from 'rn-tourguide';
+import NetInfo from "@react-native-community/netinfo";
 
 const HomePage = () => {
     const navigation = useNavigation();
@@ -53,14 +52,7 @@ const HomePage = () => {
         companyId: null
     })
     const [userData, setUserData] = useState()
-    const [appLaunchedTime, setAppLaunchedTime] = useState()
     const [orientation, setOrientation] = useState()
-    // const {
-    //     canStart, // a boolean indicate if you can start tour guide
-    //     start, // a function to start the tourguide
-    //     stop, // a function  to stopping it
-    //     eventEmitter, // an object for listening some events
-    // } = useTourGuideController()
 
     /**
     * Returns true if the screen is in portrait mode
@@ -78,45 +70,6 @@ const HomePage = () => {
         return dim.width >= dim.height;
     };
 
-    // const onvideoSwitch
-
-    // Can start at mount 🎉
-    // you need to wait until everything is registered 😁
-    // useEffect(() => {
-    //     if (canStart) {
-    //         getAppLaunched().then((res) => {
-    //             console.log(res, "home res")
-    //             if (res === null) {
-    //                 start() // 👈 test if you can start otherwise nothing will happen
-    //             }
-    //         })
-    //     }
-    // }, [canStart]) // 👈 don't miss it!
-
-    // const handleOnStart = () => console.log('start')
-    // const handleOnStop = () => console.log('stop')
-    // const handleOnStepChange = () => console.log(`stepChange`)
-
-    // useEffect(() => {
-    //     eventEmitter.on('start', handleOnStart)
-    //     eventEmitter.on('stop', () => { // When the tour for that screen ends, navigate to the next screen if it exists.
-    //         let data = null
-    //         data = {
-    //             code: "HOME",
-    //             screenVisited: "IsVisited",
-    //         }
-    //         // console.log(data, "data called")
-    //         setAppLaunched(data)
-    //     })
-    //     eventEmitter.on('stepChange', handleOnStepChange)
-
-    //     return () => {
-    //         eventEmitter.off('start', handleOnStart)
-    //         eventEmitter.off('stop', handleOnStop)
-    //         eventEmitter.off('stepChange', handleOnStepChange)
-    //     }
-    // }, [])
-
     useEffect(() => {
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
@@ -129,13 +82,12 @@ const HomePage = () => {
 
 
     const logOut = async () => {
-        // await AsyncStorage.removeItem("online_screen_visited")
+        await AsyncStorage.removeItem("online_screen_visited")
         await AsyncStorage.removeItem("userData")
         navigation.reset({
             index: 0,
-            routes: [{ name: "Home" }],
-        });
-        // RNExitApp.exitApp()
+            routes: [{ name: "Login" }],
+        })
     }
 
     const backAction = () => {
@@ -150,8 +102,31 @@ const HomePage = () => {
         return true;
     };
 
+    const CheckConnectivity = () => {
+        // For Android devices
+        if (Platform.OS === "android") {
+            NetInfo.fetch().then(xx => {
+                if (xx.isConnected) {
+                    // Alert.alert("You are online!");
+                } else {
+                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
+                        {
+                            text: 'OK', onPress: () => {
+                                AsyncStorage.removeItem("online_screen_visited")
+                                AsyncStorage.removeItem("userData")
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: "Home" }],
+                                })
+                            }
+                        },
+                    ]);
+                }
+            });
+        }
+    }
+
     async function fetchData() {
-        CheckConnectivity()
         if (userLoginData.userId !== null) {
             await axios.get(`${getURL.base_URL}/AppVideo/GetVideoList`, {
                 params: {
@@ -174,7 +149,6 @@ const HomePage = () => {
     }
 
     const onRefresh = async () => {
-        // console.log("third");
         setIsLoading(true);
         fetchData()
     };
@@ -187,7 +161,6 @@ const HomePage = () => {
             } else {
                 setOrientation("landscape")
             }
-            CheckConnectivity()
             getUserData_1().then((res) => {
                 setUserData(res.userData)
                 setUserLoginData({
@@ -204,6 +177,7 @@ const HomePage = () => {
 
     useEffect(() => {
         if (isFocused) {
+            CheckConnectivity()
             setIsLoading(true)
             const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
@@ -314,7 +288,6 @@ const HomePage = () => {
                             </View>
 
                             <View style={{ margin: 4, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                                {/* <TourGuideZone text="This Button shows the list of videos todo" zone={1} maskOffset={2} borderRadius={4} style={{ flex: 1 }}> */}
                                 <Pressable style={videoType == "TODOLIST" ? styles.active_circle_button : styles.circle_button}
                                     onPress={() => {
                                         setVideoType("TODOLIST")
@@ -327,8 +300,6 @@ const HomePage = () => {
                                         <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>To Do List</Text>
                                     </View>
                                 </Pressable>
-                                {/* </TourGuideZone> */}
-                                {/* <TourGuideZone text="This Button shows the list of Completed or Expired Videos and Assessment" zone={2} maskOffset={2} borderRadius={4} style={{ flex: 1 }}> */}
                                 <Pressable style={videoType == "COMPLIST" ? styles.active_circle_button : styles.circle_button}
                                     onPress={() => {
                                         setVideoType("COMPLIST")
@@ -337,7 +308,6 @@ const HomePage = () => {
                                     <Image source={CompletedIcon} style={{ height: 22, width: 22, marginRight: 4 }} />
                                     <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>Completed List</Text>
                                 </Pressable>
-                                {/* </TourGuideZone> */}
                             </View>
 
                             {videoType == "TODOLIST" &&
@@ -370,7 +340,6 @@ const HomePage = () => {
                                                 numColumns={ShowContinueAssessmentSection ? 0 : (orientation === "landscape" ? 4 : 2)}
                                                 data={videoType == "TODOLIST" || videoType == "" ? videoData && videoData.lstToDo : videoData && videoData.lstCompleted}
                                                 renderItem={({ item, index }) => (
-                                                    // <TourGuideZone isTourGuide={index === 0 ? true : false} text="Click on this cards to view video and take Assessment of that particular video." zone={3} maskOffset={2} borderRadius={4} tooltipBottomOffset={30}>
                                                     <View>
                                                         <GridViewCard
                                                             VideoCategory={item.Category}
@@ -382,8 +351,6 @@ const HomePage = () => {
                                                             orientationType={orientation}
                                                         />
                                                     </View>
-                                                    // </TourGuideZone>
-
                                                 )}
                                                 keyExtractor={item => item.Id}
                                                 style={{ margin: 4, padding: 4, flexDirection: "row" }}

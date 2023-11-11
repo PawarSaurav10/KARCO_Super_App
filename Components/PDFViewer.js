@@ -5,7 +5,6 @@ import { COLORS } from '../Constants/theme';
 import { getURL } from "../baseUrl"
 
 const PDFViewer = (props) => {
-    // console.log(props, "props")
     return (
         <View style={styles.container}>
             <Pdf
@@ -22,7 +21,6 @@ const PDFViewer = (props) => {
                     <View style={{ padding: 6 }}>
                         <Text style={{ fontSize: 16, color: COLORS.primary }}>{error}</Text>
                     </View>
-                    // console.log(error);
                 }}
             />
         </View>

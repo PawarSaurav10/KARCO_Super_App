@@ -2,7 +2,7 @@ import React from 'react'
 import { TextInput, Text, View, TouchableOpacity, StyleSheet, Pressable, Image } from 'react-native';
 import { COLORS } from '../Constants/theme';
 
-const CustomInput = ({ value, onChangeText, inputType, label, keyboardType, icon, fieldButtonFunction, fieldButtonLabel, textColor, onIconClick, secureTextEntry }) => {
+const CustomInput = ({ value, onChangeText, inputType, label, keyboardType, icon, fieldButtonFunction, fieldButtonLabel, textColor, onIconClick, secureTextEntry, inputMode }) => {
     return (
         <View
             style={{
@@ -35,7 +35,8 @@ const CustomInput = ({ value, onChangeText, inputType, label, keyboardType, icon
             ) : (
                     <TextInput
                         placeholder={label}
-                        keyboardType={keyboardType}
+                        keyboardType={"numeric"}
+                        inputMode="search"
                         style={{ flex: 1, paddingVertical: 0, fontSize: 16 }}
                         onChangeText={onChangeText}
                         value={value}

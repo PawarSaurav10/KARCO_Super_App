@@ -2,33 +2,18 @@ import React, { useState, useRef, useEffect } from "react";
 import {
     View,
     Text,
-    TouchableOpacity,
     TouchableWithoutFeedback,
     Image,
     FlatList,
-    Platform,
-    SafeAreaView,
     ActivityIndicator,
-    Dimensions,
-    StatusBar,
-    BackHandler,
-    Modal,
-    Alert,
-    Linking,
 } from "react-native";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withTiming,
 } from "react-native-reanimated";
-import { connect, useDispatch, useSelector } from "react-redux";
+import { connect } from "react-redux";
 import { setSelectedTab } from "../store/actions/tabActions"
-
-// import { fetchAppMain } from "../stores/actions/app-main";
-// import { useFocusEffect, useNavigation } from "@react-navigation/native";
-// import FastImage from "react-native-fast-image";
-// import Header from "../Components/Header";
-// import MenuIcon from "../Images/menu.png"
 import { COLORS, SIZES } from "../Constants/theme";
 import Online_Home from "../miniapps/TrACE_Online/screens/HomeScreen";
 import HomeScreen from "../miniapps/TrACE_KPI/screens/HomeScreen";
@@ -37,7 +22,7 @@ import LinearGradient from "react-native-linear-gradient";
 import HomeIcon from "../Images/home.png"
 import DonloadIcon from "../Images/file.png"
 import DownloadsScreen from "../miniapps/TrACE_Video_View/screens/DownloadsScreen";
-// import { HomePage, FeedBackScreen, VideoDetailScreen } from "./screens";
+
 
 const TabButton = ({
     label,
@@ -190,23 +175,17 @@ const MainLayout = ({
                             overflow: "hidden",
                             ...drawerAnimationStyle,
                         }}
-                    >{
-                            appName !== "KARCO Videos" &&
+                    >
+                        {appName !== "KARCO Videos" &&
                             <View style={{ flex: 1 }}>
                                 {appName === "TrACE Online" ? <Online_Home /> : appName === "TrACE KPI" ? <HomeScreen /> : <Video_HomeScreen />}
                             </View>
                         }
 
-
                         {/* Footer */}
                         {appName === "KARCO Videos" &&
                             <View style={{ flex: 1 }}>
-                                <View
-                                    style={{
-                                        flex: 1,
-                                        // marginTop: 0
-                                    }}
-                                >
+                                <View style={{flex: 1}}>
                                     <FlatList
                                         ref={flatListRef}
                                         horizontal
@@ -218,6 +197,7 @@ const MainLayout = ({
                                         data={TabsData}
                                         keyExtractor={(item) => `${item}`}
                                         renderItem={({ item, index }) => {
+                                            console.log(item,"tab")
                                             return (
                                                 <View
                                                     key={index}
@@ -228,9 +208,7 @@ const MainLayout = ({
                                                 >
                                                     {item == "Home" && <Video_HomeScreen />}
                                                     {item == "Downloads" && (
-                                                        <DownloadsScreen
-                                                            isFocused={selectedTab === "Downloads"}
-                                                        />
+                                                        <DownloadsScreen/>
                                                     )}
                                                 </View>
                                             );
@@ -294,7 +272,6 @@ const MainLayout = ({
                                                 // navigation.navigate("Downloads")
                                             }}
                                         />
-
                                     </View>
                                 </View>
                             </View>
@@ -307,7 +284,6 @@ const MainLayout = ({
 };
 
 function mapStateToProps(state) {
-    console.log(state, "state")
     return {
         selectedTab: state.tabReducer.selectedTab,
     };
