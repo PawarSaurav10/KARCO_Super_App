@@ -22,6 +22,10 @@ import LinearGradient from "react-native-linear-gradient";
 import HomeIcon from "../Images/home.png"
 import DonloadIcon from "../Images/file.png"
 import DownloadsScreen from "../miniapps/TrACE_Video_View/screens/DownloadsScreen";
+import { getDownloaded, setDownloaded } from "../Utils/getScreenVisisted";
+import CustomToast from "../Components/CustomToast";
+import DownloadedIcon from "../Images/checkmark.png"
+import { useIsFocused } from "../node_modules/@react-navigation/core";
 
 
 const TabButton = ({
@@ -93,12 +97,15 @@ const MainLayout = ({
     setSelectedTab,
     appName
 }) => {
+    const isFocused = useIsFocused()
     const flatListRef = useRef();
     const homeTabFlex = useSharedValue(1);
     const homeTabColor = useSharedValue(COLORS.white);
     const searchTabFlex = useSharedValue(1);
     const searchTabColor = useSharedValue(COLORS.white);
     const [isLoading, setIsLoading] = useState(true);
+    const [viewToast, setViewToast] = useState(false);
+    const [screenVisisted, setScreenVisisted] = useState("Home")
 
     const TabsData = ["Home", "Downloads"]
     const homeFlexStyle = useAnimatedStyle(() => {
@@ -124,6 +131,18 @@ const MainLayout = ({
             backgroundColor: searchTabColor.value,
         };
     });
+
+    useEffect(() => {
+        if (isFocused) {
+            setTimeout(() => {
+                getDownloaded().then((res) => {
+                    if (res === "Yes") {
+                        setViewToast(true)
+                    }
+                })
+            }, 5000);
+        }
+    }, [isFocused])
 
     useEffect(() => {
         if (selectedTab == "Home") {
@@ -185,7 +204,7 @@ const MainLayout = ({
                         {/* Footer */}
                         {appName === "KARCO Videos" &&
                             <View style={{ flex: 1 }}>
-                                <View style={{flex: 1}}>
+                                <View style={{ flex: 1 }}>
                                     <FlatList
                                         ref={flatListRef}
                                         horizontal
@@ -197,7 +216,6 @@ const MainLayout = ({
                                         data={TabsData}
                                         keyExtractor={(item) => `${item}`}
                                         renderItem={({ item, index }) => {
-                                            console.log(item,"tab")
                                             return (
                                                 <View
                                                     key={index}
@@ -206,10 +224,8 @@ const MainLayout = ({
                                                         width: SIZES.width,
                                                     }}
                                                 >
-                                                    {item == "Home" && <Video_HomeScreen />}
-                                                    {item == "Downloads" && (
-                                                        <DownloadsScreen/>
-                                                    )}
+                                                    {item == "Home" && <Video_HomeScreen ScreenName={screenVisisted} />}
+                                                    {item == "Downloads" && <DownloadsScreen ScreenName={screenVisisted} />}
                                                 </View>
                                             );
                                         }}
@@ -257,6 +273,7 @@ const MainLayout = ({
                                             innerContainerStyle={homeColorStyle}
                                             onPress={() => {
                                                 setSelectedTab("Home")
+                                                setScreenVisisted("Home")
                                                 // navigation.navigate("Video_Home")
                                             }}
                                         />
@@ -269,9 +286,41 @@ const MainLayout = ({
                                             innerContainerStyle={searchColorStyle}
                                             onPress={() => {
                                                 setSelectedTab("Downloads")
+                                                setScreenVisisted("Downloads")
                                                 // navigation.navigate("Downloads")
                                             }}
                                         />
+                                    </View>
+                                </View>
+                                <View>
+                                    <View
+                                        style={{
+                                            position: "absolute",
+                                            top: -15,
+                                            left: 0,
+                                            right: 0,
+                                        }}>
+                                        {viewToast === true &&
+                                            <CustomToast
+                                                icon={DownloadedIcon}
+                                                iconStyle={{
+                                                    tintColor: COLORS.white,
+                                                    marginRight: 10,
+                                                }}
+                                                containerStyle={{
+                                                    backgroundColor: COLORS.primary,
+                                                }}
+                                                labelStyle={{
+                                                    color: COLORS.white,
+                                                    fontWeight: "bold",
+                                                }}
+                                                message={"Your Video is Downloaded"}
+                                                onHide={() => {
+                                                    setDownloaded("")
+                                                    setViewToast(!viewToast)
+                                                }}
+                                                ViewPoint={-100}
+                                            />}
                                     </View>
                                 </View>
                             </View>

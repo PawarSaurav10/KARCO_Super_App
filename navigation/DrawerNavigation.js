@@ -65,8 +65,6 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
     const [userProfileData, setUserProfileData] = useState()
     const [orientation, setOrientation] = useState()
     const [companyLoginData, setCompanyLoginData] = useState({
-        userId: null,
-        password: null,
         companyId: null,
         companyName: null,
         companyLogoName: null,
@@ -75,18 +73,18 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
     })
 
     useEffect(() => {
-        getCompanyUserData().then((res) => {
-            setCompanyLoginData({
-                userId: res.userId,
-                password: res.password,
-                companyId: res.companyId,
-                companyName: res.companyName,
-                companyLogoName: res.companyLogoName,
-                companyLogoPath: res.companyLogoPath,
-                NoOfShips: res.NoOfShips
-            })
-        });
-    }, [appName === "TrACE KPI"])
+        if (appName === "TrACE KPI") {
+            getCompanyUserData().then((res) => {
+                setCompanyLoginData({
+                    companyId: res.companyId,
+                    companyName: res.companyName,
+                    companyLogoName: res.companyLogoName,
+                    companyLogoPath: res.companyLogoPath,
+                    NoOfShips: res.NoOfShips
+                })
+            });
+        }
+    }, [])
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');

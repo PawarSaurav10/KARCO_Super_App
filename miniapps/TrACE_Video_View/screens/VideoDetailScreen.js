@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Dimensions, StyleSheet, Image, ScrollView, TouchableOpacity, PermissionsAndroid, Alert, Platform, ActivityIndicator } from 'react-native'
+import { View, Text, Dimensions, Image, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator } from 'react-native'
 import { WebView } from 'react-native-webview';
 import { COLORS } from '../../../Constants/theme';
-import FavouriteIcon from "../../../Images/heart.png"
 import CalendarIcon from "../../../Images/calendar.png"
 import CustomIconButton from '../../../Components/CustomIconButton';
 import ViewIcon from "../../../Images/show.png"
@@ -20,10 +19,9 @@ import NoInternetComponent from '../../../Components/NoInternetComponent';
 import DownloadingIcon from "../../../Images/downloading.png"
 import DownloadedIcon from "../../../Images/checkmark.png"
 import { getURL } from "../../../baseUrl"
-
+import { setDownloaded } from '../../../Utils/getScreenVisisted';
 
 const VideoDetailScreen = ({ navigation, route }) => {
-    console.log(route.params.type)
     const isFocused = useIsFocused()
     const [videoDetail, setVideoDetail] = useState(null)
     const [fileContent, setFileContent] = useState(null)
@@ -97,8 +95,17 @@ const VideoDetailScreen = ({ navigation, route }) => {
     useEffect(() => {
         if (route.params.type === "Downloads") {
             // CheckConnectivity()
+            RNFetchBlob.fs.stat(route.params.data.path)
+                .then((stats) => { console.log(stats, "stats") })
+                .catch((err) => { })
+            // RNFetchBlob.fs.readFile(route.params.data.path, 'utf8')
+            //     .then((data) => {
+            //         console.log(data,"data")
+            //         // handle the data ..
+            //     })
             RNFetchBlob.fs.readStream(route.params.data.path, 'utf8')
                 .then((stream) => {
+                    // console.log(stream,"sad")
                     setFileContent(stream.path);
                     let data = ''
                     stream.open()
@@ -118,6 +125,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 await ReactNativeBlobUtil.fs
                     .lstat(docPath)
                     .then(response => {
+                        console.log(response, "response")
                         setDirectory(response);
                     })
                     .catch(error => console.error(error));
@@ -128,8 +136,10 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
     const downloadFile = async () => {
         CheckConnectivity()
+        let fileExpired = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name && (moment.utc(moment.unix(xx.lastModified / 1000).format("YYYYMMDD")).local().startOf('hours').fromNow() <= "2 days")).length === 0
         let fileDownloaded = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name).length > 0
-        if (fileDownloaded === false) {
+        if (fileExpired) {
+            console.log("true")
             setToastHide(true)
             let dirs = RNFetchBlob.fs.dirs
             RNFetchBlob
@@ -138,20 +148,44 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
                     transform: true
                 })
-                .fetch('GET', `${videoDetail.originalFileURL}`, {
-                    //some headers ..
-                })
+                .fetch('GET', `${videoDetail.originalFileURL}`)
+                // .progress((received, total) => {
+                //     console.log('progress', received / total)
+                // })
                 .then((res) => {
-                    // if (res.status) {
-                    // setToastHide(false)
+                    console.log(res, "download res")
+                    setDownloaded("Yes")
                     setToastHide(true)
                     setMessage({ message: "Your Video is Downloaded", icon: DownloadedIcon, isHide: true })
                 })
         } else {
-            Alert.alert('Warning', 'This Video is already downloaded to view downloaded video go to Downloads.', [
-                { text: 'OK', onPress: () => console.log("object") },
-            ]);
+            console.log("false")
+            if (fileDownloaded === false) {
+                setToastHide(true)
+                let dirs = RNFetchBlob.fs.dirs
+                RNFetchBlob
+                    .config({
+                        fileCache: true,
+                        path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
+                        transform: true
+                    })
+                    .fetch('GET', `${videoDetail.originalFileURL}`)
+                    // .progress((received, total) => {
+                    //     console.log('progress', received / total)
+                    // })
+                    .then((res) => {
+                        console.log(res, "download res")
+                        setDownloaded("Yes")
+                        setToastHide(true)
+                        setMessage({ message: "Your Video is Downloaded", icon: DownloadedIcon, isHide: true })
+                    })
+            } else {
+                Alert.alert('Warning', 'This Video is already downloaded to view downloaded video go to Downloads.', [
+                    { text: 'OK', onPress: () => console.log("object") },
+                ]);
+            }
         }
+
     }
 
     const htmlContent = `
@@ -202,7 +236,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>
                                     {route.params.type !== "Downloads" ? (videoDetail && videoDetail.name) : (route.params.data.filename).slice(0, -4)}
                                 </Text>
-                                <View style={[styles.icon_container, styles.shadowProp]}><Image style={styles.icon} source={FavouriteIcon} /></View>
+                                {/* <View style={[styles.icon_container, styles.shadowProp]}><Image style={styles.icon} source={FavouriteIcon} /></View> */}
                             </View>
                             {route.params.type !== "Downloads" &&
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 4 }}>
@@ -227,7 +261,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         onPress={() => {
                                             CheckConnectivity()
                                             downloadFile()
-                                            // requestStoragePermission()
                                         }}
                                         containerStyle={{
                                             backgroundColor: COLORS.blue,
@@ -264,6 +297,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     onHide={() => {
                         setToastHide(!toastHide)
                     }}
+                    ViewPoint={-20}
                 />
             }
 
@@ -274,43 +308,4 @@ const VideoDetailScreen = ({ navigation, route }) => {
     )
 }
 
-const styles = StyleSheet.create({
-    icon: {
-        height: 20,
-        width: 20,
-        padding: 4,
-    },
-    icon_container: {
-        borderRadius: 35,
-        height: 35,
-        width: 35,
-        borderColor: COLORS.lightGray1,
-        borderWidth: 1,
-
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: COLORS.white2,
-    },
-    shadowProp: {
-        shadowColor: COLORS.white2,
-        shadowOffset: { width: -4, height: 8 },
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
-    },
-    backgroundVideo: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        marginTop: 25,
-    },
-})
-
 export default VideoDetailScreen
-

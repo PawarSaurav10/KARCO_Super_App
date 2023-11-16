@@ -1,6 +1,8 @@
 import NetInfo from "@react-native-community/netinfo";
 import RNExitApp from 'react-native-exit-app';
 import { Platform, Alert, View } from "react-native";
+import CustomToast from "../Components/CustomToast";
+import DownloadedIcon from "../Images/checkmark.png"
 
 export class NetworkUtils {
     static async isNetworkAvailable() {
@@ -42,5 +44,32 @@ handleFirstConnectivityChange = (isConnected) => {
         ]);
     } else {
         // Alert.alert("You are online!");
+    }
+};
+
+
+export async function CheckDownload(isDownload) {
+    // For Android devices
+    if (isDownload) {
+        <CustomToast
+            icon={DownloadedIcon}
+            iconStyle={{
+                tintColor: COLORS.white,
+                marginRight: 10,
+            }}
+            containerStyle={{
+                backgroundColor: COLORS.primary,
+            }}
+            labelStyle={{
+                color: COLORS.white,
+                fontWeight: "bold",
+            }}
+            message={"Your Video is Downloaded"}
+            onHide={() => {
+                !isDownload
+            }}
+        />
+    } else {
+        // setisDownload(false)
     }
 };

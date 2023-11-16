@@ -72,7 +72,7 @@ const LoginScreen = ({ navigation, route }) => {
                                 let companyLogoName = response.data.LogoName
                                 let companyLogoPath = response.data.LogoPath
                                 let NoOfShips = response.data.NoOfShips
-                                saveCompanyDataToStorage(loginData.userId.trimStart("").trimEnd(""), loginData.password.trimStart("").trimEnd(""), companyId, companyName, companyLogoName, companyLogoPath, NoOfShips)
+                                saveCompanyDataToStorage(companyId, companyName, companyLogoName, companyLogoPath, NoOfShips)
                                 setScreenVisited("Yes")
                                 navigation.reset({
                                     index: 0,

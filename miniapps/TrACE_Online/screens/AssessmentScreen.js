@@ -158,7 +158,10 @@ const AssessmentScreen = ({ navigation, route }) => {
         setIsLoading(false)
         Alert.alert("Warning", "This is not a correct option, please see the video & try again", [{
             text: 'Proceed',
-            onPress: () => onProceedClick(),
+            onPress: () => {
+                setPlayVideo(true)
+                setSelectedOptions("")
+            },
         }])
     }
 
@@ -179,11 +182,6 @@ const AssessmentScreen = ({ navigation, route }) => {
                 VesselId: userLoginData.vesselId
             }
         })
-    }
-
-    const onProceedClick = () => {
-        setPlayVideo(true)
-        setSelectedOptions("")
     }
 
     useEffect(() => {
@@ -223,14 +221,14 @@ const AssessmentScreen = ({ navigation, route }) => {
                             }}>
                             <Text style={[styles.options_text, { color: selectedOptions == "B" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionB}</Text>
                         </TouchableOpacity>
-                        {((initialData ?.OptionC !== "NA") && (initialData ?.OptionC !== "N A") && (initialData ?.OptionC !== "")) && (
+                        {((initialData ?.OptionC !== "NA") && (initialData ?.OptionC !== "N A") && (initialData ?.OptionC !== "") && (initialData ?.OptionC !== "NA.")) && (
                             <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "C" ? COLORS.primary : COLORS.white2 }]}
                                 onPress={() => {
                                     onOptionClick("C", initialData, questionIndex)
                                 }}>
                                 <Text style={[styles.options_text, { color: selectedOptions == "C" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionC}</Text>
                             </TouchableOpacity>)}
-                        {((initialData ?.OptionD !== "NA") && (initialData ?.OptionD !== "N A") && (initialData ?.OptionD !== "")) && (
+                        {((initialData ?.OptionD !== "NA") && (initialData ?.OptionD !== "N A") && (initialData ?.OptionD !== "") && (initialData ?.OptionD !== "NA.")) && (
                             <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "D" ? COLORS.primary : COLORS.white2 }]}
                                 onPress={() => {
                                     onOptionClick("D", initialData, questionIndex)
@@ -303,7 +301,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                                     </View>
                                     <QuestionCard initialData={questionToShow} questionIndex={currentQuestion + 1} />
                                 </View>
-                                {playVideo == true &&
+                                {playVideo === true &&
                                     <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200, marginBottom: 40 }}>
                                         {route.params.ModuleType == "Circular" ?
                                             <PDFViewer pdf={assessmentData.videoDetail.VideoPath} pageNo={questionToShow ?.ClipTimingFrom} />
@@ -312,10 +310,11 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                 source={{
                                                     html: `
                                                     <div width="100%" height="auto" *ngIf="MainVideoPreview">
-                                                        <iframe src="${getURL.play_video_URL}/${assessmentData ?.videoDetail ?.Videokey}?start=${questionToShow ?.ClipTimingFrom}&end=${questionToShow ?.ClipTimingTo}" allow="autoplay; encrypted-media" width="100%" height="100%" allowtransparency="true" data-tap-disabled="true" />
+                                                        <iframe src="${getURL.play_video_URL}/${assessmentData ?.videoDetail ?.Videokey}?start=${questionToShow ?.ClipTimingFrom}&end=${questionToShow ?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
                                                     </div>
                                             `}}
                                                 allowsFullscreenVideo={true}
+                                                mediaPlaybackRequiresUserAction={false}
                                             />
                                         }
                                     </View>

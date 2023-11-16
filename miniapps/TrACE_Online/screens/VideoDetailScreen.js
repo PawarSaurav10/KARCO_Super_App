@@ -171,7 +171,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             <View style={{ margin: 20 }}>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.VideoName}</Text>
-                                    <View style={[styles.icon_container, styles.shadowProp]}><Image style={styles.icon} source={FavouriteIcon} /></View>
+                                    {/* <View style={[styles.icon_container, styles.shadowProp]}><Image style={styles.icon} source={FavouriteIcon} /></View> */}
                                 </View>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 4 }}>
                                     <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 10 }}>

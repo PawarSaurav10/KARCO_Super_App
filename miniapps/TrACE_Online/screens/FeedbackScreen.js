@@ -9,9 +9,8 @@ import Rater1 from "../../../Images/raters.png"
 import Rater3 from "../../../Images/raters2.png"
 import Rater2 from "../../../Images/raters3.png"
 import axios from 'axios';
-import { getUserData, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
+import { getUserData_1 } from "../../../Utils/getScreenVisisted"
 import { useIsFocused } from '@react-navigation/native';
-// import { CheckConnectivity } from "../../../Utils/isInternetConnected"
 import Header from '../../../Components/Header';
 import CloseIcon from "../../../Images/close.png"
 import BackIcon from "../../../Images/left-arrow.png"
@@ -258,9 +257,9 @@ const FeedbackScreen = ({ navigation, route }) => {
     const Percentage = (100 * resultData ?.Scores ?.ObtainedMarks) / resultData ?.Scores ?.TotalMarks;
 
     function validateString(string) {
-        let strRegex = new RegExp(/^[a-zA-Z0-9\(\)\-\]\[\?\.\,\!\s*]+$/);
+        let strRegex = new RegExp(/^[a-zA-Z0-9\(\)\-\]\[\?\.\,\!\s*]*$/);
         let result = strRegex.test(string);
-        if (result) {
+        if (result === true) {
             setViewWarnings(false)
         } else {
             setViewWarnings(true)
@@ -268,7 +267,7 @@ const FeedbackScreen = ({ navigation, route }) => {
     }
 
     function validateString1(string) {
-        let strRegex = new RegExp(/^[a-zA-Z0-9\(\)\-\]\[\?\.\,\!\s*]+$/);
+        let strRegex = new RegExp(/^[a-zA-Z0-9\(\)\-\]\[\?\.\,\!\s*]*$/);
         let result = strRegex.test(string);
         if (result) {
             setViewWarningsImp(false)
@@ -278,9 +277,6 @@ const FeedbackScreen = ({ navigation, route }) => {
     }
 
     const onSubmitClick = () => {
-        console.log(feedbackFormData.Relevant_Part_Dtl, feedbackFormData.Improvement_Dtl)
-        validateString(feedbackFormData.Relevant_Part_Dtl);
-        validateString1(feedbackFormData.Improvement_Dtl);
         let data = {
             CBT_Assesment: null,
             Video_qty: null,
@@ -368,6 +364,7 @@ const FeedbackScreen = ({ navigation, route }) => {
             ToBeImproved: tempData.ToBeImproved
         })
         if (
+            (viewWarningsImp === false && viewWarnings === false) &&
             (tempData.CBTOverAll != "") &&
             tempData.CBTAssessment != null &&
             tempData.VideoQuality != null &&
@@ -395,9 +392,16 @@ const FeedbackScreen = ({ navigation, route }) => {
                 console.error(`Error received ${JSON.stringify(err)}`);
             }
         } else {
-            Alert.alert("Warning", "Fields with * mark are Mandatory", [{
-                text: 'OK',
-            }])
+            if (viewWarningsImp === true && viewWarnings === true) {
+                Alert.alert("Warning", "Fields with * mark are Mandatory", [{
+                    text: 'OK',
+                }])
+            } else {
+                Alert.alert("Warning", "Text Field must not Contains Special Charcters", [{
+                    text: 'OK',
+                }])
+            }
+
         }
     }
 
@@ -648,8 +652,9 @@ const FeedbackScreen = ({ navigation, route }) => {
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>
                             <Text style={{ color: "white" }}>1. What was the most relevant part of the course ? </Text>
                             <CustomInput value={feedbackFormData.Relevant_Part_Dtl} textColor={COLORS.white} onChangeText={(value) => {
-                                setViewWarnings(false)
+                                validateString(value);
                                 setFeedbackFormData({ ...feedbackFormData, Relevant_Part_Dtl: value === null ? "" : value })
+                                // setViewWarnings(false)
                             }} />
                             {
                                 feedbackFormData.Relevant_Part_Dtl !== "" && viewWarnings === true &&
@@ -659,8 +664,9 @@ const FeedbackScreen = ({ navigation, route }) => {
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6, }}>
                             <Text style={{ color: "white" }}>2. Which part might be improved and why ? </Text>
                             <CustomInput inputMode={"text"} value={feedbackFormData.Improvement_Dtl} textColor={COLORS.white} onChangeText={(value) => {
-                                setViewWarningsImp(false)
+                                validateString1(value);
                                 setFeedbackFormData({ ...feedbackFormData, Improvement_Dtl: value === null ? "" : value })
+                                setViewWarningsImp(false)
                             }} />
                             {
                                 feedbackFormData.Improvement_Dtl !== "" && viewWarningsImp === true &&
@@ -674,7 +680,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                     <View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>
                             <Text style={{ color: "white" }}>
-                                Please provide an overall rating based on your experience of using and learning this module on this platform.
+                                Please provide an overall rating based on your experience of using and learning this module on this platform. <Text style={{ color: "red" }}>*</Text>
                             </Text>
                         </View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>

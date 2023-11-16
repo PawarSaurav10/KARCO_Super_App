@@ -112,7 +112,6 @@ const OnBoardingScreen = ({ navigation }) => {
 
     const Dots = () => {
         const dotPosition = Animated.divide(scrollX, SIZES.width);
-
         return (
             <View
                 style={{
@@ -195,7 +194,6 @@ const OnBoardingScreen = ({ navigation }) => {
                             labelStyle={{
                                 color: COLORS.primary,
                             }}
-                            // onPress={() => start()}
                             onPress={() => {
                                 let data = [];
                                 data.push({

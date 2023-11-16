@@ -32,6 +32,7 @@ import MenuIcon from "../../../Images/menu.png"
 import { getURL } from "../../../baseUrl"
 import HomePageLoader from '../../../Components/HomePageLoader';
 import NetInfo from "@react-native-community/netinfo";
+import _ from "lodash"
 
 const HomePage = () => {
     const navigation = useNavigation();
@@ -192,6 +193,10 @@ const HomePage = () => {
         }
     }, [userLoginData, isFocused])
 
+    const CompletedList = _.sortBy(videoData && videoData.lstCompleted, ["lstCompleted"])
+
+    console.log(CompletedList,'CompletedList')
+
     useEffect(() => {
         if (searchedTodoVideo) {
             setSearchedTodoVideoData(
@@ -210,7 +215,7 @@ const HomePage = () => {
     useEffect(() => {
         if (searchedCompVideo) {
             setSearchedCompVideoData(
-                videoData.lstCompleted.filter((element) =>
+                CompletedList.filter((element) =>
                     element.VideoName.toLowerCase().includes(searchedCompVideo.toLowerCase())
                 )
             );
@@ -223,6 +228,8 @@ const HomePage = () => {
     }, [searchedCompVideo]);
 
     const ShowContinueAssessmentSection = videoData && videoData.lstToDo && videoData.lstToDo.filter((xx) => xx.AssessmentStatus == "Continue" || xx.AssessmentStatus == "Feedback").length > 0
+    
+
 
     return (
         <View style={{ flex: 1 }}>
@@ -267,9 +274,9 @@ const HomePage = () => {
                                         </Text>
                                     </View>
                                 </View>
-                                <View style={[styles.icon_container, styles.shadowProp]}>
+                                {/* <View style={[styles.icon_container, styles.shadowProp]}>
                                     <Image style={styles.icon} source={NotificationIcon} />
-                                </View>
+                                </View> */}
                             </View>
 
                             {/* Search Input */}
@@ -340,7 +347,7 @@ const HomePage = () => {
                                                 numColumns={ShowContinueAssessmentSection ? 0 : (orientation === "landscape" ? 4 : 2)}
                                                 data={videoType == "TODOLIST" || videoType == "" ? videoData && videoData.lstToDo : videoData && videoData.lstCompleted}
                                                 renderItem={({ item, index }) => (
-                                                    <View>
+                                                    <View key={index}>
                                                         <GridViewCard
                                                             VideoCategory={item.Category}
                                                             CourseNo={item.CourseNo}
@@ -368,14 +375,16 @@ const HomePage = () => {
                                                 numColumns={ShowContinueAssessmentSection ? 0 : (orientation === "landscape" ? 4 : 2)}
                                                 data={searchedTodoVideoData}
                                                 renderItem={({ item, index }) => (
-                                                    <GridViewCard
-                                                        VideoCategory={item.Category}
-                                                        CourseNo={item.CourseNo}
-                                                        VideoName={item.VideoName}
-                                                        onPress={() => navigation.navigate("Video Detail", item)}
-                                                        Status={item.AssessmentStatus}
-                                                        orientationType={orientation}
-                                                    />
+                                                    <View key={index}>
+                                                        <GridViewCard
+                                                            VideoCategory={item.Category}
+                                                            CourseNo={item.CourseNo}
+                                                            VideoName={item.VideoName}
+                                                            onPress={() => navigation.navigate("Video Detail", item)}
+                                                            Status={item.AssessmentStatus}
+                                                            orientationType={orientation}
+                                                        />
+                                                    </View>
                                                 )}
                                                 keyExtractor={item => item.Id}
                                                 style={{ margin: 4, padding: 4, flexDirection: "row" }}
@@ -405,17 +414,19 @@ const HomePage = () => {
                                                 scrollEnabled={false}
                                                 columnWrapperStyle={{ justifyContent: 'space-between' }}
                                                 numColumns={orientation === "landscape" ? 4 : 2}
-                                                data={videoType == "COMPLIST" ? videoData && videoData.lstCompleted : videoData && videoData.lstToDo}
+                                                data={CompletedList}
                                                 renderItem={({ item, index }) => (
-                                                    <GridViewCard
-                                                        isVideoCompleted={true}
-                                                        Status={item.AssessmentStatus}
-                                                        VideoCategory={item.Category}
-                                                        CourseNo={item.CourseNo}
-                                                        VideoName={item.VideoName}
-                                                        onPress={() => navigation.navigate("Video Detail", item)}
-                                                        orientationType={orientation}
-                                                    />
+                                                    <View key={index}>
+                                                        <GridViewCard
+                                                            isVideoCompleted={true}
+                                                            Status={item.AssessmentStatus}
+                                                            VideoCategory={item.Category}
+                                                            CourseNo={item.CourseNo}
+                                                            VideoName={item.VideoName}
+                                                            onPress={() => navigation.navigate("Video Detail", item)}
+                                                            orientationType={orientation}
+                                                        />
+                                                    </View>
                                                 )}
                                                 keyExtractor={item => item.Id}
                                                 style={{ margin: 4, padding: 4, flexDirection: "row" }}
@@ -431,15 +442,17 @@ const HomePage = () => {
                                                 numColumns={orientation === "landscape" ? 4 : 2}
                                                 data={searchedCompVideoData}
                                                 renderItem={({ item, index }) => (
-                                                    <GridViewCard
-                                                        isVideoCompleted={true}
-                                                        Status={item.AssessmentStatus}
-                                                        VideoCategory={item.Category}
-                                                        CourseNo={item.CourseNo}
-                                                        VideoName={item.VideoName}
-                                                        onPress={() => navigation.navigate("Video Detail", item)}
-                                                        orientationType={orientation}
-                                                    />
+                                                    <View key={index}>
+                                                        <GridViewCard
+                                                            isVideoCompleted={true}
+                                                            Status={item.AssessmentStatus}
+                                                            VideoCategory={item.Category}
+                                                            CourseNo={item.CourseNo}
+                                                            VideoName={item.VideoName}
+                                                            onPress={() => navigation.navigate("Video Detail", item)}
+                                                            orientationType={orientation}
+                                                        />
+                                                    </View>
                                                 )}
                                                 keyExtractor={item => item.Id}
                                                 style={{ margin: 4, padding: 4, flexDirection: "row" }}

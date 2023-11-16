@@ -39,7 +39,6 @@ function App() {
 
   useEffect(() => {
     getScreenVisited().then((res) => {
-      console.log(res,"sad")
       if (res === null) {
         setInitialRoute("OnBoardingScreen")
       } else {

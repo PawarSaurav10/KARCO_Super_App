@@ -17,22 +17,16 @@ const OnlineNavigation = ({ route }) => {
     const [initialRoute, setInitialRoute] = useState()
     useEffect(() => {
         getOnlineScreenVisited().then((res) => {
-            console.log(res,"res")
-            // if (res.length > 0 && res.filter((xx) => xx.code === "ONBOARD")) {
             if (res === null) {
                 setInitialRoute("Login")
             } else {
                 setInitialRoute("Online_Home")
             }
-            // } else {
-            //     setInitialRoute("OnBoarding");
-            // }
         });
     }, [])
     return (
         <>
             {initialRoute && (
-                // <NavigationContaine>
                 <Online.Navigator
                     screenOptions={{
                         headerShown: false,
@@ -45,12 +39,10 @@ const OnlineNavigation = ({ route }) => {
                         initialParams={{ appName: "TrACE Online" }}
                     />
                     <Online.Screen name={"Login"} component={LoginScreen} initialParams={{ appName: route.params }} />
-                    {/* <Online.Screen name={"Online_Home"} component={HomeScreen} /> */}
                     <Online.Screen name={"Video Detail"} component={VideoDetailScreen} />
                     <Online.Screen name={"AssessmentNew"} component={AssessmentScreen} />
                     <Online.Screen name={"Feedback Form"} component={FeedbackScreen} />
                     <Online.Screen name={"View All"} component={ViewAllScreen} />
-                    {/* <Online.Screen name={"OnBoarding"} component={OnBoardingScreen} /> */}
                 </Online.Navigator>
             )}
         </>

@@ -6,10 +6,7 @@ import OnBoardingImage3 from "../Images/support.png"
 import { COLORS, SIZES } from '../Constants/theme';
 import CustomButton from '../Components/CustomButton';
 import BackIcon from "../Images/arrow.png"
-import { setAppLaunced, setOnlineScreenVisited } from "../Utils/getScreenVisisted"
 import _ from "lodash"
-import { setScreenVisited } from '../Utils/getOnBoardingScreenVisited';
-
 
 const OnBoardingScreen = ({ navigation }) => {
     const scrollX = useRef(new Animated.Value(0)).current;

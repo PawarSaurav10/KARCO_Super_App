@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, ScrollView, BackHandler, RefreshControl } from 'react-native'
-import CalendarIcon from "../../../Images/calendar.png"
-import { COLORS, SIZES } from '../../../Constants/theme';
+import { View, Text, Image, FlatList, ActivityIndicator, BackHandler, } from 'react-native'
+import { COLORS } from '../../../Constants/theme';
 import axios from 'axios';
-import moment from "moment"
 import CustomSearch from '../../../Components/CustomSearch';
-import MenuIcon from "../../../Images/menu.png"
 import AvatarImg from "../../../Images/profile.png"
-import NotificationIcon from "../../../Images/notification.png"
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import NoInternetComponent from '../../../Components/NoInternetComponent';
 import NetInfo from "@react-native-community/netinfo";
 import { getURL } from "../../../baseUrl"
+import VideoListView from '../../../Components/VideoListView';
 
-const HomeScreen = () => {
+const HomeScreen = (props) => {
     const navigation = useNavigation();
     const isFocused = useIsFocused()
     const [videoList, setVideoList] = useState()
@@ -23,7 +20,6 @@ const HomeScreen = () => {
     const [searchedVideo, setSearchedVideo] = useState("")
 
     const backAction = () => {
-        // setSelectedTab("Home")
         navigation.reset({
             index: 0,
             routes: [{ name: "Home" }],
@@ -67,7 +63,7 @@ const HomeScreen = () => {
     };
 
     const onRefresh = async () => {
-        setIsLoading(true);
+        setIsLoading(true)
         CheckConnectivity()
         axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
             .then((res) => {
@@ -76,12 +72,9 @@ const HomeScreen = () => {
             })
     };
 
-
-
-
-
     useEffect(() => {
         if (isFocused) {
+            setIsLoading(true)
             CheckConnectivity()
             axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
                 .then((res) => {
@@ -94,7 +87,7 @@ const HomeScreen = () => {
             );
             return () => backHandler.remove();
         }
-    }, [isFocused])
+    }, [isFocused, props.ScreenName === "Home"])
 
     useEffect(() => {
         if (searchedVideo) {
@@ -121,209 +114,78 @@ const HomeScreen = () => {
                 />
             }
             {!isLoading &&
-                <ScrollView
-                    contentInsetAdjustmentBehavior="automatic"
-                    refreshControl={
-                        <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
-                    }>
-                    <View>
-
-
-                        <View style={{ margin: 10, padding: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                            <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
-                                <TouchableOpacity
-                                    style={{ marginRight: 8, justifyContent: "flex-start" }}
-                                    onPress={() => console.log("object")}
-                                >
-                                    <Image source={MenuIcon} style={{ width: 24, height: 24 }} />
-                                </TouchableOpacity>
-                                <Image
+                <View>
+                    <View style={{ margin: 10, padding: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
+                            <Image
+                                style={{
+                                    height: 40,
+                                    width: 40,
+                                    marginRight: 6
+                                }}
+                                source={AvatarImg}
+                            />
+                            <View style={{ marginLeft: 10, }}>
+                                <Text
                                     style={{
-                                        height: 40,
-                                        width: 40,
-                                        marginRight: 6
+                                        fontSize: 18,
+                                        fontWeight: "bold",
+                                        color: COLORS.primary
                                     }}
-                                    source={AvatarImg}
-                                />
-                                <View style={{ marginLeft: 10, }}>
-                                    <Text
-                                        style={{
-                                            fontSize: 18,
-                                            fontWeight: "bold",
-                                            color: COLORS.primary
-                                        }}
-                                        numberOfLines={1}
-                                    >
-                                        KARCO
+                                    numberOfLines={1}
+                                >
+                                    KARCO
                                 </Text>
-                                </View>
-                            </View>
-                            <View style={[styles.icon_container, styles.shadowProp]}>
-                                <Image style={styles.icon} source={NotificationIcon} />
                             </View>
                         </View>
+                    </View>
 
-                        {/* Search Input */}
-                        {!isView &&
-                            < View >
-                                <View style={{ margin: 8, padding: 8, }}>
-                                    <CustomSearch
-                                        label={"Search Videos"}
-                                        style={{ fontSize: 20 }}
-                                        value={searchedVideo}
-                                        onChangeText={(value) => {
-                                            setSearchedVideo(value)
+                    {/* Search Input */}
+                    {!isView &&
+                        < View >
+                            <View style={{ margin: 8, padding: 8, }}>
+                                <CustomSearch
+                                    label={"Search Videos"}
+                                    style={{ fontSize: 20 }}
+                                    value={searchedVideo}
+                                    onChangeText={(value) => {
+                                        setSearchedVideo(value)
+                                    }}
+                                />
+                            </View >
+                        </View>
+                    }
+
+                    {!isView &&
+                        <View style={{ marginHorizontal: 6 }}>
+                            <FlatList
+                                refreshing={isLoading}
+                                onRefresh={onRefresh}
+                                data={searchedVideo !== "" ? searchedVideoData : videoList}
+                                keyExtractor={item => item.id}
+                                showsHorizontalScrollIndicator={false}
+                                renderItem={({ item, index }) => (
+                                    <VideoListView
+                                        thumbnail={item.thumbnail}
+                                        videoName={item.name}
+                                        createdDate={item.created}
+                                        key={index}
+                                        OnPress={() => {
+                                            CheckConnectivity()
+                                            navigation.navigate("Video Detail", item.id)
                                         }}
                                     />
-                                </View >
-                            </View>
-                        }
-
-                        {!isView &&
-                            <ScrollView
-                                contentInsetAdjustmentBehavior="automatic"
-                                nestedScrollEnabled={true}
-                            // refreshControl={
-                            //     <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
-                            // }
-                            >
-                                <View style={{ marginHorizontal: 6 }}>
-                                    <FlatList
-                                        data={searchedVideo !== "" ? searchedVideoData : videoList}
-                                        keyExtractor={item => item.id}
-                                        showsHorizontalScrollIndicator={false}
-                                        renderItem={({ item, index }) => (
-                                            <TouchableOpacity
-                                                key={index}
-                                                onPress={() => {
-                                                    navigation.navigate("Video Detail", item.id)
-                                                    CheckConnectivity()
-                                                }}
-                                            >
-                                                <View style={{ flexDirection: "row", padding: 10, alignItems: "center" }}>
-                                                    <View style={{ flex: 0.28 }}>
-                                                        <Image source={{ uri: item.thumbnail }} style={{ height: 80, width: 80, borderRadius: 10, objectFit: "cover" }} />
-                                                    </View>
-                                                    <View style={{ flex: 0.72 }}>
-                                                        <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{item.name}</Text>
-                                                        <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 6 }}>
-                                                            <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
-                                                                <Image style={{
-                                                                    height: 16,
-                                                                    width: 16,
-                                                                }} source={CalendarIcon} />
-                                                            </View>
-                                                            <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(item.created).format("DD MMM YYYY")}</Text>
-                                                        </View>
-                                                    </View>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        height: 2,
-                                                        marginVertical: SIZES.height > 800 ? SIZES.radius : 0,
-                                                        marginHorizontal: SIZES.radius,
-                                                        backgroundColor: COLORS.lightGray1,
-                                                    }}
-                                                />
-                                            </TouchableOpacity>
-                                        )}
-                                    />
-                                </View>
-                            </ScrollView>
-                        }
-                        {isView === true && (
-                            <NoInternetComponent />
-                        )}
-                    </View>
-                </ScrollView>
+                                )}
+                            />
+                        </View>
+                    }
+                    {isView === true && (
+                        <NoInternetComponent />
+                    )}
+                </View>
             }
-
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    video_card_container: {
-        margin: 6,
-        padding: 10,
-        borderRadius: 12,
-        backgroundColor: COLORS.white2,
-        width: Dimensions.get('window').width / 2.2,
-        display: 'flex',
-        flexDirection: "column"
-    },
-    circle_button: {
-        flex: 1,
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        borderColor: COLORS.lightGray1,
-        borderWidth: 1,
-        backgroundColor: COLORS.white2,
-        margin: 4,
-        paddingVertical: 6,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-    },
-    active_circle_button: {
-        flex: 1,
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        borderColor: COLORS.lightBlue,
-        borderWidth: 1,
-        backgroundColor: COLORS.lightBlue2,
-        margin: 4,
-        paddingVertical: 6,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-    },
-    section_header_container: {
-        marginHorizontal: 10,
-        paddingHorizontal: 8,
-
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
-    },
-    rowContainer: {
-        flex: 1,
-        marginVertical: 20,
-        paddingHorizontal: 10,
-    },
-    rowTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    item: {
-        padding: 10,
-        backgroundColor: '#f2f2f2',
-        marginRight: 10,
-        borderRadius: 5,
-    },
-    icon: {
-        height: 20,
-        width: 20,
-        padding: 4,
-    },
-    icon_container: {
-        borderRadius: 35,
-        height: 35,
-        width: 35,
-        borderColor: COLORS.lightGray1,
-        borderWidth: 1,
-
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: COLORS.white2,
-    },
-    shadowProp: {
-        shadowColor: COLORS.white2,
-        shadowOffset: { width: -4, height: 8 },
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
-    },
-})
 
 export default HomeScreen

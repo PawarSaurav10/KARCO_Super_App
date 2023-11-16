@@ -22,21 +22,10 @@ const ViewAllScreen = ({ navigation, route }) => {
     const windowWidth = Dimensions.get('window').width;
     const [orientation, setOrientation] = useState()
 
-    /**
-    * Returns true if the screen is in portrait mode
-    */
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
         return dim.height >= dim.width;
     };
-
-    /**
-     * Returns true of the screen is in landscape mode
-     */
-    // const isLandscape = () => {
-    //     const dim = Dimensions.get('screen');
-    //     return dim.width >= dim.height;
-    // };
 
     useEffect(() => {
         // Event Listener for orientation changes

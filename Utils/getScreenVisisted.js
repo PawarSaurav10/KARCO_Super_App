@@ -30,12 +30,10 @@ export async function setScreenVisited(screenData) {
     );
 }
 
-export async function saveCompanyDataToStorage(userId, password, companyId, companyName, companyLogoName, companyLogoPath, NoOfShips) {
+export async function saveCompanyDataToStorage(companyId, companyName, companyLogoName, companyLogoPath, NoOfShips) {
     AsyncStorage.setItem(
         "userCompanyData_",
         JSON.stringify({
-            userId: userId,
-            password: password,
             companyId: companyId,
             companyName: companyName,
             companyLogoName: companyLogoName,
@@ -115,6 +113,28 @@ export function getUserData() {
     return new Promise(async (resolve, reject) => {
         await AsyncStorage.getItem("userData_")
             .then((value) => JSON.parse(value))
+            .then((response) => {
+                if (response) {
+                    resolve(response);
+                } else {
+                    resolve(null);
+                }
+            })
+            .catch((err) => reject(err));
+    });
+}
+
+export async function setDownloaded(screenData) {
+    await AsyncStorage.setItem(
+        "downloaded",
+        screenData
+    );
+}
+
+export function getDownloaded() {
+    return new Promise(async (resolve, reject) => {
+        await AsyncStorage.getItem("downloaded")
+            .then((value) => (value))
             .then((response) => {
                 if (response) {
                     resolve(response);

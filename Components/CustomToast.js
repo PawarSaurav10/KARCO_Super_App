@@ -8,7 +8,6 @@ import { Animated, Button, Image, Text, View } from "react-native";
 // };
 
 const CustomToast = (props) => {
-    console.log(props.onHide)
     const opacity = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -37,7 +36,7 @@ const CustomToast = (props) => {
                     {
                         translateY: opacity.interpolate({
                             inputRange: [0, 1],
-                            outputRange: [0, -20],
+                            outputRange: [0, props.ViewPoint],
                         }),
                     },
                 ],

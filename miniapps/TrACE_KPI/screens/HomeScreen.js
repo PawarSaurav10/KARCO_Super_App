@@ -29,8 +29,6 @@ const HomeScreen = () => {
     const navigation = useNavigation();
     const isFocused = useIsFocused();
     const [userLoginData, setUserLoginData] = useState({
-        userId: null,
-        password: null,
         companyId: null,
     })
     const [buttonType, setButtonType] = useState("Overall")
@@ -118,8 +116,6 @@ const HomeScreen = () => {
         CheckConnectivity()
         getCompanyUserData().then((res) => {
             setUserLoginData({
-                userId: res.userId,
-                password: res.password,
                 companyId: res.companyId,
             })
         });
@@ -132,95 +128,92 @@ const HomeScreen = () => {
                 'hardwareBackPress',
                 backAction,
             )
-
-            axios.get(`${getURL.KPI_base_URL}/GetOverallPercByCompanyId?companyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
-                .then((res) => {
-                    setTotalPercentage(res.data)
-                })
-
-            axios.get(`${getURL.KPI_base_URL}/GetIndividualPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
-                .then((res) => {
-                    setOverAllData({
-                        KVAvg: res.data.KVAvg,
-                        CCAvg: res.data.CCAvg,
-                        ReflAvg: res.data.ReflAvg,
-                        ResAvg: res.data.ResAvg,
-                        RespAvg: res.data.RespAvg,
-                        KVColor: res.data.KVColor,
-                        CCColor: res.data.CCColor,
-                        RefColor: res.data.RefColor,
-                        RespColor: res.data.RespColor,
-                        ResColor: res.data.ResColor,
+            if (userLoginData.companyId) {
+                axios.get(`${getURL.KPI_base_URL}/GetOverallPercByCompanyId?companyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
+                    .then((res) => {
+                        setTotalPercentage(res.data)
                     })
-                    // setIsLoading(false)
-                })
 
-            axios.get(`${getURL.KPI_base_URL}/GetTopBottomPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? 1 : 2}`)
-                .then((res) => {
-                    let topPerformanceData = res.data.TopPerformer
-                    let botttomPerformanceData = res.data.BottomPerformer
-                    let arryTopPerformance = topPerformanceData.split(",")
-                    let arryBottmPerformance = botttomPerformanceData.split(",")
-                    console.log(res.data.TopPerformer, arryTopPerformance, "arryTopPerformance")
-                    console.log(res.data.BottomPerformer, arryBottmPerformance, "arryBottmPerformance")
+                axios.get(`${getURL.KPI_base_URL}/GetIndividualPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
+                    .then((res) => {
+                        setOverAllData({
+                            KVAvg: res.data.KVAvg,
+                            CCAvg: res.data.CCAvg,
+                            ReflAvg: res.data.ReflAvg,
+                            ResAvg: res.data.ResAvg,
+                            RespAvg: res.data.RespAvg,
+                            KVColor: res.data.KVColor,
+                            CCColor: res.data.CCColor,
+                            RefColor: res.data.RefColor,
+                            RespColor: res.data.RespColor,
+                            ResColor: res.data.ResColor,
+                        })
+                        // setIsLoading(false)
+                    })
 
-                    setTopPerformance(arryTopPerformance)
-                    setBottomPerformance(arryBottmPerformance)
-                })
+                axios.get(`${getURL.KPI_base_URL}/GetTopBottomPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? 1 : 2}`)
+                    .then((res) => {
+                        let topPerformanceData = res.data.TopPerformer
+                        let botttomPerformanceData = res.data.BottomPerformer
+                        let arryTopPerformance = topPerformanceData.split(",")
+                        let arryBottmPerformance = botttomPerformanceData.split(",")
+                        setTopPerformance(arryTopPerformance)
+                        setBottomPerformance(arryBottmPerformance)
+                    })
 
-            axios.get(`${getURL.KPI_base_URL}/GetSummaryDataByCompanyId?companyId=${userLoginData.companyId}`)
-                .then((res) => {
-                    let temp30Data = []
-                    res.data.ChartFor30.map((aa) => {
-                        return temp30Data.push({
-                            ...aa,
-                            date: moment(aa.date).format("D MMM YY"),
-                            value: aa.value
+                axios.get(`${getURL.KPI_base_URL}/GetSummaryDataByCompanyId?companyId=${userLoginData.companyId}`)
+                    .then((res) => {
+                        let temp30Data = []
+                        res.data.ChartFor30.map((aa) => {
+                            return temp30Data.push({
+                                ...aa,
+                                date: moment(aa.date).format("D MMM YY"),
+                                value: aa.value
+                            })
+                        })
+                        let temp60Data = []
+                        res.data.ChartFor60.map((aa) => {
+                            return temp60Data.push({
+                                ...aa,
+                                date: moment(aa.date).format("D MMM YY"),
+                                value: aa.value
+                            })
+                        })
+                        let temp90Data = []
+                        res.data.ChartFor90.map((aa) => {
+                            return temp90Data.push({
+                                ...aa,
+                                date: moment(aa.date).format("D MMM YY"),
+                                value: aa.value
+                            })
+                        })
+                        setDay30LineData(temp30Data)
+                        setDay60LineData(temp60Data)
+                        setDay90LineData(temp90Data)
+                    })
+
+                axios.get(`${getURL.KPI_base_URL}/GetTrainigOverdueByCompanyId?companyId=${userLoginData.companyId}`)
+                    .then((res) => {
+                        setDueData({
+                            tenDays: JSON.parse(res.data.TenDays),
+                            twentyDays: JSON.parse(res.data.TwentyDays),
+                            thirtyDays: JSON.parse(res.data.ThirtyDays),
+                            minustenDays: JSON.parse(res.data.TenDaysOverdue),
+                            minustwentyDays: JSON.parse(res.data.TwentyDaysOverdue),
+                            minusthirtyDays: JSON.parse(res.data.ThirtyDaysOverdue),
                         })
                     })
-                    let temp60Data = []
-                    res.data.ChartFor60.map((aa) => {
-                        return temp60Data.push({
-                            ...aa,
-                            date: moment(aa.date).format("D MMM YY"),
-                            value: aa.value
+
+                axios.get(`${getURL.KPI_base_URL}/GetImportExportReportByCompanyId?companyId=${userLoginData.companyId}`)
+                    .then((res) => {
+                        setImportExportData({
+                            ImportDays: res.data.ImportDays,
+                            ExportDays: res.data.ExportDays,
+                            ImportColor: res.data.ImportColor,
+                            ExportColor: res.data.ExportColor,
                         })
                     })
-                    let temp90Data = []
-                    res.data.ChartFor90.map((aa) => {
-                        return temp90Data.push({
-                            ...aa,
-                            date: moment(aa.date).format("D MMM YY"),
-                            value: aa.value
-                        })
-                    })
-                    setDay30LineData(temp30Data)
-                    setDay60LineData(temp60Data)
-                    setDay90LineData(temp90Data)
-                })
-
-            axios.get(`${getURL.KPI_base_URL}/GetTrainigOverdueByCompanyId?companyId=${userLoginData.companyId}`)
-                .then((res) => {
-                    setDueData({
-                        tenDays: JSON.parse(res.data.TenDays),
-                        twentyDays: JSON.parse(res.data.TwentyDays),
-                        thirtyDays: JSON.parse(res.data.ThirtyDays),
-                        minustenDays: JSON.parse(res.data.TenDaysOverdue),
-                        minustwentyDays: JSON.parse(res.data.TwentyDaysOverdue),
-                        minusthirtyDays: JSON.parse(res.data.ThirtyDaysOverdue),
-                    })
-                })
-
-            axios.get(`${getURL.KPI_base_URL}/GetImportExportReportByCompanyId?companyId=${userLoginData.companyId}`)
-                .then((res) => {
-                    setImportExportData({
-                        ImportDays: res.data.ImportDays,
-                        ExportDays: res.data.ExportDays,
-                        ImportColor: res.data.ImportColor,
-                        ExportColor: res.data.ExportColor,
-                    })
-                })
-
+            }
             return () => {
                 backHandler.remove();
                 setIsLoading(false)
@@ -257,27 +250,29 @@ const HomeScreen = () => {
                 }
                 {!isLoading &&
                     <View style={{ flex: 1 }}>
-                        <View style={{ margin: 10, flexDirection: "row" }}>
-                            <TouchableOpacity style={buttonType == "Overall" ? styles.active_circle_button : styles.circle_button}
-                                onPress={() => {
-                                    CheckConnectivity()
-                                    setButtonType("Overall")
-                                    setSelectedDays("90 Days")
-                                    setPerformanceType("Top")
-                                    setIsLoading(true)
-                                }}>
-                                <Text style={{ fontSize: 16, fontWeight: "bold", color: `${buttonType == "Overall" ? "#004C6B" : "#898B9A"}` }}>Overall</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={buttonType == "Monthly" ? styles.active_circle_button : styles.circle_button}
-                                onPress={() => {
-                                    CheckConnectivity()
-                                    setButtonType("Monthly")
-                                    setSelectedDays("90 Days")
-                                    setPerformanceType("Top")
-                                    setIsLoading(true)
-                                }}>
-                                <Text style={{ fontSize: 16, fontWeight: "bold", color: `${buttonType == "Monthly" ? "#004C6B" : "#898B9A"}` }}>Monthly</Text>
-                            </TouchableOpacity>
+                        <View style={{ backgroundColor: COLORS.white2 }}>
+                            <View style={{ margin: 10, flexDirection: "row" }}>
+                                <TouchableOpacity style={buttonType == "Overall" ? styles.active_circle_button : styles.circle_button}
+                                    onPress={() => {
+                                        CheckConnectivity()
+                                        setButtonType("Overall")
+                                        setSelectedDays("90 Days")
+                                        setPerformanceType("Top")
+                                        setIsLoading(true)
+                                    }}>
+                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: `${buttonType == "Overall" ? "#004C6B" : "#898B9A"}` }}>Overall</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={buttonType == "Monthly" ? styles.active_circle_button : styles.circle_button}
+                                    onPress={() => {
+                                        CheckConnectivity()
+                                        setButtonType("Monthly")
+                                        setSelectedDays("90 Days")
+                                        setPerformanceType("Top")
+                                        setIsLoading(true)
+                                    }}>
+                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: `${buttonType == "Monthly" ? "#004C6B" : "#898B9A"}` }}>Monthly</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                         <ScrollView>
                             <View style={{
@@ -285,7 +280,6 @@ const HomeScreen = () => {
                                 justifyContent: 'center',
                                 padding: 12,
                             }}>
-
                                 {/* Overall Progress Chart */}
                                 <View style={{ backgroundColor: "white", padding: 10, borderRadius: 10 }}>
                                     <Text style={{ fontSize: 16, fontWeight: "bold", color: "black", textAlign: "center" }}>{buttonType} Completion Status</Text>
@@ -415,15 +409,15 @@ const HomeScreen = () => {
                                         </TouchableOpacity>
                                     </View>
                                     <View>
-                                        {performanceType === "Top" && topPerformance.map((aa) => (
-                                            <View style={{ borderColor: Colors.lighter, borderRadius: 6, padding: 6, margin: 4, borderWidth: 2, flexDirection: "row", alignItems: "center" }}>
+                                        {performanceType === "Top" && topPerformance.map((aa, idx) => (
+                                            <View key={idx} style={{ borderColor: Colors.lighter, borderRadius: 6, padding: 6, margin: 4, borderWidth: 2, flexDirection: "row", alignItems: "center" }}>
                                                 <Image source={TopDoubleIcon} style={{ marginRight: 8, width: 20, height: 20 }} />
                                                 <Text style={{ fontSize: 16, fontWeight: "bold", color: "#004C6B" }}>{aa}</Text>
                                             </View>
                                         ))}
-                                        {performanceType === "Bottom" && bottomPerformance.map((aa) => {
+                                        {performanceType === "Bottom" && bottomPerformance.map((aa, idx) => {
                                             return (
-                                                <>
+                                                <View key={idx}>
                                                     {aa !== "No record exist" ? (
                                                         <View style={{ borderColor: Colors.lighter, borderRadius: 6, padding: 6, margin: 4, borderWidth: 2, flexDirection: "row", alignItems: "center" }}>
                                                             {aa !== "No record exist" && <Image source={DownDoubleIcon} style={{ marginRight: 8, width: 20, height: 20 }} />}
@@ -436,7 +430,7 @@ const HomeScreen = () => {
                                                             </View>
                                                         )
                                                     }
-                                                </>
+                                                </View>
                                             )
                                         })}
                                     </View>
@@ -450,6 +444,7 @@ const HomeScreen = () => {
                                         </View>
                                         <View style={{ flex: 0.4, alignItems: "flex-end" }}>
                                             <SelectDropdown
+                                                key={daysData}
                                                 rowStyle={styles.dropdown2RowStyle}
                                                 rowTextStyle={styles.dropdown2RowTxtStyle}
                                                 dropdownStyle={{
@@ -464,7 +459,7 @@ const HomeScreen = () => {
                                                     )
                                                 }}
                                                 dropdownIconPosition="right"
-                                                defaultValue={selectedDays === "" ? "30 Days" : selectedDays}
+                                                defaultValue={selectedDays === "" ? "90 Days" : selectedDays}
                                                 data={daysData}
                                                 onSelect={(selectedItem, index) => {
                                                     setSelectedDays(selectedItem)
@@ -528,7 +523,8 @@ const HomeScreen = () => {
                                                     duration: 3000,
                                                     onLoad: { duration: 2000 },
 
-                                                }} />
+                                                }}
+                                            />
                                             <VictoryScatter
                                                 name="scatter"
                                                 animate={{
@@ -634,10 +630,10 @@ const HomeScreen = () => {
                                 </View>
                             </View>
                         </ScrollView>
-                    </View>
+                    </View >
                 }
-            </View>
-        </SafeAreaView>
+            </View >
+        </SafeAreaView >
     )
 }
 
