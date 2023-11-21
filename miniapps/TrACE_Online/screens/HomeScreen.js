@@ -195,7 +195,7 @@ const HomePage = () => {
 
     const CompletedList = _.sortBy(videoData && videoData.lstCompleted, ["lstCompleted"])
 
-    console.log(CompletedList,'CompletedList')
+    // console.log(CompletedList,'CompletedList')
 
     useEffect(() => {
         if (searchedTodoVideo) {

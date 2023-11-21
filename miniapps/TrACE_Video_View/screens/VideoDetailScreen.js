@@ -136,29 +136,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
     const downloadFile = async () => {
         CheckConnectivity()
-        let fileExpired = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name && (moment.utc(moment.unix(xx.lastModified / 1000).format("YYYYMMDD")).local().startOf('hours').fromNow() <= "2 days")).length === 0
+        // let fileExpired = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name && (moment.utc(moment.unix(xx.lastModified / 1000).format("YYYYMMDD")).local().startOf('hours').fromNow() <= "2 days")).length === 0
         let fileDownloaded = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name).length > 0
-        if (fileExpired) {
-            console.log("true")
-            setToastHide(true)
-            let dirs = RNFetchBlob.fs.dirs
-            RNFetchBlob
-                .config({
-                    fileCache: true,
-                    path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
-                    transform: true
-                })
-                .fetch('GET', `${videoDetail.originalFileURL}`)
-                // .progress((received, total) => {
-                //     console.log('progress', received / total)
-                // })
-                .then((res) => {
-                    console.log(res, "download res")
-                    setDownloaded("Yes")
-                    setToastHide(true)
-                    setMessage({ message: "Your Video is Downloaded", icon: DownloadedIcon, isHide: true })
-                })
-        } else {
             console.log("false")
             if (fileDownloaded === false) {
                 setToastHide(true)
@@ -184,8 +163,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     { text: 'OK', onPress: () => console.log("object") },
                 ]);
             }
-        }
-
     }
 
     const htmlContent = `

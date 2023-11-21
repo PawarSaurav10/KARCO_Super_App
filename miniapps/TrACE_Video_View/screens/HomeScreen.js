@@ -169,7 +169,6 @@ const HomeScreen = (props) => {
                                         thumbnail={item.thumbnail}
                                         videoName={item.name}
                                         createdDate={item.created}
-                                        key={index}
                                         OnPress={() => {
                                             CheckConnectivity()
                                             navigation.navigate("Video Detail", item.id)

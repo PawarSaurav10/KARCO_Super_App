@@ -32,7 +32,21 @@ const DownloadsScreen = () => {
         }
     }, [isLoading, isFocused]);
 
-    
+    const deleteFile = (item, loading) => {
+        Alert.alert('Warning', 'Are you sure do you want to delete this video.', [
+            {
+                text: 'OK', onPress: () => {
+                    ReactNativeBlobUtil.fs.unlink(item.path)
+                    setIsLoading(loading)
+                }
+            },
+            {
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+            },
+        ]);
+    }
 
     return (
         <View style={{ flex: 1 }}>
@@ -66,7 +80,7 @@ const DownloadsScreen = () => {
                                 data={directory}
                                 keyExtractor={item => item.filename}
                                 renderItem={({ item, index }) => (
-                                    <VideoListView videoName={item.filename} key={index} createdDate={item.lastModified} listType={"Downloads"} item={item}/>
+                                    <VideoListView videoName={item.filename} createdDate={item.lastModified} listType={"Downloads"} item={item} onDelete={deleteFile}/>
                                 )}
                             />
                         </View>
@@ -82,4 +96,3 @@ const DownloadsScreen = () => {
 }
 
 export default DownloadsScreen
-
