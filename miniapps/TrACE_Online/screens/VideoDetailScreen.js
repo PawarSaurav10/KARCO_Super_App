@@ -34,7 +34,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
     const [orientation, setOrientation] = useState()
 
     const backAction = () => {
-        navigation.replace("Online_Home")
+        navigation.replace("Online_Home", { type: route.params.type })
         return true;
     };
 
@@ -108,29 +108,36 @@ const VideoDetailScreen = ({ navigation, route }) => {
     }, []);
 
     const htmlContentPromo = `
-        <div width="100%" height="auto" allowFullScreen = "true">
-            <iframe src="${getURL.play_video_URL}/${route.params.videokeypromo}" frameborder="0" allowFullscreen="true"  width="100%" height="100%" allowtransparency="true" />
-        </div>
+    <html>
+        <body>
+            <div width="100%" height="auto" allowFullScreen = "true">
+                <iframe id="iframe" src="${getURL.play_video_URL}/${route.params.item.videokeypromo}" frameborder="0" allowFullscreen="true"  width="100%" height="100%" allowtransparency="true" onload="displayMessage()"/>
+            </div>
+            <script>
+             document.getElementById("iframe").play()
+            </script>
+        </body>
+    </html>
       `;
     const htmlContent = `
         <div width="100%" height="auto" allowfullscreen="true">
-            <iframe src="${getURL.play_video_URL}/${route.params.videokey}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
+            <iframe src="${getURL.play_video_URL}/${route.params.item.videokey}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
         </div>
       `;
 
     const onPromoViewVideoClick = () => {
-        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoPreViewActivity?VideoId=${route.params.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
-            .then((response) => console.log(response.status, "onPromoViewVideoClick"))
+        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoPreViewActivity?VideoId=${route.params.item.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
+            .then((response) => { })
     }
 
     const onFullViewVideoClick = () => {
-        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoViewActivity?VideoId=${route.params.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
-            .then((response) => console.log(response.status, "onFullViewVideoClick"))
+        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoViewActivity?VideoId=${route.params.item.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
+            .then((response) => { })
     }
 
     const onClickPlayVideo = () => {
-        axios.get(`${getURL.base_URL}/AppVideo/UpdateCrewActivity?VideoId=${route.params.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
-            .then((response) => console.log(response.status, "onClickPlayVideo"))
+        axios.get(`${getURL.base_URL}/AppVideo/UpdateCrewActivity?VideoId=${route.params.item.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
+            .then((response) => { })
     }
 
     // const onSynopsisPress = useCallback(async (url) => {
@@ -147,12 +154,12 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     leftComponent={
                         <TouchableOpacity
                             style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
-                            onPress={() => navigation.replace("Online_Home")}
+                            onPress={() => navigation.replace("Online_Home", { type: route.params.type })}
                         >
                             <Image source={BackIcon} style={{ width: 20, height: 20 }} />
                         </TouchableOpacity>
                     }
-                    title={route.params.VideoName}
+                    title={route.params.item.VideoName}
                 />
                 {isLoading &&
                     <VideoScreenLoader />
@@ -163,14 +170,27 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             contentInsetAdjustmentBehavior="automatic"
                         >
                             <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
-                                {route.params.ModuleType == "Circular"
-                                    ? <PDFViewer pdf={route.params.VideoPath} pageNo={1} />
-                                    : <WebView source={{ html: (videoType == "PROMOKEY" || videoType == "") ? htmlContentPromo : htmlContent }} allowsFullscreenVideo={true} automaticallyAdjustContentInsets minimumFontSize={12} />
+                                {route.params.item.ModuleType == "Circular"
+                                    ? <PDFViewer pdf={route.params.item.VideoPath} pageNo={1} />
+                                    : <WebView
+                                        ref={(ref) => (webViewRef = ref)}
+                                        source={{ html: (videoType == "PROMOKEY" || videoType == "") ? htmlContentPromo : htmlContent }}
+                                        allowsFullscreenVideo={true}
+                                        mediaPlaybackRequiresUserAction={true}
+                                        allowsInlineMediaPlayback={true}
+                                        domStorageEnabled={true}
+                                        allowFileAccess={false}
+                                        // startInLoadingState={true}
+                                        startInLoadingState={<ActivityIndicator />}
+                                        automaticallyAdjustContentInsets
+                                        minimumFontSize={18}
+                                        injectJavaScript={true}
+                                    />
                                 }
                             </View>
                             <View style={{ margin: 20 }}>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                    <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.VideoName}</Text>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1 }}>
+                                    <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.item.VideoName}</Text>
                                     {/* <View style={[styles.icon_container, styles.shadowProp]}><Image style={styles.icon} source={FavouriteIcon} /></View> */}
                                 </View>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 4 }}>
@@ -181,7 +201,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                                 width: 16,
                                             }} source={CalendarIcon} />
                                         </View>
-                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.CreatedDate}</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.item.CreatedDate}</Text>
                                     </View>
                                     <View
                                         style={{
@@ -194,30 +214,30 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             paddingHorizontal: 6,
                                             paddingVertical: 6,
                                             // width: "50%",
-                                            backgroundColor: `${route.params.Category === "OCIMF SIRE VIQ SERIES"
+                                            backgroundColor: `${route.params.item.Category === "OCIMF SIRE VIQ SERIES"
                                                 ? "#FFC239" :
-                                                route.params.Category === "SHIP SPECIFIC SERIES"
+                                                route.params.item.Category === "SHIP SPECIFIC SERIES"
                                                     ? "#29ABE2" :
-                                                    route.params.Category === "ACCIDENT / INCIDENT SERIES"
+                                                    route.params.item.Category === "ACCIDENT / INCIDENT SERIES"
                                                         ? "#9E005D" :
-                                                        route.params.Category === "PERSONAL SAFETY"
+                                                        route.params.item.Category === "PERSONAL SAFETY"
                                                             ? "#f75a24" :
-                                                            route.params.Category === "SHIP BOARD OPERATION"
+                                                            route.params.item.Category === "SHIP BOARD OPERATION"
                                                                 ? "#22B573" :
                                                                 "red"
                                                 }`
                                         }}>
-                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.white }} numberOfLines={1}>{route.params.Category}</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.white }} numberOfLines={1}>{route.params.item.Category}</Text>
                                     </View>
                                 </View>
-                                {route.params.ModuleType != "Circular" && (
+                                {route.params.item.ModuleType != "Circular" && (
                                     <View style={{ fontSize: 12, flexDirection: "row", marginVertical: 10 }}>
                                         <Text style={{ color: COLORS.darkBlue, fontWeight: "600" }}>Description : </Text>
                                         <TouchableOpacity style={{ borderBottomWidth: 1, maxWidth: "100%", color: COLORS.blue }}
                                             onPress={() => {
                                                 CheckConnectivity()
                                                 setViewPdf(!viewPdf)
-                                                // onSynopsisPress(`https://testtrace.karco.in/Uploads/Synopsis/${route.params.SynopsisPath}`)
+                                                // onSynopsisPress(`https://testtrace.karco.in/Uploads/Synopsis/${route.params.item.SynopsisPath}`)
                                             }}
                                         >
                                             <Text style={{ color: COLORS.blue }}>View Synopsis</Text>
@@ -225,7 +245,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     </View>
                                 )}
                                 <View style={{ borderWidth: 1, borderColor: COLORS.darkBlue, width: "100%", marginVertical: 8 }}></View>
-                                {route.params.ModuleType == "Circular"
+                                {route.params.item.ModuleType == "Circular"
                                     ?
                                     <CustomIconButton
                                         label={"View PDF"}
@@ -271,19 +291,19 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         }}
                                         iconStyle={{ marginRight: 6 }} />
                                 }
-                                {route.params.AssessmentStatus == "Pending" &&
+                                {route.params.item.AssessmentStatus == "Pending" &&
                                     <CustomIconButton
                                         label={"Take Assessment"}
                                         icon={AssesmentIcon}
                                         onPress={() => {
                                             CheckConnectivity()
-                                            if (route.params.HavingAssessment == "Y" && videoType != "") {
-                                                navigation.replace("AssessmentNew", { Id: route.params.Id, videoPassword: route.params.Password, ModuleType: route.params.ModuleType })
+                                            if (route.params.item.HavingAssessment == "Y" && videoType != "") {
+                                                navigation.replace("AssessmentNew", { Id: route.params.item.Id, videoPassword: route.params.item.Password, ModuleType: route.params.item.ModuleType })
                                             } else {
-                                                if (route.params.HavingAssessment !== "Y") {
+                                                if (route.params.item.HavingAssessment !== "Y") {
                                                     alert("The video does not have an Assessment")
                                                 } else {
-                                                    alert(`Please First ${route.params.ModuleType == "Circular" ? "View Circular" : "Play Full Video"}`)
+                                                    alert(`Please First ${route.params.item.ModuleType == "Circular" ? "View Circular" : "Play Full Video"}`)
                                                 }
                                             }
                                         }}
@@ -298,13 +318,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         iconStyle={{ marginRight: 6 }} />
                                 }
 
-                                {route.params.AssessmentStatus == "Continue" &&
+                                {route.params.item.AssessmentStatus == "Continue" &&
                                     <CustomIconButton
                                         label={"Continue Assessment"}
                                         icon={AssesmentIcon}
                                         onPress={() => {
                                             CheckConnectivity()
-                                            navigation.replace("AssessmentNew", { Id: route.params.Id, videoPassword: route.params.Password, ModuleType: route.params.ModuleType })
+                                            navigation.replace("AssessmentNew", { Id: route.params.item.Id, videoPassword: route.params.item.Password, ModuleType: route.params.item.ModuleType })
                                         }}
                                         containerStyle={{
                                             backgroundColor: COLORS.darkBlue,
@@ -316,13 +336,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         iconStyle={{ marginRight: 6 }} />
                                 }
 
-                                {route.params.AssessmentStatus == "Feedback" &&
+                                {route.params.item.AssessmentStatus == "Feedback" &&
                                     <CustomIconButton
                                         label={"Give Feedback"}
                                         icon={AssesmentIcon}
                                         onPress={() => {
                                             CheckConnectivity()
-                                            navigation.replace("Feedback Form", { Id: route.params.Id, videoPassword: route.params.Password })
+                                            navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
                                         }}
                                         containerStyle={{
                                             backgroundColor: COLORS.darkBlue,
@@ -361,7 +381,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         scale={1.0}
                                         minScale={1.0}
                                         trustAllCerts={false}
-                                        source={{ uri: `${route.params.ModuleType === "Circular" ? `${getURL.view_PDF_URL}/${route.params.VideoPath}` : `${getURL.view_Synopsis_URL}/${route.params.SynopsisPath}`}` }}
+                                        source={{ uri: `${route.params.item.ModuleType === "Circular" ? `${getURL.view_PDF_URL}/${route.params.item.VideoPath}` : `${getURL.view_Synopsis_URL}/${route.params.item.SynopsisPath}`}` }}
                                         style={[styles.pdf, { position: "relative" }]}
                                         onError={(error) => {
                                             Alert.alert('Oops !!', 'File is not View able or corrupted', [

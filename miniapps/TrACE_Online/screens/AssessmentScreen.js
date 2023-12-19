@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Alert, BackHandler, Image, ActivityIndicator } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Alert, BackHandler, Image, ActivityIndicator, Modal } from 'react-native'
 import { COLORS } from '../../../Constants/theme';
 import axios from 'axios';
 import { getUserData, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
@@ -11,9 +11,12 @@ import BackIcon from "../../../Images/left-arrow.png"
 import { getURL } from "../../../baseUrl"
 import AssessmentScreenLoader from '../../../Components/AssessmentScreenLoader';
 import NetInfo from "@react-native-community/netinfo";
+import { Colors } from '../../../node_modules/react-native/Libraries/NewAppScreen';
+import CloseIcon from "../../../Images/close.png"
 
 
 const AssessmentScreen = ({ navigation, route }) => {
+    const videoPlay = useRef(null)
     const isFocused = useIsFocused()
     const [playVideo, setPlayVideo] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState("")
@@ -27,6 +30,11 @@ const AssessmentScreen = ({ navigation, route }) => {
     const [assessmentData, setAssessmentData] = useState(null)
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [orientation, setOrientation] = useState()
+
+    const isPortrait = () => {
+        const dim = Dimensions.get('screen');
+        return dim.height >= dim.width;
+    };
 
     useEffect(() => {
         // Event Listener for orientation changes
@@ -91,6 +99,11 @@ const AssessmentScreen = ({ navigation, route }) => {
         }
     }
 
+    const htmlContent = `
+<div width="100%" height="auto" allowfullscreen="true">
+    <iframe id="iframe" src="${getURL.play_video_URL}/${assessmentData ?.videoDetail ?.Videokey}?start=${questionToShow ?.ClipTimingFrom}&end=${questionToShow ?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
+</div>
+`
 
     useEffect(() => {
         if (isFocused) {
@@ -127,13 +140,13 @@ const AssessmentScreen = ({ navigation, route }) => {
 
     const callGetOnlineAssessmentApi = () => {
         axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment?VideoId=${route.params.Id}&username=${userLoginData.userId}&password=${route.params.videoPassword}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
-            .then((res) => console.log(res.status, "get online assessment called"))
+            .then((res) => { })
     }
 
     const onCorrectOptionClick = () => {
         if (assessmentData.QuestionList.length === (questioncountIndex + currentQuestion + 1)) {
             setIsLoading(true)
-            Alert.alert("Congratulations!", "You Have Answered All The Questions, To Complete The Assessment & Generate Certificate. Click on Proceed To Feedback", [{
+            Alert.alert("Congratulations!", "You have completed the assessment. To generate your certificate, proceed to feedback.", [{
                 text: 'Proceed',
                 onPress: () => {
                     callGetOnlineAssessmentApi()
@@ -142,7 +155,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                 },
             }])
         } else {
-            Alert.alert("Well Done!", "You Have Answered Right Answer, Click on Proceed for Next Question", [{
+            Alert.alert("Well Done!", "You have provided the correct answer", [{
                 text: 'Proceed',
                 onPress: () => {
                     callGetOnlineAssessmentApi()
@@ -156,9 +169,10 @@ const AssessmentScreen = ({ navigation, route }) => {
 
     const onWrongOptionClick = () => {
         setIsLoading(false)
-        Alert.alert("Warning", "This is not a correct option, please see the video & try again", [{
+        Alert.alert("Warning", "This is not a correct option, please watch the video & try again", [{
             text: 'Proceed',
             onPress: () => {
+                // videoPlay.current.focus()
                 setPlayVideo(true)
                 setSelectedOptions("")
             },
@@ -299,9 +313,9 @@ const AssessmentScreen = ({ navigation, route }) => {
                                             </View>
                                         </View>
                                     </View>
-                                    <QuestionCard initialData={questionToShow} questionIndex={currentQuestion + 1} />
+                                    {assessmentData.QuestionList.length >= (questioncountIndex + currentQuestion + 1) && <QuestionCard initialData={questionToShow} questionIndex={currentQuestion + 1} />}
                                 </View>
-                                {playVideo === true &&
+                                {/* {playVideo === true &&
                                     <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200, marginBottom: 40 }}>
                                         {route.params.ModuleType == "Circular" ?
                                             <PDFViewer pdf={assessmentData.videoDetail.VideoPath} pageNo={questionToShow ?.ClipTimingFrom} />
@@ -318,9 +332,66 @@ const AssessmentScreen = ({ navigation, route }) => {
                                             />
                                         }
                                     </View>
-                                }
+                                } */}
+                                <Modal
+                                    animationType="slide"
+                                    transparent={true}
+                                    visible={playVideo}
+                                    onRequestClose={() => {
+                                        setPlayVideo(false)
+                                    }}
+                                >
+                                    <View
+                                        style={{
+                                            height: '100%',
+                                            backgroundColor: 'rgba(0,0,0,0.6)',
+                                        }}>
+                                        <View style={{
+                                            position: 'absolute', top: 0, left: 10, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', width: Dimensions.get('screen').width - 20,
+                                            shadowColor: '#000',
+                                            shadowOffset: {
+                                                width: 10,
+                                                height: 10,
+                                            },
+                                            shadowOpacity: 0.50,
+                                            shadowRadius: 6,
+                                            elevation: 5,
+                                        }}>
+                                            <TouchableOpacity
+                                                style={{ flex: 0.07, marginLeft: "auto", padding: 4 }}
+                                                onPress={() => {
+                                                    setPlayVideo(!playVideo);
+                                                }}>
+                                                <View style={{ backgroundColor: "white", width: 24, height: 24, alignItems: 'center', justifyContent: "center", borderRadius: 20 }}>
+                                                    <Image source={CloseIcon} style={{ width: 16, height: 16 }} />
+                                                </View>
+                                            </TouchableOpacity>
+                                            <View style={{ width: "100%", height: orientation === "landscape" ? 280 : 200 }}>
+                                                {route.params.ModuleType == "Circular" ?
+                                                    <PDFViewer pdf={assessmentData.videoDetail.VideoPath} pageNo={questionToShow ?.ClipTimingFrom} />
+                                                    :
+                                                    <WebView
+                                                        ref={videoPlay}
+                                                        source={{ html: htmlContent }}
+                                                        allowsFullscreenVideo={true}
+                                                        mediaPlaybackRequiresUserAction={true}
+                                                        allowsInlineMediaPlayback={true}
+                                                        domStorageEnabled={true}
+                                                        allowFileAccess={false}
+                                                        // startInLoadingState={true}
+                                                        startInLoadingState={<ActivityIndicator />}
+                                                        automaticallyAdjustContentInsets
+                                                        minimumFontSize={18}
+                                                    />
+                                                }
+                                            </View>
+                                        </View>
+                                    </View>
+                                </Modal>
                             </ScrollView>
+
                         }
+
                     </View>
                 }
             </ScrollView>
@@ -343,7 +414,18 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#004C6B",
         textAlign: "left"
-    }
+    },
+    footer: {
+        flex: 1,
+        backgroundColor: Colors.lighter,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        top: "50%",
+        zIndex: 10,
+        // justifyContent: "center", 
+        // alignItems: 'center'
+    },
 })
 
 export default AssessmentScreen

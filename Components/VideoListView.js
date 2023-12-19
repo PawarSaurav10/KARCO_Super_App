@@ -56,49 +56,9 @@ const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, i
 
     // function to handle our read file
     const handleReadFile = (item) => {
-        // if (date > 2) {
-        //     Alert.alert('Warning', "The Video is Expired, Please re-download the video", [
-        //         {
-        //             text: 'OK', onPress: () => {
-        //                 console.log("object")
-        //             }
-        //         }
-        //     ])
-        // } else {
             navigation.navigate("Video Detail", { data: item, type: "Downloads" })
             setReadFile(item);
-        // }
     };
-
-    const deleteFile = (item) => {
-        console.log(item.path, "path")
-        // if (date > 2) {
-        //     Alert.alert('Warning', "The Video is Expired, Please re-download the video", [
-        //         {
-        //             text: 'OK', onPress: () => {
-        //                 console.log("object")
-        //             }
-        //         }
-        //     ])
-        // }
-        // else {
-            Alert.alert('Warning', 'Are you sure do you want to delete this video.', [
-                {
-                    text: 'OK', onPress: () => {
-                        ReactNativeBlobUtil.fs.unlink(item.path)
-                        // setIsLoading(true)
-                    }
-                },
-                {
-                    text: 'Cancel',
-                    onPress: () => console.log('Cancel Pressed'),
-                    style: 'cancel',
-                },
-            ]);
-        // }
-
-
-    }
 
     return (
         <>
@@ -109,7 +69,7 @@ const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, i
                             <Image source={PlayIcon} style={{ height: 60, width: 60, borderRadius: 10, objectFit: "cover" }} />
                         </TouchableOpacity>
                         <View style={{ flex: 0.7, marginLeft: 6, }}>
-                            <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{(videoName).slice(0, -4)}</Text>
+                            <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{((videoName).slice(0, -8)).replace(/[^a-zA-Z0-9 ]+/g, " ")}</Text>
                             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 6 }}>
                                 <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
                                     <Image style={{
@@ -142,7 +102,7 @@ const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, i
                             <Image source={{ uri: thumbnail }} style={[{ height: 80, width: 80, borderRadius: 10, objectFit: "cover" }]} />
                         </View>
                         <View style={{ flex: 0.72 }}>
-                            <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{videoName}</Text>
+                            <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{((videoName).slice(0, -4)).replace(/[^a-zA-Z0-9 ]+/g, " ")}</Text>
                             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 6 }}>
                                 <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
                                     <Image style={{

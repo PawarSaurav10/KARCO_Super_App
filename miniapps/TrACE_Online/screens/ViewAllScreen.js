@@ -92,19 +92,20 @@ const ViewAllScreen = ({ navigation, route }) => {
                 }
                 title={route.params.listType === "Todo" ? "New Added Video" : "Continue Assessment"}
             />
+
+            <View style={{ margin: 8, padding: 8 }}>
+                <CustomSearch
+                    label={"Search Videos"}
+                    value={searchedVideo}
+                    onChangeText={(value) => {
+                        setSearchedVideo(value)
+                    }}
+                />
+            </View>
             <ScrollView
                 contentInsetAdjustmentBehavior="automatic"
                 nestedScrollEnabled={true}
             >
-                <View style={{ margin: 8, padding: 8 }}>
-                    <CustomSearch
-                        label={"Search Videos"}
-                        value={searchedVideo}
-                        onChangeText={(value) => {
-                            setSearchedVideo(value)
-                        }}
-                    />
-                </View>
                 {route.params.listType === "Todo" &&
                     <View style={{ flex: 1 }}>
                         {!searchedVideo &&
@@ -122,6 +123,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                         VideoName={item.VideoName}
                                         onPress={() => navigation.navigate("Video Detail", item)}
                                         orientationType={orientation}
+                                        PosterImage={item.PosterPath}
                                     />
                                 )}
                                 keyExtractor={item => item.Id}
@@ -143,6 +145,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                         VideoName={item.VideoName}
                                         onPress={() => navigation.navigate("Video Detail", item)}
                                         orientationType={orientation}
+                                        PosterImage={item.PosterPath}
                                     />
                                 )}
                                 keyExtractor={item => item.Id}
@@ -151,7 +154,12 @@ const ViewAllScreen = ({ navigation, route }) => {
                         }
                         {searchedVideo && searchedTodoVideoData && searchedTodoVideoData.length == 0 &&
                             <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
-                                <NoDataFound />
+                                <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
+                            </View>
+                        }
+                        {route && route.params && route.params.data.length == 0 &&
+                            <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
+                                <NoDataFound title={"No Data Available"} desc="No videos have assissgned for you or you have completed all assessment." imageType="NoData" />
                             </View>
                         }
                     </View>
@@ -168,8 +176,9 @@ const ViewAllScreen = ({ navigation, route }) => {
                                                 VideoName={xx.VideoName}
                                                 TimeLeft={xx.TimeLeft}
                                                 CourseNo={xx.CourseNo}
+                                                PosterImage={xx.PosterPath}
                                                 onPress={() => {
-                                                    navigation.navigate("Video Detail", xx)
+                                                    navigation.navigate("Video Detail", { item: xx })
                                                 }} />
                                         </View>
                                     )
@@ -186,6 +195,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                                 VideoName={xx.VideoName}
                                                 TimeLeft={xx.TimeLeft}
                                                 CourseNo={xx.CourseNo}
+                                                PosterImage={xx.PosterPath}
                                                 onPress={() => {
                                                     navigation.navigate("Video Detail", xx)
                                                 }} />
@@ -196,7 +206,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                         )}
                         {searchedVideo && searchedTodoVideoData && searchedTodoVideoData.length == 0 && (
                             <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
-                                <NoDataFound />
+                                <NoDataFound title={"No Data Available"} desc="You had not started any videos to watch." imageType="NoData" />
                             </View>
                         )}
                     </View>

@@ -22,7 +22,6 @@ const DownloadsScreen = () => {
                 await ReactNativeBlobUtil.fs
                     .lstat(docPath)
                     .then(response => {
-                        // console.log(response,"response")
                         setDirectory(response);
                         setIsLoading(false)
                     })
@@ -35,16 +34,16 @@ const DownloadsScreen = () => {
     const deleteFile = (item, loading) => {
         Alert.alert('Warning', 'Are you sure do you want to delete this video.', [
             {
-                text: 'OK', onPress: () => {
-                    ReactNativeBlobUtil.fs.unlink(item.path)
-                    setIsLoading(loading)
-                }
-            },
-            {
                 text: 'Cancel',
                 onPress: () => console.log('Cancel Pressed'),
                 style: 'cancel',
             },
+            {
+                text: 'OK', onPress: () => {
+                    ReactNativeBlobUtil.fs.unlink(item.path)
+                    setIsLoading(loading)
+                }
+            }
         ]);
     }
 
@@ -66,7 +65,8 @@ const DownloadsScreen = () => {
             />
 
             {isLoading &&
-                <ActivityIndicator style={{ flex: 1 }}
+                <ActivityIndicator
+                    style={{ flex: 1 }}
                     size="large"
                     color={COLORS.primary}
                 />
@@ -75,18 +75,20 @@ const DownloadsScreen = () => {
             {!isLoading &&
                 <View style={{ flex: 1, marginBottom: 70 }}>
                     {directory.length > 0 ? (
-                        <View style={{ margin: 6, padding: 6, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                        <View style={{ margin: 6, padding: 6 }}>
                             <FlatList
                                 data={directory}
                                 keyExtractor={item => item.filename}
                                 renderItem={({ item, index }) => (
-                                    <VideoListView videoName={item.filename} createdDate={item.lastModified} listType={"Downloads"} item={item} onDelete={deleteFile}/>
+                                    <View style={{ flex: 1 }}>
+                                        <VideoListView videoName={item.filename} createdDate={item.lastModified} listType={"Downloads"} item={item} onDelete={deleteFile} />
+                                    </View>
                                 )}
                             />
                         </View>
                     ) : (
                             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                <NoDataFound appName={"KARCO Videos"} />
+                                <NoDataFound title={"No Data Available"} desc="Please Download Videos to view Downloaded Videos." imageType="NoData" />
                             </View>
                         )}
                 </View>

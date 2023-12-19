@@ -11,19 +11,29 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
 
     return (
         <TouchableOpacity
-            style={{ padding: 8, marginVertical: 4, borderWidth: 1, borderRadius: 10, borderColor: COLORS.lightGray1, backgroundColor: "white" }}
+            style={{
+                padding: 8, marginVertical: 6, borderWidth: 1, borderRadius: 10, borderColor: COLORS.lightGray1, backgroundColor: "white", shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 6,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 6,
+                elevation: 4,
+            }}
             onPress={onPress}
         >
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", flex: 0.78 }}>
                     <View style={{ marginRight: 8 }}>
                         <Image style={{ height: 70, width: 70, borderRadius: 10, objectFit: "cover" }}
+                            // defaultSource={{ uri: "https://testtrace.karco.in/videos/poster/default.jpg" }}
                             source={{ uri: posterImage }}
                             onError={(error) => {
                                 setPosterImage("https://testtrace.karco.in/videos/poster/default.jpg")
                             }} />
                     </View>
-                    <View style={{ width: "58%" }}>
+                    <View style={{ flex: 1 }}>
                         <View style={{ alignSelf: "flex-start", marginBottom: 6 }}>
                             <View style={{ justifyContent: "center", alignItems: "center", borderColor: COLORS.lightBlue, borderWidth: 1, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 20, }}>
                                 <Text style={{ fontSize: 12, fontWeight: "bold", color: COLORS.lightBlue1 }}>{CourseNo}</Text>
@@ -34,7 +44,7 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
                         </View>
                         <View style={{ alignSelf: "flex-start" }}>
                             <View style={{
-                                justifyContent: "center",
+                                // justifyContent: "center",
                                 alignItems: "center",
                                 paddingVertical: 4,
                                 paddingHorizontal: 8,
@@ -57,7 +67,7 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
                         </View>
                     </View>
                 </View>
-                <View style={{ alignItems: "center", justifyContent: "flex-end" }}>
+                <View style={{ alignItems: "center", justifyContent: "flex-end", flex: 0.22 }}>
                     <CountdownCircleTimer
                         size={70}
                         rotation={"counterclockwise"}
@@ -90,9 +100,7 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
                         }}
                     </CountdownCircleTimer>
                 </View>
-
             </View>
-
         </TouchableOpacity>
     )
 }

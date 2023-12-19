@@ -118,7 +118,6 @@ const LoginScreen = ({ navigation, route }) => {
         }
         // } else {
         //     setIsLoading(false)
-        //     console.log(isConnected, "connection is off")
         //     Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
         //         { text: 'OK', onPress: () => CloseApp() },
         //     ]);

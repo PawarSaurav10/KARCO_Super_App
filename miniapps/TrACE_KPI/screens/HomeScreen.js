@@ -68,8 +68,34 @@ const HomeScreen = () => {
         RespColor: null,
         ResColor: null,
     })
-
+    const [orientation, setOrientation] = useState()
     const daysData = ["90 Days", "60 Days", "30 Days"]
+
+    /**
+    * Returns true if the screen is in portrait mode
+    */
+    const isPortrait = () => {
+        const dim = Dimensions.get('screen');
+        return dim.height >= dim.width;
+    };
+
+    /**
+     * Returns true of the screen is in landscape mode
+     */
+    const isLandscape = () => {
+        const dim = Dimensions.get('screen');
+        return dim.width >= dim.height;
+    };
+
+    useEffect(() => {
+        // Event Listener for orientation changes
+        Dimensions.addEventListener('change', () => {
+            setOrientation(
+                isPortrait() ? 'portrait' : 'landscape'
+            );
+        });
+    }, [orientation])
+
 
     const logOut = async () => {
         await AsyncStorage.removeItem("screen_visited")
@@ -123,6 +149,12 @@ const HomeScreen = () => {
 
     useEffect(() => {
         if (isFocused) {
+            const dim = Dimensions.get('screen');
+            if (dim.height >= dim.width) {
+                setOrientation("protrait")
+            } else {
+                setOrientation("landscape")
+            }
             CheckConnectivity()
             const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
@@ -195,12 +227,12 @@ const HomeScreen = () => {
                 axios.get(`${getURL.KPI_base_URL}/GetTrainigOverdueByCompanyId?companyId=${userLoginData.companyId}`)
                     .then((res) => {
                         setDueData({
-                            tenDays: JSON.parse(res.data.TenDays),
-                            twentyDays: JSON.parse(res.data.TwentyDays),
-                            thirtyDays: JSON.parse(res.data.ThirtyDays),
-                            minustenDays: JSON.parse(res.data.TenDaysOverdue),
-                            minustwentyDays: JSON.parse(res.data.TwentyDaysOverdue),
-                            minusthirtyDays: JSON.parse(res.data.ThirtyDaysOverdue),
+                            tenDays: JSON.parse(res.data.TenDays === "NaN" ? 0 : res.data.TenDays),
+                            twentyDays: JSON.parse(res.data.TwentyDays === "NaN" ? 0 : res.data.TwentyDays),
+                            thirtyDays: JSON.parse(res.data.ThirtyDays === "NaN" ? 0 : res.data.ThirtyDays),
+                            minustenDays: JSON.parse(res.data.TenDaysOverdue === "NaN" ? 0 : res.data.TenDaysOverdue),
+                            minustwentyDays: JSON.parse(res.data.TwentyDaysOverdue === "NaN" ? 0 : res.data.TwentyDaysOverdue),
+                            minusthirtyDays: JSON.parse(res.data.ThirtyDaysOverdue === "NaN" ? 0 : res.data.ThirtyDaysOverdue),
                         })
                     })
 
@@ -547,6 +579,8 @@ const HomeScreen = () => {
                                     <Text style={{ fontSize: 16, fontWeight: "bold", color: "black", textAlign: "left" }}>Training Due / Overdue Days</Text>
                                     <View>
                                         <VictoryChart
+                                            maxDomain={{ y: 100 }}
+                                            minDomain={{ y: 0 }}
                                             padding={{ bottom: 60, left: 30, right: 60, top: 40 }}
                                             width={Dimensions.get("window").width}
                                             style={{
@@ -558,7 +592,7 @@ const HomeScreen = () => {
                                         >
                                             <VictoryLabel
                                                 text="Percentage (%)"
-                                                x={180}
+                                                x={orientation === "protrait" ? 180 : Dimensions.get("screen").width / 2.1}
                                                 y={20}
                                                 textAnchor="middle"
                                                 style={{
@@ -568,7 +602,7 @@ const HomeScreen = () => {
                                             <VictoryAxis
                                                 dependentAxis
                                                 crossAxis
-                                                offsetX={180}
+                                                offsetX={orientation === "protrait" ? 180 : Dimensions.get("screen").width / 2.1}
                                                 height={400}
                                                 style={{
                                                     axisLabel: { fontSize: 14, padding: 24, fontWeight: "bold" },
@@ -577,7 +611,8 @@ const HomeScreen = () => {
                                                 standalone={false}
                                             />
                                             <VictoryBar
-                                                labels={({ datum }) => `${parseFloat(datum.earnings).toFixed(0)}%`}
+
+                                                labels={({ datum }) => `${parseFloat(datum.earnings).toFixed()}%`}
                                                 animate={{
                                                     duration: 2000,
                                                     onLoad: { duration: 1000 }

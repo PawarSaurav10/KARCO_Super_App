@@ -26,6 +26,8 @@ import { getDownloaded, setDownloaded } from "../Utils/getScreenVisisted";
 import CustomToast from "../Components/CustomToast";
 import DownloadedIcon from "../Images/checkmark.png"
 import { useIsFocused } from "../node_modules/@react-navigation/core";
+import { async } from "../node_modules/fast-glob";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const TabButton = ({
@@ -95,7 +97,8 @@ const MainLayout = ({
     navigation,
     selectedTab,
     setSelectedTab,
-    appName
+    appName,
+    videoType
 }) => {
     const isFocused = useIsFocused()
     const flatListRef = useRef();
@@ -138,6 +141,8 @@ const MainLayout = ({
                 getDownloaded().then((res) => {
                     if (res === "Yes") {
                         setViewToast(true)
+                    } else {
+                        setViewToast(false)
                     }
                 })
             }, 5000);
@@ -146,7 +151,7 @@ const MainLayout = ({
 
     useEffect(() => {
         if (selectedTab == "Home") {
-            flatListRef ?.current ?.scrollToIndex({
+            flatListRef && flatListRef.current && flatListRef.current.scrollToIndex({
                 index: 0,
                 animated: false,
             });
@@ -159,7 +164,7 @@ const MainLayout = ({
         }
 
         if (selectedTab == "Downloads") {
-            flatListRef ?.current ?.scrollToIndex({
+            flatListRef && flatListRef.current && flatListRef.current.scrollToIndex({
                 index: 1,
                 animated: false,
             });
@@ -176,6 +181,7 @@ const MainLayout = ({
         setIsLoading(false);
         setSelectedTab("Home");
     }, []);
+
 
     return (
         <View style={{ flex: 1 }}>
@@ -197,7 +203,7 @@ const MainLayout = ({
                     >
                         {appName !== "KARCO Videos" &&
                             <View style={{ flex: 1 }}>
-                                {appName === "TrACE Online" ? <Online_Home /> : appName === "TrACE KPI" ? <HomeScreen /> : <Video_HomeScreen />}
+                                {appName === "TrACE Online" ? <Online_Home videoType={videoType} /> : appName === "TrACE KPI" ? <HomeScreen /> : <Video_HomeScreen />}
                             </View>
                         }
 
@@ -315,8 +321,8 @@ const MainLayout = ({
                                                     fontWeight: "bold",
                                                 }}
                                                 message={"Your Video is Downloaded"}
-                                                onHide={() => {
-                                                    setDownloaded("")
+                                                onHide={async () => {
+                                                    await AsyncStorage.removeItem("downloaded")
                                                     setViewToast(!viewToast)
                                                 }}
                                                 ViewPoint={-100}

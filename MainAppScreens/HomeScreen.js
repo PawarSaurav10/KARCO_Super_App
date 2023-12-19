@@ -23,9 +23,9 @@ const HomeScreen = ({ navigation }) => {
         }
     }, [canStart]) // don't miss it!
 
-    const handleOnStart = () => console.log('start')
-    const handleOnStop = () => console.log('stop')
-    const handleOnStepChange = () => console.log(`stepChange`)
+    const handleOnStart = () => { }
+    const handleOnStop = () => { }
+    const handleOnStepChange = () => { }
 
     useEffect(() => {
         eventEmitter.on('start', handleOnStart)

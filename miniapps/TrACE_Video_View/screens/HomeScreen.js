@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Image, FlatList, ActivityIndicator, BackHandler, } from 'react-native'
+import { View, Text, Image, FlatList, ActivityIndicator, BackHandler, Dimensions, } from 'react-native'
 import { COLORS } from '../../../Constants/theme';
 import axios from 'axios';
 import CustomSearch from '../../../Components/CustomSearch';
@@ -9,6 +9,7 @@ import NoInternetComponent from '../../../Components/NoInternetComponent';
 import NetInfo from "@react-native-community/netinfo";
 import { getURL } from "../../../baseUrl"
 import VideoListView from '../../../Components/VideoListView';
+import NoDataFound from '../../../Components/NoDataFound';
 
 const HomeScreen = (props) => {
     const navigation = useNavigation();
@@ -18,6 +19,33 @@ const HomeScreen = (props) => {
     const [isView, setIsView] = useState(false)
     const [searchedVideoData, setSearchedVideoData] = useState([])
     const [searchedVideo, setSearchedVideo] = useState("")
+    const [orientation, setOrientation] = useState()
+
+    /**
+    * Returns true if the screen is in portrait mode
+    */
+    const isPortrait = () => {
+        const dim = Dimensions.get('screen');
+        return dim.height >= dim.width;
+    };
+
+    /**
+     * Returns true of the screen is in landscape mode
+     */
+    const isLandscape = () => {
+        const dim = Dimensions.get('screen');
+        return dim.width >= dim.height;
+    };
+
+    useEffect(() => {
+        // Event Listener for orientation changes
+        Dimensions.addEventListener('change', () => {
+            setOrientation(
+                isPortrait() ? 'portrait' : 'landscape'
+            );
+        });
+    }, [orientation])
+
 
     const backAction = () => {
         navigation.reset({
@@ -74,6 +102,12 @@ const HomeScreen = (props) => {
 
     useEffect(() => {
         if (isFocused) {
+            const dim = Dimensions.get('screen');
+            if (dim.height >= dim.width) {
+                setOrientation("protrait")
+            } else {
+                setOrientation("landscape")
+            }
             setIsLoading(true)
             CheckConnectivity()
             axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
@@ -158,24 +192,49 @@ const HomeScreen = (props) => {
 
                     {!isView &&
                         <View style={{ marginHorizontal: 6 }}>
-                            <FlatList
-                                refreshing={isLoading}
-                                onRefresh={onRefresh}
-                                data={searchedVideo !== "" ? searchedVideoData : videoList}
-                                keyExtractor={item => item.id}
-                                showsHorizontalScrollIndicator={false}
-                                renderItem={({ item, index }) => (
-                                    <VideoListView
-                                        thumbnail={item.thumbnail}
-                                        videoName={item.name}
-                                        createdDate={item.created}
-                                        OnPress={() => {
-                                            CheckConnectivity()
-                                            navigation.navigate("Video Detail", item.id)
-                                        }}
-                                    />
-                                )}
-                            />
+                            {!searchedVideo &&
+                                <FlatList
+                                    refreshing={isLoading}
+                                    onRefresh={onRefresh}
+                                    data={videoList}
+                                    keyExtractor={item => item.id}
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={({ item, index }) => (
+                                        <VideoListView
+                                            thumbnail={item.thumbnail}
+                                            videoName={item.name}
+                                            createdDate={item.created}
+                                            OnPress={() => {
+                                                CheckConnectivity()
+                                                navigation.navigate("Video Detail", item.id)
+                                            }}
+                                        />
+                                    )}
+                                />}
+
+                            {searchedVideo && searchedVideoData && searchedVideoData.length > 0 ?
+                                <FlatList
+                                    refreshing={isLoading}
+                                    onRefresh={onRefresh}
+                                    data={searchedVideo !== "" && searchedVideoData}
+                                    keyExtractor={item => item.id}
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={({ item, index }) => (
+                                        <VideoListView
+                                            thumbnail={item.thumbnail}
+                                            videoName={item.name}
+                                            createdDate={item.created}
+                                            OnPress={() => {
+                                                CheckConnectivity()
+                                                navigation.navigate("Video Detail", item.id)
+                                            }}
+                                        />
+                                    )}
+                                /> :
+                                <View>
+                                    <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
+                                </View>}
+
                         </View>
                     }
                     {isView === true && (

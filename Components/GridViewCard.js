@@ -10,11 +10,22 @@ const GridViewCard = ({ VideoName, VideoCategory, CourseNo, onPress, isVideoComp
     return (
         <TouchableOpacity
             onPress={onPress}
+            style={[styles.video_card_container, styles.borderRadius, {
+                width: orientationType === "landscape" ? Dimensions.get("screen").width / 4.35 : Dimensions.get('window').width / 2.2, shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 6,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 6,
+                elevation: 5,
+            }]}
         >
-            <View style={[styles.video_card_container, styles.borderRadius, { width: orientationType === "landscape" ? Dimensions.get("screen").width / 4.35 : Dimensions.get('window').width / 2.2, }]}>
+            <View >
                 <View style={{ padding: 10, }}>
                     <View>
                         <Image
+                            defaultSource={{ uri: "https://testtrace.karco.in/videos/poster/default.jpg" }}
                             style={{ height: 110, width: "100%", marginBottom: 4, borderRadius: 10, objectFit: "cover" }}
                             source={{ uri: posterImage }}
                             onError={(error) => {

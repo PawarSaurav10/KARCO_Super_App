@@ -155,8 +155,6 @@ const FeedbackScreen = ({ navigation, route }) => {
         return dim.width >= dim.height;
     };
 
-
-
     useEffect(() => {
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
@@ -349,7 +347,7 @@ const FeedbackScreen = ({ navigation, route }) => {
         let tempSaveData = []
         tempSaveData.push({
             password: tempData.password,
-            CBTOverAll: tempData.CBTOverAll,
+            CBTOverAll: tempData.CBTOverAll === "" ? 4 : tempData.CBTOverAll,
             CBTAssessment: tempData.CBTAssessment,
             VideoQuality: tempData.VideoQuality,
             CBTPresentation: tempData.CBTPresentation,
@@ -365,7 +363,7 @@ const FeedbackScreen = ({ navigation, route }) => {
         })
         if (
             (viewWarningsImp === false && viewWarnings === false) &&
-            (tempData.CBTOverAll != "") &&
+            // (tempData.CBTOverAll != "") &&
             tempData.CBTAssessment != null &&
             tempData.VideoQuality != null &&
             tempData.CBTPresentation != null &&
@@ -381,7 +379,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                 axios.get(`${getURL.base_URL}/AppFeedback/SaveFeedbackActivity?FeedbackData=${JSON.stringify(tempSaveData)}&VideoId=${route.params.Id}&username=${userLoginData.userId}&password=${route.params.videoPassword}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}&CompanyId=${userLoginData.companyId}`)
                     .then((res) => {
                         if (res.status === 200) {
-                            Alert.alert("Success", "Thank You for Your Feedback", [{
+                            Alert.alert("Success", "Thank you for providing your feedback", [{
                                 text: 'OK', onPress: () => navigation.replace("Online_Home")
                             }])
                         }
@@ -392,7 +390,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                 console.error(`Error received ${JSON.stringify(err)}`);
             }
         } else {
-            if (viewWarningsImp === true && viewWarnings === true) {
+            if (viewWarningsImp === false && viewWarnings === false) {
                 Alert.alert("Warning", "Fields with * mark are Mandatory", [{
                     text: 'OK',
                 }])
@@ -407,25 +405,30 @@ const FeedbackScreen = ({ navigation, route }) => {
 
     return (
         <View style={{ flex: 1 }}>
-            <Header
+            {/* <Header
                 titleStyle={{
                     fontSize: 16, fontWeight: "bold"
                 }}
                 leftComponent={
-                    <TouchableOpacity
-                        style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
-                        onPress={() => backAction()}
-                    >
-                        <Image source={BackIcon} style={{ width: 20, height: 20 }} />
-                    </TouchableOpacity>
+
                 }
-                title={"Feedback"}
-            />
+            // title={"Feedback"}
+            /> */}
             <ScrollView>
                 <View style={{ padding: 8, display: "flex", justifyContent: "center", backgroundColor: "#004C6B", color: "white" }}>
-                    <View style={{ justifyContent: "center", alignItems: "center" }}>
-                        <View style={{ paddingHorizontal: 6, paddingVertical: 4, backgroundColor: "red", marginBottom: 16 }}>
-                            <Text style={{ fontSize: 16, color: COLORS.white, textTransform: "uppercase" }}>Feedback Form</Text>
+                    <View style={{ marginTop: 10 }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16, flex: 1 }}>
+                            <TouchableOpacity
+                                style={{ marginHorizontal: 12, justifyContent: "flex-start", flex: 0.04 }}
+                                onPress={() => backAction()}
+                            >
+                                <Image source={BackIcon} style={{ width: 20, height: 20 }} />
+                            </TouchableOpacity>
+                            <View style={{ flex: 0.9, justifyContent: "center", alignItems: "center" }}>
+                                <View style={{ paddingHorizontal: 6, paddingVertical: 4, backgroundColor: "red" }}>
+                                    <Text style={{ fontSize: 16, color: COLORS.white, textTransform: "uppercase" }}>Feedback Form</Text>
+                                </View>
+                            </View>
                         </View>
                         <Text style={styles.paragraphText}>In Order to Successfully 'Complete' this assessment, you are required to fill the feedback form.</Text>
                         <Text style={styles.paragraphText}>This form is for you to provide us with an assessment of the course you have attended.</Text>
@@ -680,7 +683,8 @@ const FeedbackScreen = ({ navigation, route }) => {
                     <View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>
                             <Text style={{ color: "white" }}>
-                                Please provide an overall rating based on your experience of using and learning this module on this platform. <Text style={{ color: "red" }}>*</Text>
+                                Please provide an overall rating based on your experience of using and learning this module on this platform. 
+                                {/* <Text style={{ color: "red" }}>*</Text> */}
                             </Text>
                         </View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>
@@ -808,7 +812,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                                             }}
                                         />
                                         <View style={{ marginVertical: 20, flexDirection: "row", justifyContent: "center" }}>
-                                            <View style={styles.totalAnsweredContainer}>
+                                            <View style={[styles.totalAnsweredContainer, { backgroundColor: "#ff0000" }]}>
                                                 <View style={{ flexDirection: "row", marginBottom: 6 }}>
                                                     <Text style={styles.totalAnswerText}>{resultData ?.Scores ?.WAcorrect}</Text>
                                                     <Text style={styles.outOfText}>/ {resultData ?.Scores ?.WA}</Text>
@@ -817,7 +821,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                                                     <Text style={{ fontSize: 16, color: COLORS.white2, }}>A Weightage</Text>
                                                 </View>
                                             </View>
-                                            <View style={styles.totalAnsweredContainer}>
+                                            <View style={[styles.totalAnsweredContainer, { backgroundColor: "#ff8f00" }]}>
                                                 <View style={{ flexDirection: "row", marginBottom: 6 }}>
                                                     <Text style={styles.totalAnswerText}>{resultData ?.Scores ?.WBcorrect}</Text>
                                                     <Text style={styles.outOfText}>/ {resultData ?.Scores ?.WB}</Text>
@@ -826,7 +830,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                                                     <Text style={{ fontSize: 16, color: COLORS.white2, }}>B Weightage</Text>
                                                 </View>
                                             </View>
-                                            <View style={styles.totalAnsweredContainer}>
+                                            <View style={[styles.totalAnsweredContainer, { backgroundColor: "#ffd500" }]}>
                                                 <View style={{ flexDirection: "row", marginBottom: 6 }}>
                                                     <Text style={styles.totalAnswerText}>{resultData ?.Scores ?.WCcorrect}</Text>
                                                     <Text style={styles.outOfText}>/ {resultData ?.Scores ?.WC}</Text>
@@ -922,7 +926,7 @@ const styles = StyleSheet.create({
         margin: 4,
         borderRadius: 8,
         borderColor: COLORS.lightGray1,
-        backgroundColor: COLORS.primary
+        // backgroundColor: COLORS.primary
     },
     totalAnswerText: {
         fontSize: 28,

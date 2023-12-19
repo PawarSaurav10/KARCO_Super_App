@@ -34,12 +34,12 @@ import HomePageLoader from '../../../Components/HomePageLoader';
 import NetInfo from "@react-native-community/netinfo";
 import _ from "lodash"
 
-const HomePage = () => {
+const HomePage = (props) => {
     const navigation = useNavigation();
     const isFocused = useIsFocused();
     const windowWidth = Dimensions.get('window').width;
     const [videoData, setVideoData] = useState([])
-    const [videoType, setVideoType] = useState("TODOLIST")
+    const [videoType, setVideoType] = useState(props.videoType ? props.videoType : "TODOLIST")
     const [isLoading, setIsLoading] = useState(true)
     const [searchedTodoVideoData, setSearchedTodoVideoData] = useState([])
     const [searchedCompVideoData, setSearchedCompVideoData] = useState([])
@@ -195,8 +195,6 @@ const HomePage = () => {
 
     const CompletedList = _.sortBy(videoData && videoData.lstCompleted, ["lstCompleted"])
 
-    // console.log(CompletedList,'CompletedList')
-
     useEffect(() => {
         if (searchedTodoVideo) {
             setSearchedTodoVideoData(
@@ -228,7 +226,7 @@ const HomePage = () => {
     }, [searchedCompVideo]);
 
     const ShowContinueAssessmentSection = videoData && videoData.lstToDo && videoData.lstToDo.filter((xx) => xx.AssessmentStatus == "Continue" || xx.AssessmentStatus == "Feedback").length > 0
-    
+
 
 
     return (
@@ -239,6 +237,97 @@ const HomePage = () => {
 
             {isLoading === false && (
                 <View style={{ flex: 1 }}>
+
+                    {/* <View> */}
+                    <View style={{ margin: 10, padding: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
+                            <TouchableOpacity
+                                style={{ marginRight: 8, justifyContent: "flex-start" }}
+                                onPress={() => navigation.openDrawer()}
+                            >
+                                <Image source={MenuIcon} style={{ width: 24, height: 24 }} />
+                            </TouchableOpacity>
+                            <Image
+                                style={{
+                                    height: 40,
+                                    width: 40,
+                                    marginRight: 6
+                                }}
+                                source={AvatarImg}
+                            />
+                            <View style={{ marginLeft: 10, }}>
+                                <Text style={{
+                                    fontSize: 18,
+                                    fontWeight: "bold",
+                                    color: COLORS.primary
+                                }}
+                                    numberOfLines={1}>
+                                    Hello {userData.Name} !
+                                        </Text>
+                            </View>
+                        </View>
+                        {/* <View style={[styles.icon_container, styles.shadowProp]}>
+                                    <Image style={styles.icon} source={NotificationIcon} />
+                                </View> */}
+                    </View>
+
+                    {/* Search Input */}
+                    <View style={{ margin: 8, padding: 8 }}>
+                        <CustomSearch
+                            label={"Search Videos"}
+                            value={videoType === "TODOLIST" ? searchedTodoVideo : searchedCompVideo}
+                            onChangeText={(value) => {
+                                if (videoType === "TODOLIST") {
+                                    setSearchedTodoVideo(value)
+                                } else {
+                                    setSearchedCompVideo(value)
+                                }
+                            }}
+                        />
+                    </View>
+
+                    <View style={{ margin: 4, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                        <Pressable
+                            style={[videoType == "TODOLIST" ? styles.active_circle_button : styles.circle_button, {
+                                shadowColor: '#000',
+                                shadowOffset: {
+                                    width: 0,
+                                    height: 6,
+                                },
+                                shadowOpacity: 0.25,
+                                shadowRadius: 6,
+                                elevation: 5,
+                            }]}
+                            onPress={() => {
+                                setVideoType("TODOLIST")
+                                setSearchedCompVideo("")
+                            }}>
+                            <View style={{ marginRight: 4 }}>
+                                <Image source={ToDoIcon} style={{ height: 22, width: 22, }} />
+                            </View>
+                            <View>
+                                <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>To Do List</Text>
+                            </View>
+                        </Pressable>
+                        <Pressable
+                            style={[videoType == "COMPLIST" ? styles.active_circle_button : styles.circle_button, {
+                                shadowColor: '#000',
+                                shadowOffset: {
+                                    width: 0,
+                                    height: 6,
+                                },
+                                shadowOpacity: 0.25,
+                                shadowRadius: 6,
+                                elevation: 5,
+                            }]}
+                            onPress={() => {
+                                setVideoType("COMPLIST")
+                                setSearchedTodoVideo("")
+                            }}>
+                            <Image source={CompletedIcon} style={{ height: 22, width: 22, marginRight: 4 }} />
+                            <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>Completed List</Text>
+                        </Pressable>
+                    </View>
                     <ScrollView
                         contentInsetAdjustmentBehavior="automatic"
                         nestedScrollEnabled={true}
@@ -247,76 +336,6 @@ const HomePage = () => {
                         }
                     >
                         <View>
-                            <View style={{ margin: 10, padding: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
-                                    <TouchableOpacity
-                                        style={{ marginRight: 8, justifyContent: "flex-start" }}
-                                        onPress={() => navigation.openDrawer()}
-                                    >
-                                        <Image source={MenuIcon} style={{ width: 24, height: 24 }} />
-                                    </TouchableOpacity>
-                                    <Image
-                                        style={{
-                                            height: 40,
-                                            width: 40,
-                                            marginRight: 6
-                                        }}
-                                        source={AvatarImg}
-                                    />
-                                    <View style={{ marginLeft: 10, }}>
-                                        <Text style={{
-                                            fontSize: 18,
-                                            fontWeight: "bold",
-                                            color: COLORS.primary
-                                        }}
-                                            numberOfLines={1}>
-                                            Hello {userData.Name} !
-                                        </Text>
-                                    </View>
-                                </View>
-                                {/* <View style={[styles.icon_container, styles.shadowProp]}>
-                                    <Image style={styles.icon} source={NotificationIcon} />
-                                </View> */}
-                            </View>
-
-                            {/* Search Input */}
-                            <View style={{ margin: 8, padding: 8 }}>
-                                <CustomSearch
-                                    label={"Search Videos"}
-                                    value={videoType === "TODOLIST" ? searchedTodoVideo : searchedCompVideo}
-                                    onChangeText={(value) => {
-                                        if (videoType === "TODOLIST") {
-                                            setSearchedTodoVideo(value)
-                                        } else {
-                                            setSearchedCompVideo(value)
-                                        }
-                                    }}
-                                />
-                            </View>
-
-                            <View style={{ margin: 4, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                                <Pressable style={videoType == "TODOLIST" ? styles.active_circle_button : styles.circle_button}
-                                    onPress={() => {
-                                        setVideoType("TODOLIST")
-                                        setSearchedCompVideo("")
-                                    }}>
-                                    <View style={{ marginRight: 4 }}>
-                                        <Image source={ToDoIcon} style={{ height: 22, width: 22, }} />
-                                    </View>
-                                    <View>
-                                        <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>To Do List</Text>
-                                    </View>
-                                </Pressable>
-                                <Pressable style={videoType == "COMPLIST" ? styles.active_circle_button : styles.circle_button}
-                                    onPress={() => {
-                                        setVideoType("COMPLIST")
-                                        setSearchedTodoVideo("")
-                                    }}>
-                                    <Image source={CompletedIcon} style={{ height: 22, width: 22, marginRight: 4 }} />
-                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>Completed List</Text>
-                                </Pressable>
-                            </View>
-
                             {videoType == "TODOLIST" &&
                                 <View style={styles.section_header_container}>
                                     <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.darkBlue }}>New Added</Text>
@@ -352,7 +371,7 @@ const HomePage = () => {
                                                             VideoCategory={item.Category}
                                                             CourseNo={item.CourseNo}
                                                             VideoName={item.VideoName}
-                                                            onPress={() => navigation.navigate("Video Detail", item)}
+                                                            onPress={() => navigation.navigate("Video Detail", { item: item, type: "TODOLIST" })}
                                                             Status={item.AssessmentStatus}
                                                             PosterImage={item.PosterPath}
                                                             orientationType={orientation}
@@ -380,8 +399,9 @@ const HomePage = () => {
                                                             VideoCategory={item.Category}
                                                             CourseNo={item.CourseNo}
                                                             VideoName={item.VideoName}
-                                                            onPress={() => navigation.navigate("Video Detail", item)}
+                                                            onPress={() => navigation.navigate("Video Detail", { item: item, type: "TODOLIST" })}
                                                             Status={item.AssessmentStatus}
+                                                            PosterImage={item.PosterPath}
                                                             orientationType={orientation}
                                                         />
                                                     </View>
@@ -393,7 +413,12 @@ const HomePage = () => {
                                         }
                                         {videoType == "TODOLIST" && searchedTodoVideo && searchedTodoVideoData && searchedTodoVideoData.length == 0 &&
                                             <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
-                                                <NoDataFound />
+                                                <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
+                                            </View>
+                                        }
+                                        {videoType == "TODOLIST" && videoData && videoData.lstToDo && videoData.lstToDo.length == 0 &&
+                                            <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
+                                                <NoDataFound title={"No Data Available"} desc="No videos have assissgned for you or you have completed all assessment." imageType="NoData" />
                                             </View>
                                         }
                                     </View>
@@ -423,8 +448,9 @@ const HomePage = () => {
                                                             VideoCategory={item.Category}
                                                             CourseNo={item.CourseNo}
                                                             VideoName={item.VideoName}
-                                                            onPress={() => navigation.navigate("Video Detail", item)}
+                                                            onPress={() => navigation.navigate("Video Detail", { item: item, type: "COMPLIST" })}
                                                             orientationType={orientation}
+                                                            PosterImage={item.PosterPath}
                                                         />
                                                     </View>
                                                 )}
@@ -449,8 +475,9 @@ const HomePage = () => {
                                                             VideoCategory={item.Category}
                                                             CourseNo={item.CourseNo}
                                                             VideoName={item.VideoName}
-                                                            onPress={() => navigation.navigate("Video Detail", item)}
+                                                            onPress={() => navigation.navigate("Video Detail", { item: item, type: "COMPLIST" })}
                                                             orientationType={orientation}
+                                                            PosterImage={item.PosterPath}
                                                         />
                                                     </View>
                                                 )}
@@ -460,7 +487,12 @@ const HomePage = () => {
                                         }
                                         {videoType == "COMPLIST" && searchedCompVideo && searchedCompVideoData && searchedCompVideoData.length == 0 &&
                                             <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
-                                                <NoDataFound />
+                                                <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
+                                            </View>
+                                        }
+                                        {videoType == "COMPLIST" && CompletedList && CompletedList.length == 0 &&
+                                            <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
+                                                <NoDataFound title={"No Data Available"} desc="You had not completed any videos yet." imageType="NoData" />
                                             </View>
                                         }
                                     </View>
@@ -491,8 +523,9 @@ const HomePage = () => {
                                                         VideoName={xx.VideoName}
                                                         TimeLeft={xx.TimeLeft}
                                                         CourseNo={xx.CourseNo}
+                                                        PosterImage={xx.PosterPath}
                                                         onPress={() => {
-                                                            navigation.navigate("Video Detail", xx)
+                                                            navigation.navigate("Video Detail", { item: xx })
                                                         }} />
                                                 </View>
                                             )
@@ -502,6 +535,8 @@ const HomePage = () => {
                             )}
                         </View>
                     </ScrollView>
+                    {/* </View> */}
+
                 </View>
             )}
         </View>

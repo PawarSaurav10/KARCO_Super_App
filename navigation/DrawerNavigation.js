@@ -230,29 +230,29 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                                 }}
                             />
 
-                            <CustomDrawerItem
+                            {/* <CustomDrawerItem
                                 label="Settings"
                                 icon={SettingsIcon}
                                 onPress={() => {
                                     navigation.closeDrawer();
                                 }}
-                            />
+                            /> */}
 
-                            <CustomDrawerItem
+                            {/* <CustomDrawerItem
                                 label="Help Center"
                                 icon={SupportIcon}
                                 onPress={() => {
                                     navigation.closeDrawer();
                                 }}
-                            />
+                            /> */}
 
-                            <CustomDrawerItem
+                            {/* <CustomDrawerItem
                                 label="FAQ"
                                 icon={FAQIcon}
                                 onPress={() => {
                                     navigation.closeDrawer();
                                 }}
-                            />
+                            /> */}
                         </View>
 
                         <View>
@@ -280,6 +280,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                                 onPress={() => {
                                     setSelectedTab("Home");
                                     navigation.navigate(appName === "TrACE Online" ? "Online_Home" : "KPI_Home");
+                                    navigation.closeDrawer();
                                 }}
                             />
                             {appName === "KARCO Videos" &&
@@ -305,29 +306,29 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                                 }}
                             />
 
-                            <CustomDrawerItem
+                            {/* <CustomDrawerItem
                                 label="Settings"
                                 icon={SettingsIcon}
                                 onPress={() => {
                                     navigation.closeDrawer();
                                 }}
-                            />
+                            /> */}
 
-                            <CustomDrawerItem
+                            {/* <CustomDrawerItem
                                 label="Help Center"
                                 icon={SupportIcon}
                                 onPress={() => {
                                     navigation.closeDrawer();
                                 }}
-                            />
+                            /> */}
 
-                            <CustomDrawerItem
+                            {/* <CustomDrawerItem
                                 label="FAQ"
                                 icon={FAQIcon}
                                 onPress={() => {
                                     navigation.closeDrawer();
                                 }}
-                            />
+                            /> */}
                         </View>
 
                         <View
@@ -364,6 +365,7 @@ const DrawerNew = ({ selectedTab, setSelectedTab, route }) => {
             <Drawer.Navigator
                 screenOptions={{
                     headerShown: false,
+                    swipeEdgeWidth: route.params.appName === "KARCO Videos" ? -100 : 80,
                 }}
                 drawerType="slide"
                 overlayColor="transparent"
@@ -394,7 +396,7 @@ const DrawerNew = ({ selectedTab, setSelectedTab, route }) => {
             >
                 <Drawer.Screen name="MainLayout">
                     {(props) => (
-                        <MainLayout {...props} appName={route.params.appName} />
+                        <MainLayout {...props} appName={route.params.appName} videoType={route.params.type} />
                     )}
                 </Drawer.Screen>
             </Drawer.Navigator>
