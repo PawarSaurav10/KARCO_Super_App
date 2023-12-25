@@ -121,7 +121,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                         VideoCategory={item.Category}
                                         CourseNo={item.CourseNo}
                                         VideoName={item.VideoName}
-                                        onPress={() => navigation.navigate("Video Detail", item)}
+                                        onPress={() => navigation.navigate("Video Detail", { item: item, type: "TODOLIST" })}
                                         orientationType={orientation}
                                         PosterImage={item.PosterPath}
                                     />
@@ -143,7 +143,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                         VideoCategory={item.Category}
                                         CourseNo={item.CourseNo}
                                         VideoName={item.VideoName}
-                                        onPress={() => navigation.navigate("Video Detail", item)}
+                                        onPress={() => navigation.navigate("Video Detail", { item: item, type: "TODOLIST" })}
                                         orientationType={orientation}
                                         PosterImage={item.PosterPath}
                                     />
@@ -197,7 +197,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                                 CourseNo={xx.CourseNo}
                                                 PosterImage={xx.PosterPath}
                                                 onPress={() => {
-                                                    navigation.navigate("Video Detail", xx)
+                                                    navigation.navigate("Video Detail", { item: xx })
                                                 }} />
                                         </View>
                                     )
