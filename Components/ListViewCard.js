@@ -24,7 +24,7 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
             onPress={onPress}
         >
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", flex: 0.78 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
                     <View style={{ marginRight: 8 }}>
                         <Image style={{ height: 70, width: 70, borderRadius: 10, objectFit: "cover" }}
                             // defaultSource={{ uri: "https://testtrace.karco.in/videos/poster/default.jpg" }}
@@ -62,12 +62,12 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
                                                     "#ee3024"
                                     }`
                             }}>
-                                <Text style={{ fontSize: 13, fontWeight: "bold", color: COLORS.white }}>{VideoCategory}</Text>
+                                <Text style={{ fontSize: 12, fontWeight: "bold", color: COLORS.white }}>{VideoCategory}</Text>
                             </View>
                         </View>
                     </View>
                 </View>
-                <View style={{ alignItems: "center", justifyContent: "flex-end", flex: 0.22 }}>
+                <View style={{ alignItems: "center", justifyContent: "flex-end", flex: 0.2 }}>
                     <CountdownCircleTimer
                         size={70}
                         rotation={"counterclockwise"}

@@ -258,14 +258,14 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             onClickPlayVideo()
                                         }}
                                         containerStyle={{
-                                            backgroundColor: COLORS.blue,
+                                            backgroundColor: COLORS.primary,
                                             width: "100%",
                                             padding: 16,
                                             alignItems: "center",
                                             marginVertical: 6,
                                             borderRadius: 5,
                                         }}
-                                        iconStyle={{ marginRight: 6 }} />
+                                        iconStyle={{ marginRight: 6, tintColor: "white" }} />
                                     :
                                     <CustomIconButton
                                         label={(videoType == "" || videoType == "PROMOKEY") ? "View Full Video" : "View Promo Video"}
@@ -282,14 +282,14 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             }
                                         }}
                                         containerStyle={{
-                                            backgroundColor: COLORS.blue,
+                                            backgroundColor: COLORS.primary,
                                             width: "100%",
                                             padding: 16,
                                             alignItems: "center",
                                             marginVertical: 6,
                                             borderRadius: 5,
                                         }}
-                                        iconStyle={{ marginRight: 6 }} />
+                                        iconStyle={{ marginRight: 6, tintColor: "white" }} />
                                 }
                                 {route.params.item.AssessmentStatus == "Pending" &&
                                     <CustomIconButton

@@ -213,7 +213,6 @@ const FeedbackScreen = ({ navigation, route }) => {
                     setResultData(res.data)
                 })
                 .catch((error) => {
-                    console.log(error, "error")
                     throw error
                 })
         }
@@ -384,7 +383,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                             }])
                         }
                     }).catch((error) => {
-                        console.log(error);
+                        throw error
                     })
             } catch (error) {
                 console.error(`Error received ${JSON.stringify(err)}`);

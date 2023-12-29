@@ -26,6 +26,7 @@ const AssessmentScreen = ({ navigation, route }) => {
         password: null,
         crewId: null,
         vesselId: null,
+        companyId: null
     })
     const [assessmentData, setAssessmentData] = useState(null)
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -87,23 +88,42 @@ const AssessmentScreen = ({ navigation, route }) => {
                     username: userLoginData.userId,
                     password: route.params.videoPassword,
                     CrewId: userLoginData.crewId,
-                    VesselId: userLoginData.vesselId
+                    VesselId: userLoginData.vesselId,
                 }
             }).then((res) => {
-                setAssessmentData(res.data)
+                if (res.data.QuestionList.length === 0) {
+                    setIsLoading(true)
+                    Alert.alert("Congratulations!", "You have completed the assessment. To generate your certificate, proceed to feedback.", [{
+                        text: 'Proceed To Feedback',
+                        onPress: () => {
+                            callGetOnlineAssessmentApi()
+                            setIsLoading(false)
+                            navigation.replace("Feedback Form", { Id: route.params.Id, videoPassword: route.params.videoPassword })
+                        },
+                    }, {
+                        text: 'Continue Without Feedback',
+                        onPress: () => {
+                            callGetOnlineAssessmentApi()
+                            callFeedbackAPI(route.params.Id, route.params.videoPassword)
+                            setIsLoading(false)
+                            navigation.replace("Online_Home")
+                        },
+                    }])
+                } else {
+                    setAssessmentData(res.data)
+                }
                 setIsLoading(false)
             }).catch((error) => {
-                console.log(error, "error")
                 throw error
             })
         }
     }
 
     const htmlContent = `
-<div width="100%" height="auto" allowfullscreen="true">
-    <iframe id="iframe" src="${getURL.play_video_URL}/${assessmentData ?.videoDetail ?.Videokey}?start=${questionToShow ?.ClipTimingFrom}&end=${questionToShow ?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
-</div>
-`
+        <div width="100%" height="auto" allowfullscreen="true">
+            <iframe id="iframe" src="${getURL.play_video_URL}/${assessmentData ?.videoDetail ?.Videokey}?start=${questionToShow ?.ClipTimingFrom}&end=${questionToShow ?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
+        </div>
+    `
 
     useEffect(() => {
         if (isFocused) {
@@ -120,6 +140,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                     password: res.userPassword,
                     crewId: res.userData.CrewListId,
                     vesselId: res.userData.VesselId,
+                    companyId: res.userData.CompanyId
                 })
             });
         }
@@ -147,13 +168,23 @@ const AssessmentScreen = ({ navigation, route }) => {
         if (assessmentData.QuestionList.length === (questioncountIndex + currentQuestion + 1)) {
             setIsLoading(true)
             Alert.alert("Congratulations!", "You have completed the assessment. To generate your certificate, proceed to feedback.", [{
-                text: 'Proceed',
+                text: 'Continue With Feedback',
                 onPress: () => {
                     callGetOnlineAssessmentApi()
                     setIsLoading(false)
                     navigation.replace("Feedback Form", { Id: route.params.Id, videoPassword: route.params.videoPassword })
                 },
-            }])
+            },
+            {
+                text: 'Continue Without Feedback',
+                onPress: () => {
+                    callGetOnlineAssessmentApi()
+                    callFeedbackAPI(route.params.Id, route.params.videoPassword)
+                    setIsLoading(false)
+                    navigation.replace("Online_Home")
+                }
+            }
+            ])
         } else {
             Alert.alert("Well Done!", "You have provided the correct answer", [{
                 text: 'Proceed',
@@ -179,6 +210,36 @@ const AssessmentScreen = ({ navigation, route }) => {
         }])
     }
 
+    const callFeedbackAPI = (Id, videoPassword) => {
+        let tempData = []
+        tempData.push({
+            CBTAssessment: 0,
+            CBTOverAll: 0,
+            CBTPresentation: 0,
+            CourseContent: 0,
+            KnowledgeScope: 0,
+            KnowledgeVolume: 0,
+            Opinion: 0,
+            PartCourse: "",
+            StructureNContent: 0,
+            ToBeImproved: "",
+            Understanding: 0,
+            VideoObjective: 0,
+            VideoQuality: 0,
+            password: videoPassword
+        })
+        axios.get(`${getURL.base_URL}/AppFeedback/SaveFeedbackActivity`, {
+            params: {
+                FeedbackData: JSON.stringify(tempData),
+                VideoId: Id,
+                username: userLoginData.userId,
+                password: videoPassword,
+                CrewId: userLoginData.crewId,
+                VesselId: userLoginData.vesselId,
+                CompanyId: userLoginData.companyId
+            }
+        })
+    }
 
     const callUpdateCrewActivityAPI = (data, questionIndex, selected) => {
         setIsLoading(true)
@@ -274,6 +335,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                     }
                     title={assessmentData ?.videoDetail ?.VideoName}
                 />
+
                 {isLoading &&
                     <AssessmentScreenLoader />
                 }
@@ -389,16 +451,13 @@ const AssessmentScreen = ({ navigation, route }) => {
                                     </View>
                                 </Modal>
                             </ScrollView>
-
                         }
-
                     </View>
                 }
             </ScrollView>
         </View>
     )
 }
-
 
 const styles = StyleSheet.create({
     options_container: {

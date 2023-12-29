@@ -108,12 +108,12 @@ const LoginScreen = ({ navigation, route }) => {
                         })
                 }
             } catch (error) {
-                return console.log(error)
+                throw error
             }
         } else {
             setIsLoading(false)
             Alert.alert('Warning', `Plaese Enter ${loginData.userId === "" ? "Username" : loginData.password === "" ? "Password" : "Username and Password"}`, [
-                { text: 'OK', onPress: () => console.log("OK Pressed") },
+                { text: 'OK' },
             ]);
         }
         // } else {

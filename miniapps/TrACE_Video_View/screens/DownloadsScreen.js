@@ -35,7 +35,6 @@ const DownloadsScreen = () => {
         Alert.alert('Warning', 'Are you sure do you want to delete this video.', [
             {
                 text: 'Cancel',
-                onPress: () => console.log('Cancel Pressed'),
                 style: 'cancel',
             },
             {
