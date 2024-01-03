@@ -148,7 +148,7 @@ const HomeScreen = (props) => {
                 />
             }
             {!isLoading &&
-                <View>
+                <View style={{ flex: 1 }}>
                     <View style={{ margin: 10, padding: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                         <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
                             <Image

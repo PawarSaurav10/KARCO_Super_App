@@ -19,6 +19,7 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 import SubmitIcon from "../../../Images/submit.png"
 import CustomButton from '../../../Components/CustomButton';
 import NetInfo from "@react-native-community/netinfo";
+import { BlurView } from '../../../node_modules/@react-native-community/blur';
 
 const FeedbackScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused();
@@ -138,6 +139,7 @@ const FeedbackScreen = ({ navigation, route }) => {
     const [resultData, setResultData] = useState(null)
     const [isVisibleModal, setIsVisibleModal] = useState(false)
     const [orientation, setOrientation] = useState()
+    const [viewRef, setViewRef] = useState(null);
 
     /**
     * Returns true if the screen is in portrait mode
@@ -682,13 +684,13 @@ const FeedbackScreen = ({ navigation, route }) => {
                     <View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>
                             <Text style={{ color: "white" }}>
-                                Please provide an overall rating based on your experience of using and learning this module on this platform. 
+                                Please provide an overall rating based on your experience of using and learning this module on this platform.
                                 {/* <Text style={{ color: "red" }}>*</Text> */}
                             </Text>
                         </View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>
                             <Rating
-                                startingValue={0}
+                                startingValue={4}
                                 minValue={0}
                                 type='star'
                                 ratingCount={5}
@@ -712,6 +714,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                         onPress={() => {
                             CheckConnectivity()
                             setIsVisibleModal(true)
+                            setViewRef(true)
                         }}
                         labelStyle={{ color: COLORS.white, fontSize: 14, textTransform: "uppercase", borderBottomWidth: 2, borderBottomColor: COLORS.white }}
                     />
@@ -750,6 +753,20 @@ const FeedbackScreen = ({ navigation, route }) => {
                             marginTop: 'auto',
                             backgroundColor: 'rgba(0,0,0,0.6)',
                         }}>
+                        {/* <BlurView
+                            viewRef={viewRef}
+                            style={{
+                                position: 'absolute',
+                                left: 0,
+                                top: 0,
+                                bottom: 0,
+                                right: 0,
+                            }}
+                            blurType={"light"}
+                            blurAmount={1}
+                            blurRadius={1}
+                            overlayColor={'rgba(0,0,0,0.6)'}
+                        /> */}
                         <View style={{
                             maxHeight: "85%",
                             // height: orientation === "landscape" ? "85%" : '40%',

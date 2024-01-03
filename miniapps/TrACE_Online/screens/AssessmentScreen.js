@@ -13,9 +13,19 @@ import AssessmentScreenLoader from '../../../Components/AssessmentScreenLoader';
 import NetInfo from "@react-native-community/netinfo";
 import { Colors } from '../../../node_modules/react-native/Libraries/NewAppScreen';
 import CloseIcon from "../../../Images/close.png"
-
+import {
+    Canvas,
+    Fill,
+    BackdropBlur,
+    ColorMatrix,
+    useImage,
+} from "@shopify/react-native-skia";
+import { BlurView } from '@react-native-community/blur';
+import Pdf from 'react-native-pdf';
+// import Pdf from '../../../node_modules/react-native-pdf';
 
 const AssessmentScreen = ({ navigation, route }) => {
+    console.log(route, "route")
     const videoPlay = useRef(null)
     const isFocused = useIsFocused()
     const [playVideo, setPlayVideo] = useState(false)
@@ -31,6 +41,15 @@ const AssessmentScreen = ({ navigation, route }) => {
     const [assessmentData, setAssessmentData] = useState(null)
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [orientation, setOrientation] = useState()
+
+    const [showBlur, setShowBlur] = useState(true);
+    const [viewRef, setViewRef] = useState(null);
+    const [blurType, setBlurType] = useState('light');
+
+    const tintColor = ['#ffffff', '#000000'];
+    if (blurType === 'xlight') {
+        tintColor.reverse();
+    }
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -206,6 +225,8 @@ const AssessmentScreen = ({ navigation, route }) => {
                 // videoPlay.current.focus()
                 setPlayVideo(true)
                 setSelectedOptions("")
+                setShowBlur(true)
+                setViewRef(true)
             },
         }])
     }
@@ -395,6 +416,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                                         }
                                     </View>
                                 } */}
+                                {/* {showBlur ? renderBlurView() : null} */}
                                 <Modal
                                     animationType="slide"
                                     transparent={true}
@@ -403,35 +425,50 @@ const AssessmentScreen = ({ navigation, route }) => {
                                         setPlayVideo(false)
                                     }}
                                 >
-                                    <View
-                                        style={{
-                                            height: '100%',
-                                            backgroundColor: 'rgba(0,0,0,0.6)',
-                                        }}>
-                                        <View style={{
-                                            position: 'absolute', top: 0, left: 10, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', width: Dimensions.get('screen').width - 20,
-                                            shadowColor: '#000',
-                                            shadowOffset: {
-                                                width: 10,
-                                                height: 10,
-                                            },
-                                            shadowOpacity: 0.50,
-                                            shadowRadius: 6,
-                                            elevation: 5,
-                                        }}>
-                                            <TouchableOpacity
-                                                style={{ flex: 0.07, marginLeft: "auto", padding: 4 }}
-                                                onPress={() => {
-                                                    setPlayVideo(!playVideo);
-                                                }}>
-                                                <View style={{ backgroundColor: "white", width: 24, height: 24, alignItems: 'center', justifyContent: "center", borderRadius: 20 }}>
-                                                    <Image source={CloseIcon} style={{ width: 16, height: 16 }} />
-                                                </View>
-                                            </TouchableOpacity>
-                                            <View style={{ width: "100%", height: orientation === "landscape" ? 280 : 200 }}>
-                                                {route.params.ModuleType == "Circular" ?
-                                                    <PDFViewer pdf={assessmentData.videoDetail.VideoPath} pageNo={questionToShow ?.ClipTimingFrom} />
-                                                    :
+                                    {assessmentData.videoDetail.ModuleType !== "Company Content" &&
+                                        <View
+                                            style={{
+                                                width: "100%",
+                                                height: '100%',
+                                                marginTop: 'auto',
+                                                backgroundColor: 'rgba(0,0,0,0.6)',
+                                            }}>
+
+                                            <BlurView
+                                                viewRef={viewRef}
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: 0,
+                                                    top: 0,
+                                                    bottom: 0,
+                                                    right: 0,
+                                                }}
+                                                blurType={"light"}
+                                                blurAmount={1}
+                                                overlayColor={'rgba(0,0,0,0.6)'}
+                                            />
+                                            <View style={{
+                                                position: 'absolute', top: 0, left: 10, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', width: Dimensions.get('screen').width - 20,
+                                                shadowColor: '#000',
+                                                shadowOffset: {
+                                                    width: 10,
+                                                    height: 10,
+                                                },
+                                                shadowOpacity: 0.50,
+                                                shadowRadius: 6,
+                                                elevation: 5,
+                                            }}>
+                                                <TouchableOpacity
+                                                    style={{ flex: orientation === "landscape" ? 0.6 : 0.07, marginLeft: "auto", padding: 4 }}
+                                                    onPress={() => {
+                                                        setPlayVideo(!playVideo);
+                                                    }}>
+                                                    <View style={{ backgroundColor: "white", width: 24, height: 24, alignItems: 'center', justifyContent: "center", borderRadius: 20 }}>
+                                                        <Image source={CloseIcon} style={{ width: 16, height: 16 }} />
+                                                    </View>
+                                                </TouchableOpacity>
+
+                                                <View style={{ width: Dimensions.get('window').width - (orientation === "landscape" ? 40 : 20), height: orientation === "landscape" ? 280 : 200 }}>
                                                     <WebView
                                                         ref={videoPlay}
                                                         source={{ html: htmlContent }}
@@ -445,10 +482,50 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                         automaticallyAdjustContentInsets
                                                         minimumFontSize={18}
                                                     />
-                                                }
+                                                </View>
+                                            </View>
+
+                                        </View>
+                                    }
+                                    {assessmentData.videoDetail.ModuleType == "Company Content" &&
+                                        <View
+                                            style={{
+                                                width: "100%",
+                                                height: '100%',
+                                                marginTop: 'auto',
+                                                backgroundColor: Colors.lighter,
+                                                position: "relative",
+                                            }}>
+                                            <View style={{ flex: 0.03, padding: 10 }}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        setPlayVideo(false)
+                                                    }}>
+                                                    <Image source={CloseIcon} style={{ width: 20, height: 20 }} />
+                                                </TouchableOpacity>
+                                            </View>
+                                            <View style={{ flex: 0.97 }}>
+                                                <Pdf
+                                                    enablePaging={true}
+                                                    scale={1.0}
+                                                    minScale={1.0}
+                                                    trustAllCerts={false}
+                                                    source={{ uri: `${getURL.view_PDF_URL}/${assessmentData.videoDetail.VideoPath}` }}
+                                                    style={{ flex: 1, position: "relative" }}
+                                                    onError={(error) => {
+                                                        Alert.alert('Oops !!', 'File is not View able or corrupted', [
+                                                            { text: 'OK', onPress: () => setPlayVideo(false) },
+                                                        ]);
+                                                    }}
+                                                    page={questionToShow ?.ClipTimingFrom}
+                                                    renderActivityIndicator={() =>
+                                                        <ActivityIndicator color={COLORS.blue} size={"large"} />
+                                                    }
+                                                />
                                             </View>
                                         </View>
-                                    </View>
+
+                                    }
                                 </Modal>
                             </ScrollView>
                         }

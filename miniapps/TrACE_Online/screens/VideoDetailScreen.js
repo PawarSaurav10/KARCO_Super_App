@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, Dimensions, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Alert, Modal, ScrollView, BackHandler, PermissionsAndroid } from 'react-native'
 import { WebView } from 'react-native-webview';
 import { COLORS } from '../../../Constants/theme';
@@ -20,7 +20,18 @@ import { getURL } from "../../../baseUrl"
 import NetInfo from "@react-native-community/netinfo";
 
 const VideoDetailScreen = ({ navigation, route }) => {
+    const htmlContentPromo = `
+            <div width="100%" height="auto" allowFullScreen = "true">
+                <iframe id="iframe" src="${getURL.play_video_URL}/${route.params.item.videokeypromo}" frameborder="0" allowFullscreen="true"  width="100%" height="100%" allowtransparency="true" onload="displayMessage()"/>
+            </div>
+    `;
+    const htmlContentFull = `
+        <div width="100%" height="auto" allowfullscreen="true">
+            <iframe src="${getURL.play_video_URL}/${route.params.item.videokey}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
+        </div>
+      `;
     const isFocused = useIsFocused();
+    const webViewRef = useRef(null);
     const [videoType, setVideoType] = useState("")
     const [isLoading, setIsLoading] = useState(true)
     const [userLoginData, setUserLoginData] = useState({
@@ -30,8 +41,12 @@ const VideoDetailScreen = ({ navigation, route }) => {
         vesselId: null,
     })
     const [viewPdf, setViewPdf] = useState(false)
+    const [htmlContent, setHtmlContent] = useState(htmlContentPromo)
 
     const [orientation, setOrientation] = useState()
+    const [canGoBack, setCanGoBack] = useState(true)
+    const [canGoForward, setCanGoForward] = useState(true)
+    const [currentUrl, setCurrentUrl] = useState('')
 
     const backAction = () => {
         navigation.replace("Online_Home", { type: route.params.type })
@@ -107,23 +122,26 @@ const VideoDetailScreen = ({ navigation, route }) => {
         return () => clearTimeout(timer);
     }, []);
 
-    const htmlContentPromo = `
-    <html>
-        <body>
-            <div width="100%" height="auto" allowFullScreen = "true">
-                <iframe id="iframe" src="${getURL.play_video_URL}/${route.params.item.videokeypromo}" frameborder="0" allowFullscreen="true"  width="100%" height="100%" allowtransparency="true" onload="displayMessage()"/>
-            </div>
-            <script>
-             document.getElementById("iframe").play()
-            </script>
-        </body>
-    </html>
-      `;
-    const htmlContent = `
-        <div width="100%" height="auto" allowfullscreen="true">
-            <iframe src="${getURL.play_video_URL}/${route.params.item.videokey}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
-        </div>
-      `;
+
+
+    // const onShouldStartLoadWithRequest = (event) => {
+    //     console.log(event, "event")
+    //     // Check the URL here
+    //     // const url = event.url;
+
+    //     // // If the URL triggers the confirm navigation popup, return false
+    //     // if (url.includes('example.com/confirm-popup')) {
+    //     //     return false;
+    //     // }
+
+    //     // // Allow navigation for other URLs
+    //     // return true;
+    // };
+
+    // const disableNavigationPopup = `
+    // window.addEventListener('beforeunload', function(event) {
+    //   event.stopImmediatePropagation();
+    // }); `
 
     const onPromoViewVideoClick = () => {
         axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoPreViewActivity?VideoId=${route.params.item.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
@@ -139,6 +157,14 @@ const VideoDetailScreen = ({ navigation, route }) => {
         axios.get(`${getURL.base_URL}/AppVideo/UpdateCrewActivity?VideoId=${route.params.item.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
             .then((response) => { })
     }
+
+    // function webViewgoback() {
+    //     if (webViewRef.current) webViewRef.current.goBack();
+    // }
+
+    // function webViewNext() {
+    //     if (webViewRef.current) webViewRef.current.goForward();
+    // }
 
     // const onSynopsisPress = useCallback(async (url) => {
     //     await Linking.openURL(url);
@@ -169,25 +195,34 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         <ScrollView
                             contentInsetAdjustmentBehavior="automatic"
                         >
-                            <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
-                                {route.params.item.ModuleType == "Circular"
-                                    ? <PDFViewer pdf={route.params.item.VideoPath} pageNo={1} />
-                                    : <WebView
-                                        ref={(ref) => (webViewRef = ref)}
-                                        source={{ html: (videoType == "PROMOKEY" || videoType == "") ? htmlContentPromo : htmlContent }}
-                                        allowsFullscreenVideo={true}
-                                        mediaPlaybackRequiresUserAction={true}
-                                        allowsInlineMediaPlayback={true}
-                                        domStorageEnabled={true}
-                                        allowFileAccess={false}
-                                        // startInLoadingState={true}
-                                        startInLoadingState={<ActivityIndicator />}
-                                        automaticallyAdjustContentInsets
-                                        minimumFontSize={18}
-                                        injectJavaScript={true}
-                                    />
-                                }
-                            </View>
+                            {(videoType == "PROMOKEY" || videoType == "") &&
+                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
+                                    {route.params.item.ModuleType == "Circular"
+                                        ? <PDFViewer pdf={route.params.item.VideoPath} pageNo={1} />
+                                        : <WebView
+                                            source={{ html: htmlContentPromo }}
+                                            allowsFullscreenVideo={true}
+                                            automaticallyAdjustContentInsets
+                                            mediaPlaybackRequiresUserAction={true}
+                                            startInLoadingState={<ActivityIndicator />}
+                                            minimumFontSize={12} />
+                                    }
+                                </View>
+                            }
+                            {videoType == "FULLKEY" &&
+                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
+                                    {route.params.item.ModuleType == "Circular"
+                                        ? <PDFViewer pdf={route.params.item.VideoPath} pageNo={1} />
+                                        : <WebView
+                                            source={{ html: htmlContent }}
+                                            allowsFullscreenVideo={true}
+                                            automaticallyAdjustContentInsets
+                                            mediaPlaybackRequiresUserAction={true}
+                                            startInLoadingState={<ActivityIndicator />}
+                                            minimumFontSize={12} />
+                                    }
+                                </View>
+                            }
                             <View style={{ margin: 20 }}>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1 }}>
                                     <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.item.VideoName}</Text>
@@ -274,9 +309,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             CheckConnectivity()
                                             onClickPlayVideo()
                                             if ((videoType === "PROMOKEY") || (videoType === "")) {
+                                                // webViewNext()
+                                                setHtmlContent(htmlContentFull)
                                                 setVideoType("FULLKEY")
                                                 onFullViewVideoClick()
                                             } else {
+                                                // webViewgoback()
+                                                setHtmlContent(htmlContentPromo)
                                                 setVideoType("PROMOKEY")
                                                 onPromoViewVideoClick()
                                             }
