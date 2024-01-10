@@ -172,7 +172,6 @@ const MainLayout = ({
                 index: 0,
                 animated: false,
             });
-
             homeTabFlex.value = withTiming(4, { duration: 500 });
             homeTabColor.value = withTiming(COLORS.primary, { duration: 500 });
         } else {
@@ -185,7 +184,6 @@ const MainLayout = ({
                 index: 1,
                 animated: false,
             });
-
             searchTabFlex.value = withTiming(4, { duration: 500 });
             searchTabColor.value = withTiming(COLORS.primary, { duration: 500 });
         } else {

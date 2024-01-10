@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Dimensions, Image, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator, StyleSheet, Button } from 'react-native'
+import { View, Text, Dimensions, Image, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator } from 'react-native'
 import { WebView } from 'react-native-webview';
 import { COLORS } from '../../../Constants/theme';
 import CustomIconButton from '../../../Components/CustomIconButton';
@@ -160,126 +160,127 @@ const VideoDetailScreen = ({ navigation, route }) => {
     }
 
     const htmlStyles = `
-    <style>
-    .video-js{
-        width: 100% !important;
-        height: 100% !important;
-        background: #004C6B;
-    }
-    //   .container:hover .controls,
-    //   .container:focus-within .controls {
-    //     display: flex;
-    //   }
-    // .container {
-    //     position: relative;
-    //     display: flex;
-    //     width:100%;
-    //     height: 100%;
-    //     justify-content: center;
-    //     align-items: center;
-    // }
-    // .container #video {
-    //     width: 100%;
-    //     height: 100%;
-    //     border-radius: 0px;
-    // }
-    // .container .controls {
-    //     padding: 10px;
-    //     position: absolute;
-    //     bottom: 0px;
-    //     width: 100%;
-    //     display: flex;
-    //     justify-content: space-around;
-    //     opacity: 1;
-    //     background: #004C6B;
-    //     transition: opacity 0.4s;
-    // }
+        <style>
+            .video-js{
+                width: 100% !important;
+                height: 100% !important;
+                background: #004C6B;
+            }
+            //   .container:hover .controls,
+            //   .container:focus-within .controls {
+            //     display: flex;
+            //   }
+            // .container {
+            //     position: relative;
+            //     display: flex;
+            //     width:100%;
+            //     height: 100%;
+            //     justify-content: center;
+            //     align-items: center;
+            // }
+            // .container #video {
+            //     width: 100%;
+            //     height: 100%;
+            //     border-radius: 0px;
+            // }
+            // .container .controls {
+            //     padding: 10px;
+            //     position: absolute;
+            //     bottom: 0px;
+            //     width: 100%;
+            //     display: flex;
+            //     justify-content: space-around;
+            //     opacity: 1;
+            //     background: #004C6B;
+            //     transition: opacity 0.4s;
+            // }
 
-    // .container .controls button {
-    //     background: transparent;
-    //     color: #fff;
-    //     font-weight: bolder;
-    //     text-shadow: 2px 1px 2px #000;
-    //     border: none;
-    //     cursor: pointer;
-    // }
-    // .container .controls .timeline {
-    //     flex: 1;
-    //     display: flex;
-    //     align-items: center;
-    //     border: none;
-    //     // border-right: 3px solid #ccc;
-    //     // border-left: 3px solid #ccc;
-    // }
-    // .container .controls .timeline .bar{
-    //     background: rgb(1, 1, 65);
-    //     height: 10px;
-    //     width: 100%;
-    //     // flex: 1;
-    // }
-    // .container .controls .timeline .bar .inner{
-    //     background: #ccc;
-    //     width: 0%;
-    //     height: 100%;
-    // }
-    // .fa {
-    //     font-size: 28px !important;
-    // }
+            // .container .controls button {
+            //     background: transparent;
+            //     color: #fff;
+            //     font-weight: bolder;
+            //     text-shadow: 2px 1px 2px #000;
+            //     border: none;
+            //     cursor: pointer;
+            // }
+            // .container .controls .timeline {
+            //     flex: 1;
+            //     display: flex;
+            //     align-items: center;
+            //     border: none;
+            //     // border-right: 3px solid #ccc;
+            //     // border-left: 3px solid #ccc;
+            // }
+            // .container .controls .timeline .bar{
+            //     background: rgb(1, 1, 65);
+            //     height: 10px;
+            //     width: 100%;
+            //     // flex: 1;
+            // }
+            // .container .controls .timeline .bar .inner{
+            //     background: #ccc;
+            //     width: 0%;
+            //     height: 100%;
+            // }
+            // .fa {
+            //     font-size: 28px !important;
+            // }
 
-    .vjs-matrix.video-js .vjs-big-play-button {
-        position: absolute; 
-        left: 0; 
-        right: 0; 
-        margin-left: auto; 
-        margin-right: auto; 
-        width: ${orientation === "landscape" ? "60px" : "80px"}; /* Need a specific value to work */
-        height: ${orientation === "landscape" ? "60px" : "80px"};
-        background-color: #004C6B !important;
-        border-color: #004C6B;
-        border-radius: ${orientation === "landscape" ? "60px" : "80px"};
-    }
-    
-    .vjs-matrix.video-js {
-        color: white;
-        font-size:  ${orientation === "landscape" ? "12px" : "18px"} !important;
-        text-align: "center"
-    }
+            .vjs-matrix.video-js .vjs-big-play-button {
+                position: absolute; 
+                left: 0; 
+                right: 0; 
+                margin-left: auto; 
+                margin-right: auto; 
+                width: ${orientation === "landscape" ? "60px" : "80px"}; /* Need a specific value to work */
+                height: ${orientation === "landscape" ? "60px" : "80px"};
+                background-color: #004C6B !important;
+                border-color: #004C6B;
+                border-radius: ${orientation === "landscape" ? "60px" : "80px"};
+            }
+            
+            .vjs-matrix.video-js {
+                color: white;
+                font-size:  ${orientation === "landscape" ? "12px" : "18px"} !important;
+                text-align: "center"
+            }
 
-    .vjs-matrix.video-js .vjs-control-bar{
-        position: absolute;
-        bottom: 0;
-        background-color: #004C6B;
-        height: ${orientation === "landscape" ? "50px" : "72px"};
-        padding: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    </style>
+            .vjs-matrix.video-js .vjs-control-bar{
+                position: absolute;
+                bottom: 0;
+                background-color: #004C6B;
+                height: ${orientation === "landscape" ? "50px" : "72px"};
+                padding: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        </style>
     `
 
     const htmlContent = `
-    <html> 
-        <body> 
-            <head>
-                <link href="https://vjs.zencdn.net/8.6.1/video-js.min.css" rel="stylesheet" />
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-            </head>
-            <div data-vjs-player>
-                <video   
-                id="my_video"
-                class="vjs-matrix vjs-default-skin video-js "
-                controls
-                width="960"
-                height="264"
-                poster="${videoDetail && videoDetail.thumbnail}"
-                data-setup='{"playbackRates": [0.5, 1, 1.5, 2],"fill": true, "responsive": true}'>
-                    <source src="${videoDetail && videoDetail.originalFileURL}"  type="video/mp4">
-                </video>
-            </div>
-            <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-        </body> 
-     </html>`
+        <html> 
+            <body> 
+                <head>
+                    <link href="https://vjs.zencdn.net/8.6.1/video-js.min.css" rel="stylesheet" />
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+                </head>
+                <div data-vjs-player>
+                    <video   
+                    id="my_video"
+                    class="vjs-matrix vjs-default-skin video-js "
+                    controls
+                    width="960"
+                    height="264"
+                    poster="${videoDetail && videoDetail.thumbnail}"
+                    data-setup='{"playbackRates": [0.5, 1, 1.5, 2],"fill": true, "responsive": true}'>
+                        <source src="${videoDetail && videoDetail.originalFileURL}"  type="video/mp4">
+                    </video>
+                </div>
+                <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
+            </body> 
+        </html>
+    `
 
     // const htmlContent = `
     // <html>
@@ -310,35 +311,29 @@ const VideoDetailScreen = ({ navigation, route }) => {
     // </html>   
     // `
 
-    // const htmlContent = `
-    //         <video width="100%" height="100%" controls controlsList="nodownload" preload="auto" poster="${videoDetail && videoDetail.thumbnail}" style="background-color: #000;">
-    //             <source src="${videoDetail && videoDetail.originalFileURL}" type="video/mp4">
-    //         </video>
-    //   `;
-
     const htmlDownloadContent = `
-    <html> 
-        <body> 
-            <head>
-                <link href="https://vjs.zencdn.net/8.6.1/video-js.min.css" rel="stylesheet" />
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-            </head>
-            <div data-vjs-player>
-                <video   
-                autoplay
-                id="my_video"
-                class="vjs-matrix vjs-default-skin video-js "
-                controls
-                width="960"
-                height="264"
-                data-setup='{"playbackRates": [0.5, 1, 1.5, 2],"fill": true, "responsive": true}'>
-                    <source src="file://${fileContent}"  type="video/mp4">
-                </video>
-            </div>
-            <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-        </body> 
-     </html>
-      `;
+        <html> 
+            <body> 
+                <head>
+                    <link href="https://vjs.zencdn.net/8.6.1/video-js.min.css" rel="stylesheet" />
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+                </head>
+                <div data-vjs-player>
+                    <video   
+                    autoplay
+                    id="my_video"
+                    class="vjs-matrix vjs-default-skin video-js "
+                    controls
+                    width="960"
+                    height="264"
+                    data-setup='{"playbackRates": [0.5, 1, 1.5, 2],"fill": true, "responsive": true}'>
+                        <source src="file://${fileContent}"  type="video/mp4">
+                    </video>
+                </div>
+                <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
+            </body> 
+        </html>
+    `;
 
     let rawhtml = htmlStyles + htmlContent
     let rawhtmlContent = htmlStyles + htmlDownloadContent
@@ -352,6 +347,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     color={COLORS.primary}
                 />
             }
+
             {!isLoading && !isView &&
                 <>
                     <Header
@@ -380,9 +376,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 allowsFullscreenVideo={true}
                                 minimumFontSize={orientation === "landscape" ? 16 : 30}
                                 scalesPageToFit={(Platform.OS === 'ios') ? false : true}
-                                // injectedJavaScript={
-                                //     runjsscript
-                                // }
                                 javaScriptEnabled={true}
                             />
                         </View>
@@ -394,21 +387,18 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 {/* <View style={[styles.icon_container, styles.shadowProp]}><Image style={styles.icon} source={FavouriteIcon} /></View> */}
                             </View>
                             {route.params.type !== "Downloads" &&
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 4 }}>
-                                    <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 10 }}>
-                                        <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
-                                            <Image style={{
-                                                height: 16,
-                                                width: 16,
-                                            }} source={images.calendar_icon} />
-                                        </View>
-                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(videoDetail && videoDetail.created).format("DD MMM YYYY")}</Text>
-                                    </View>
-                                </View>
-                            }
-
-                            {route.params.type !== "Downloads" &&
                                 <>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 4 }}>
+                                        <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 10 }}>
+                                            <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
+                                                <Image style={{
+                                                    height: 16,
+                                                    width: 16,
+                                                }} source={images.calendar_icon} />
+                                            </View>
+                                            <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(videoDetail && videoDetail.created).format("DD MMM YYYY")}</Text>
+                                        </View>
+                                    </View>
                                     <View style={{ borderWidth: 1, borderColor: COLORS.darkBlue, width: "100%", marginVertical: 8 }}></View>
                                     <CustomIconButton
                                         label={"Download"}

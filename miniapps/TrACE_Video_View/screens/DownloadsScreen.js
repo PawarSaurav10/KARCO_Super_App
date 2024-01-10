@@ -127,7 +127,8 @@ const DownloadsScreen = (props) => {
                             />
                         </View>
                     }
-                    <ScrollView>
+
+                    <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }}>
                         <View style={{ flex: 1, marginBottom: props.ScreenName === "Downloads" ? (orientation === "landscape" ? 50 : 80) : 0 }}>
                             {!searchedVideo && directory.length > 0 &&
                                 <View style={{ margin: 6, padding: 6 }}>
@@ -147,11 +148,13 @@ const DownloadsScreen = (props) => {
                                     />
                                 </View>
                             }
+
                             {!searchedVideo && directory.length === 0 &&
                                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                                     <NoDataFound title={"No Data Available"} desc="Please Download Videos to view Downloaded Videos." imageType="NoData" />
                                 </View>
                             }
+
                             {searchedVideo && searchedVideoData && searchedVideoData.length > 0 &&
                                 <View style={{ margin: 6, padding: 6, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <FlatList
@@ -169,29 +172,13 @@ const DownloadsScreen = (props) => {
                                     />
                                 </View>
                             }
+                            
                             {searchedVideo && searchedVideoData.length === 0 &&
                                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginVertical: orientation === "landscape" ? 0 : 110 }}>
                                     <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
                                 </View>
                             }
                         </View>
-                        {/* {directory.length > 0 ? (
-                        <View style={{ margin: 6, padding: 6 }}>
-                            <FlatList
-                                data={directory}
-                                keyExtractor={item => item.filename}
-                                renderItem={({ item, index }) => (
-                                    <View style={{ flex: 1 }}>
-                                        <VideoListView videoName={item.filename} createdDate={item.lastModified} listType={"Downloads"} item={item} onDelete={deleteFile} />
-                                    </View>
-                                )}
-                            />
-                        </View>
-                    ) : (
-                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                <NoDataFound title={"No Data Available"} desc="Please Download Videos to view Downloaded Videos." imageType="NoData" />
-                            </View>
-                        )} */}
                     </ScrollView>
                 </View>
             }

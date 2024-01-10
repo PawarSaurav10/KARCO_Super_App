@@ -177,60 +177,62 @@ const HomeScreen = (props) => {
                             </View >
                         }
 
-                        <ScrollView>
-                            {!isView &&
-                                <View style={{ flex: 1, marginHorizontal: 6 }}>
-                                    {!searchedVideo &&
-                                        <FlatList
-                                            refreshing={isLoading}
-                                            onRefresh={onRefresh}
-                                            data={videoList}
-                                            keyExtractor={item => item.id}
-                                            showsHorizontalScrollIndicator={false}
-                                            renderItem={({ item, index }) => (
-                                                <VideoListView
-                                                    thumbnail={item.thumbnail}
-                                                    videoName={item.name}
-                                                    createdDate={item.created}
-                                                    OnPress={() => {
-                                                        CheckConnectivity()
-                                                        navigation.navigate("Video Detail", item.id)
-                                                    }}
-                                                    orientationType={orientation}
-                                                />
-                                            )}
-                                        />
-                                    }
+                        <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }}>
+                            <View style={{ flex: 1 }}>
+                                {!isView &&
+                                    <View style={{ flex: 1, marginHorizontal: 6 }}>
+                                        {!searchedVideo &&
+                                            <FlatList
+                                                refreshing={isLoading}
+                                                onRefresh={onRefresh}
+                                                data={videoList}
+                                                keyExtractor={item => item.id}
+                                                showsHorizontalScrollIndicator={false}
+                                                renderItem={({ item, index }) => (
+                                                    <VideoListView
+                                                        thumbnail={item.thumbnail}
+                                                        videoName={item.name}
+                                                        createdDate={item.created}
+                                                        OnPress={() => {
+                                                            CheckConnectivity()
+                                                            navigation.navigate("Video Detail", item.id)
+                                                        }}
+                                                        orientationType={orientation}
+                                                    />
+                                                )}
+                                            />
+                                        }
 
-                                    {searchedVideo && searchedVideoData && searchedVideoData.length > 0 &&
-                                        <FlatList
-                                            refreshing={isLoading}
-                                            onRefresh={onRefresh}
-                                            data={searchedVideo !== "" && searchedVideoData}
-                                            keyExtractor={item => item.id}
-                                            showsHorizontalScrollIndicator={false}
-                                            renderItem={({ item, index }) => (
-                                                <VideoListView
-                                                    thumbnail={item.thumbnail}
-                                                    videoName={item.name}
-                                                    createdDate={item.created}
-                                                    OnPress={() => {
-                                                        CheckConnectivity()
-                                                        navigation.navigate("Video Detail", item.id)
-                                                    }}
-                                                    orientationType={orientation}
-                                                />
-                                            )}
-                                        />
-                                    }
+                                        {searchedVideo && searchedVideoData && searchedVideoData.length > 0 &&
+                                            <FlatList
+                                                refreshing={isLoading}
+                                                onRefresh={onRefresh}
+                                                data={searchedVideo !== "" && searchedVideoData}
+                                                keyExtractor={item => item.id}
+                                                showsHorizontalScrollIndicator={false}
+                                                renderItem={({ item, index }) => (
+                                                    <VideoListView
+                                                        thumbnail={item.thumbnail}
+                                                        videoName={item.name}
+                                                        createdDate={item.created}
+                                                        OnPress={() => {
+                                                            CheckConnectivity()
+                                                            navigation.navigate("Video Detail", item.id)
+                                                        }}
+                                                        orientationType={orientation}
+                                                    />
+                                                )}
+                                            />
+                                        }
 
-                                    {searchedVideo && searchedVideoData && searchedVideoData.length === 0 &&
-                                        <View style={{ flex: 1, marginVertical: orientation === "landscape" ? 0 : 110 }}>
-                                            <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
-                                        </View>
-                                    }
-                                </View>
-                            }
+                                        {searchedVideo && searchedVideoData && searchedVideoData.length === 0 &&
+                                            <View style={{ flex: 1, justifyContent: "center" }}>
+                                                <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
+                                            </View>
+                                        }
+                                    </View>
+                                }
+                            </View>
                         </ScrollView>
 
                         {isView === true && (
@@ -238,7 +240,6 @@ const HomeScreen = (props) => {
                         )}
                     </View>
                 </View>
-
             }
         </View>
     )
