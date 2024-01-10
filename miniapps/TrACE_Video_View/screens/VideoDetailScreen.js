@@ -2,25 +2,21 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, Dimensions, Image, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator, StyleSheet, Button } from 'react-native'
 import { WebView } from 'react-native-webview';
 import { COLORS } from '../../../Constants/theme';
-import CalendarIcon from "../../../Images/calendar.png"
 import CustomIconButton from '../../../Components/CustomIconButton';
-import ViewIcon from "../../../Images/show.png"
 import axios from 'axios';
 import moment from "moment"
 import RNFetchBlob from 'react-native-blob-util';
 import Header from '../../../Components/Header';
-import BackIcon from "../../../Images/left-arrow.png"
 import { PERMISSIONS, check, request, RESULTS, requestMultiple } from 'react-native-permissions';
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import CustomToast from '../../../Components/CustomToast';
 import { useIsFocused } from '../../../node_modules/@react-navigation/core';
 import NetInfo from "@react-native-community/netinfo";
 import NoInternetComponent from '../../../Components/NoInternetComponent';
-import DownloadingIcon from "../../../Images/downloading.png"
-import DownloadedIcon from "../../../Images/checkmark.png"
 import { getURL } from "../../../baseUrl"
 import { setDownloaded } from '../../../Utils/getScreenVisisted';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import images from '../../../Constants/images';
 
 const VideoDetailScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused()
@@ -29,13 +25,27 @@ const VideoDetailScreen = ({ navigation, route }) => {
     const [toastHide, setToastHide] = useState(false)
     const [message, setMessage] = useState({
         message: "Your Video is Downloading",
-        icon: DownloadingIcon,
+        icon: images.downloading_icon,
         isHide: false
     })
     const [directory, setDirectory] = useState([]);
     const [isView, setIsView] = useState(route.params.type === "Downloads" ? false : true)
     const [isLoading, setIsLoading] = useState(route.params.type === "Downloads" ? false : true)
+    const [orientation, setOrientation] = useState()
 
+    const isPortrait = () => {
+        const dim = Dimensions.get('screen');
+        return dim.height >= dim.width;
+    };
+
+    useEffect(() => {
+        // Event Listener for orientation changes
+        Dimensions.addEventListener('change', () => {
+            setOrientation(
+                isPortrait() ? 'portrait' : 'landscape'
+            );
+        });
+    }, [orientation])
 
     function CheckConnectivity() {
         setIsLoading(false)
@@ -58,7 +68,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 );
             }
         }
-
     };
 
     handleFirstConnectivityChange = isConnected => {
@@ -83,8 +92,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
                 PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
             ])
-                .then((statuses) => { })
-                .catch((error) => { });
             axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}&videoID=${route.params}`)
                 .then((res) => {
                     setVideoDetail(res.data.videos.data[0])
@@ -97,17 +104,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
         if (route.params.type === "Downloads") {
             CheckConnectivity()
             RNFetchBlob.fs.stat(route.params.data.path)
-                .then((stats) => { })
-                .catch((err) => { })
             RNFetchBlob.fs.readStream(route.params.data.path, 'utf8')
                 .then((stream) => {
                     setFileContent(stream.path);
-                    let data = ''
-                    stream.open()
-                    stream.onData((chunk) => {
-                        data += chunk
-                    })
-                    stream.onEnd(() => { })
                 });
         }
     }, [route.params.type === "Downloads"]);
@@ -115,6 +114,12 @@ const VideoDetailScreen = ({ navigation, route }) => {
     useEffect(() => {
         if (isFocused) {
             CheckConnectivity()
+            const dim = Dimensions.get('screen');
+            if (dim.height >= dim.width) {
+                setOrientation("protrait")
+            } else {
+                setOrientation("landscape")
+            }
             const docPath = ReactNativeBlobUtil.fs.dirs.DownloadDir;
             const getDirectoryList = async () => {
                 await ReactNativeBlobUtil.fs
@@ -145,7 +150,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 .then((res) => {
                     setDownloaded("Yes")
                     setToastHide(true)
-                    setMessage({ message: "Your Video is Downloaded", icon: DownloadedIcon, isHide: true })
+                    setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
                 })
         } else {
             Alert.alert('Warning', 'This Video is already downloaded to view downloaded video go to Downloads.', [
@@ -221,34 +226,35 @@ const VideoDetailScreen = ({ navigation, route }) => {
     //     font-size: 28px !important;
     // }
 
-.vjs-matrix.video-js .vjs-big-play-button {
-    position: absolute; 
-    left: 0; 
-    right: 0; 
-    margin-left: auto; 
-    margin-right: auto; 
-    width: 100px; /* Need a specific value to work */
-    height: 100px;
-    background-color: #004C6B !important;
-    border-color: #004C6B;
-    border-radius: 100px;
-  }
-  
-  .vjs-matrix.video-js {
-    color: white;
-    font-size: 20px !important
-  }
+    .vjs-matrix.video-js .vjs-big-play-button {
+        position: absolute; 
+        left: 0; 
+        right: 0; 
+        margin-left: auto; 
+        margin-right: auto; 
+        width: ${orientation === "landscape" ? "60px" : "80px"}; /* Need a specific value to work */
+        height: ${orientation === "landscape" ? "60px" : "80px"};
+        background-color: #004C6B !important;
+        border-color: #004C6B;
+        border-radius: ${orientation === "landscape" ? "60px" : "80px"};
+    }
+    
+    .vjs-matrix.video-js {
+        color: white;
+        font-size:  ${orientation === "landscape" ? "12px" : "18px"} !important;
+        text-align: "center"
+    }
 
-  .vjs-matrix.video-js .vjs-control-bar{
-    position: absolute;
-    bottom: 0px;
-    background-color: #004C6B;
-    height: 80px;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    .vjs-matrix.video-js .vjs-control-bar{
+        position: absolute;
+        bottom: 0;
+        background-color: #004C6B;
+        height: ${orientation === "landscape" ? "50px" : "72px"};
+        padding: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
     </style>
     `
 
@@ -273,9 +279,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
             </div>
             <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
         </body> 
-     </html>
-
-         `
+     </html>`
 
     // const htmlContent = `
     // <html>
@@ -337,9 +341,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
       `;
 
     let rawhtml = htmlStyles + htmlContent
-
     let rawhtmlContent = htmlStyles + htmlDownloadContent
-
 
     return (
         <View style={{ flex: 1 }}>
@@ -361,7 +363,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
                                 onPress={() => navigation.replace(route.params.type !== "Downloads" ? "Video_Home" : "Downloads")}
                             >
-                                <Image source={BackIcon} style={{ width: 20, height: 20 }} />
+                                <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                             </TouchableOpacity>
                         }
                         title={route.params.type !== "Downloads" ? (videoDetail && ((videoDetail.name).slice(0, -4)).replace(/[^a-zA-Z0-9 ]+/g, " ")) : (route.params.data.filename).slice(0, -4)}
@@ -376,7 +378,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 source={{ html: route.params.type !== "Downloads" ? rawhtml : rawhtmlContent }}
                                 mediaPlaybackRequiresUserAction={route.params.type === "Downloads" ? false : true}
                                 allowsFullscreenVideo={true}
-                                minimumFontSize={30}
+                                minimumFontSize={orientation === "landscape" ? 16 : 30}
                                 scalesPageToFit={(Platform.OS === 'ios') ? false : true}
                                 // injectedJavaScript={
                                 //     runjsscript
@@ -398,7 +400,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             <Image style={{
                                                 height: 16,
                                                 width: 16,
-                                            }} source={CalendarIcon} />
+                                            }} source={images.calendar_icon} />
                                         </View>
                                         <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(videoDetail && videoDetail.created).format("DD MMM YYYY")}</Text>
                                     </View>
@@ -410,7 +412,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     <View style={{ borderWidth: 1, borderColor: COLORS.darkBlue, width: "100%", marginVertical: 8 }}></View>
                                     <CustomIconButton
                                         label={"Download"}
-                                        icon={DownloadingIcon}
+                                        icon={images.downloading_icon}
                                         onPress={() => {
                                             CheckConnectivity()
                                             downloadFile()

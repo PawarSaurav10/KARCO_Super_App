@@ -1,17 +1,16 @@
 import React, { useState } from "react"
-import showIcon from "../Images/show.png"
-import hideIcon from "../Images/hide.png"
+import images from "../Constants/images";
 
 export const useTogglePasswordVisibility = () => {
     const [passwordVisibility, setPasswordVisibility] = useState(true);
-    const [rightIcon, setRightIcon] = useState(showIcon);
+    const [rightIcon, setRightIcon] = useState(images.view_icon);
 
     const handlePasswordVisibility = () => {
-        if (rightIcon === showIcon) {
-            setRightIcon(hideIcon);
+        if (rightIcon === images.view_icon) {
+            setRightIcon(images.hide_icon);
             setPasswordVisibility(!passwordVisibility);
-        } else if (rightIcon === hideIcon) {
-            setRightIcon(showIcon);
+        } else if (rightIcon === images.hide_icon) {
+            setRightIcon(images.view_icon);
             setPasswordVisibility(!passwordVisibility);
         }
     };

@@ -14,16 +14,11 @@ import {
 } from "@react-navigation/drawer";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { setSelectedTab } from "../store/actions/tabActions";
-import profile_img from "../Images/profile.png";
 import { COLORS, SIZES } from "../Constants/theme";
-import HomeIcon from "../Images/home.png"
-import SettingsIcon from "../Images/settings.png"
-import FAQIcon from "../Images/help.png"
-import SupportIcon from "../Images/support.png"
-import LogoutIcon from "../Images/logout.png"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserData_1, getUserData, getCompanyUserData } from "../Utils/getScreenVisisted";
 import MainLayout from "../MainAppScreens/MainLayout";
+import images from "../Constants/images";
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerItem = ({ label, icon, isFocused, onPress }) => {
@@ -158,7 +153,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                             }}
                         >
                             <Image
-                                source={profile_img}
+                                source={images.profile_icon}
                                 style={{
                                     width: 60,
                                     height: 60,
@@ -212,7 +207,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                         >
                             <CustomDrawerItem
                                 label={"Home"}
-                                icon={HomeIcon}
+                                icon={images.home_icon}
                                 isFocused={selectedTab == "Home"}
                                 onPress={() => {
                                     setSelectedTab("Home");
@@ -258,7 +253,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                         <View>
                             <CustomDrawerItem
                                 label={"Logout"}
-                                icon={LogoutIcon}
+                                icon={images.logout_icon}
                                 onPress={() => {
                                     appName === "TrACE Online" ? OnlinelogOut() : KPIlogOut()
                                     navigation.closeDrawer();
@@ -275,7 +270,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                         >
                             <CustomDrawerItem
                                 label={"Home"}
-                                icon={HomeIcon}
+                                icon={images.home_icon}
                                 isFocused={selectedTab == "Home"}
                                 onPress={() => {
                                     setSelectedTab("Home");
@@ -286,7 +281,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                             {appName === "KARCO Videos" &&
                                 <CustomDrawerItem
                                     label={"Downloads"}
-                                    icon={HomeIcon}
+                                    icon={images.home_icon}
                                     isFocused={selectedTab == "Downloads"}
                                     onPress={() => {
                                         setSelectedTab("Downloads");
@@ -338,7 +333,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                         >
                             <CustomDrawerItem
                                 label={"Logout"}
-                                icon={LogoutIcon}
+                                icon={images.logout_icon}
                                 onPress={() => {
                                     appName === "TrACE Online" ? OnlinelogOut() : KPIlogOut()
                                     navigation.closeDrawer();

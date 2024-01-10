@@ -6,23 +6,17 @@ import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import Header from '../../../Components/Header';
-import MenuIcon from "../../../Images/menu_2.png"
 import { COLORS } from '../../../Constants/theme';
 import { ProgressChart } from 'react-native-chart-kit';
 import moment from "moment"
 import { LinearGradient, Defs, Stop } from 'react-native-svg';
 import { VictoryChart, VictoryLabel, VictoryBar, VictoryAxis, VictoryTooltip, VictoryVoronoiContainer, VictoryLine, VictoryScatter, VictoryTheme } from 'victory-native';
 import SelectDropdown from 'react-native-select-dropdown';
-import ArrowDown from "../../../Images/arrow-down.png"
-import DownIcon from "../../../Images/down.png"
-import TopIcon from "../../../Images/top.png"
-import TopDoubleIcon from "../../../Images/up-arrow.png"
-import DownDoubleIcon from "../../../Images/down-arrow.png"
-import NoDataFoundIcon from "../../../Images/empty-box.png"
 import KPIHomeScreenLoader from '../../../Components/KPIHomeScreenLoader';
 import { getURL } from '../../../baseUrl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from "@react-native-community/netinfo";
+import images from '../../../Constants/images';
 
 const HomeScreen = () => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -271,7 +265,7 @@ const HomeScreen = () => {
                         style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
                         onPress={() => navigation.openDrawer()}
                     >
-                        <Image source={MenuIcon} style={{ width: 30, height: 30 }} />
+                        <Image source={images.menu_2_icon} style={{ width: 30, height: 30 }} />
                     </TouchableOpacity>
                 }
                 title={"KEY PERFORMANCE INDICATOR"}
@@ -429,21 +423,21 @@ const HomeScreen = () => {
                                             onPress={() => {
                                                 setPerformanceType("Top")
                                             }}>
-                                            <Image source={TopIcon} style={{ width: 16, height: 16, marginRight: 4 }} />
+                                            <Image source={images.top_icon} style={{ width: 16, height: 16, marginRight: 4 }} />
                                             <Text style={{ fontSize: 16, fontWeight: "bold", color: `${performanceType == "Top" ? "#00b569" : "#898B9A"}` }}>Top Performers</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={[performanceType == "Bottom" ? styles.active_circle_button : styles.circle_button, { flexDirection: "row", alignItems: "center" }]}
                                             onPress={() => {
                                                 setPerformanceType("Bottom")
                                             }}>
-                                            <Image source={DownIcon} style={{ width: 16, height: 16, marginRight: 4 }} />
+                                            <Image source={images.down_arrow_icon} style={{ width: 16, height: 16, marginRight: 4 }} />
                                             <Text style={{ fontSize: 16, fontWeight: "bold", color: `${performanceType == "Bottom" ? "#ff0000" : "#898B9A"}` }}>Bottom Performers</Text>
                                         </TouchableOpacity>
                                     </View>
                                     <View>
                                         {performanceType === "Top" && topPerformance.map((aa, idx) => (
                                             <View key={idx} style={{ borderColor: Colors.lighter, borderRadius: 6, padding: 6, margin: 4, borderWidth: 2, flexDirection: "row", alignItems: "center" }}>
-                                                <Image source={TopDoubleIcon} style={{ marginRight: 8, width: 20, height: 20 }} />
+                                                <Image source={images.up_arrow_icon} style={{ marginRight: 8, width: 20, height: 20 }} />
                                                 <Text style={{ fontSize: 16, fontWeight: "bold", color: "#004C6B" }}>{aa}</Text>
                                             </View>
                                         ))}
@@ -452,12 +446,12 @@ const HomeScreen = () => {
                                                 <View key={idx}>
                                                     {aa !== "No record exist" ? (
                                                         <View style={{ borderColor: Colors.lighter, borderRadius: 6, padding: 6, margin: 4, borderWidth: 2, flexDirection: "row", alignItems: "center" }}>
-                                                            {aa !== "No record exist" && <Image source={DownDoubleIcon} style={{ marginRight: 8, width: 20, height: 20 }} />}
+                                                            {aa !== "No record exist" && <Image source={images.double_down_arrow_icon} style={{ marginRight: 8, width: 20, height: 20 }} />}
                                                             <Text style={{ fontSize: 16, fontWeight: "bold", color: "#004C6B" }}>{aa}</Text>
                                                         </View>
                                                     ) : (
                                                             <View style={{ padding: 6, margin: 4, alignItems: "center", justifyContent: "center" }}>
-                                                                <Image source={NoDataFoundIcon} style={{ width: 40, height: 40, marginBottom: 8 }} />
+                                                                <Image source={images.empty_box_icon} style={{ width: 40, height: 40, marginBottom: 8 }} />
                                                                 <Text style={{ fontSize: 16, fontWeight: "bold", color: "#004C6B" }}>{aa}</Text>
                                                             </View>
                                                         )
@@ -487,7 +481,7 @@ const HomeScreen = () => {
                                                 buttonTextStyle={{ fontSize: 14 }}
                                                 renderDropdownIcon={() => {
                                                     return (
-                                                        <Image source={ArrowDown} style={{ width: 10, height: 10 }} />
+                                                        <Image source={images.arrow_down_icon} style={{ width: 10, height: 10 }} />
                                                     )
                                                 }}
                                                 dropdownIconPosition="right"

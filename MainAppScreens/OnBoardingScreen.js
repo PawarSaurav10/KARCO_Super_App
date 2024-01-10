@@ -1,12 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState } from 'react'
 import { View, Text, Image, Animated, TouchableOpacity } from 'react-native'
-import OnBoardingImage1 from "../Images/Training_Content.png"
-import OnBoardingImage2 from "../Images/Software.png"
-import OnBoardingImage3 from "../Images/support.png"
 import { COLORS, SIZES } from '../Constants/theme';
 import CustomButton from '../Components/CustomButton';
 import BackIcon from "../Images/arrow.png"
 import _ from "lodash"
+import images from '../Constants/images';
 
 const OnBoardingScreen = ({ navigation }) => {
     const scrollX = useRef(new Animated.Value(0)).current;
@@ -19,21 +17,21 @@ const OnBoardingScreen = ({ navigation }) => {
     const onboarding_screens = [
         {
             id: 1,
-            bannerImage: OnBoardingImage1,
+            bannerImage: images.training_content_icon,
             title: "Effective Training Content",
             description:
                 "KARCO pioneered the concept of using 3D Animation for creating safety & operation videos for the marine industry to effectively promulgate challenging yet important training concepts.",
         },
         {
             id: 2,
-            bannerImage: OnBoardingImage2,
+            bannerImage: images.software_icon,
             title: "Efficient Software Platforms",
             description:
                 "Our Software Applications are developed in-house through rigorous collaboration between maritime industry experts & technical developers to develop products using the latest technology.",
         },
         {
             id: 3,
-            bannerImage: OnBoardingImage3,
+            bannerImage: images.support_icon,
             title: "Engaging Support Services",
             description: "A dedicated team of marine & technical experts to help you achieve your training objectives with our products.",
         },

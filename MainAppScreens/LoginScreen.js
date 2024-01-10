@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, ActivityIndicator, ScrollView, Image, StyleSheet, Platform, Alert } from 'react-native'
+import { View, Text, ScrollView, Image, StyleSheet, Platform, Alert } from 'react-native'
 import { useTogglePasswordVisibility } from '../CustomHooks/useTogglePasswordVisibility';
 import { useIsFocused } from '@react-navigation/native';
 import CustomInput from '../Components/CustomInput';
 import CustomIconButton from '../Components/CustomIconButton';
-import LoginIcon from "../Images/login.png"
-import Loader from "../Images/welcome_trace.gif"
-import Logo from "../Images/Trace_logo.png"
 import { COLORS } from '../Constants/theme';
 import FastImage from 'react-native-fast-image';
 import axios from 'axios';
@@ -14,7 +11,7 @@ import { saveCompanyDataToStorage, setScreenVisited, saveUserDataToStorage, setO
 import { getURL } from '../baseUrl';
 import LoginScreenLoader from "../Components/LoginScreenLoader"
 import NetInfo from "@react-native-community/netinfo";
-// import NetworkUtils, { CheckConnectivity } from "../Utils/isInternetConnected"
+import images from '../Constants/images';
 
 const LoginScreen = ({ navigation, route }) => {
     const { passwordVisibility, rightIcon, handlePasswordVisibility } = useTogglePasswordVisibility();
@@ -57,7 +54,6 @@ const LoginScreen = ({ navigation, route }) => {
     }, [isFocused]);
 
     const onHandleLoginClick = () => {
-        // if (isConnected) {
         CheckConnectivity()
         if (loginData.userId !== "" && loginData.password !== "") {
             setIsLoading(true)
@@ -116,12 +112,6 @@ const LoginScreen = ({ navigation, route }) => {
                 { text: 'OK' },
             ]);
         }
-        // } else {
-        //     setIsLoading(false)
-        //     Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
-        //         { text: 'OK', onPress: () => CloseApp() },
-        //     ]);
-        // }
     }
     return (
         <View style={{ flex: 1 }}>
@@ -133,10 +123,10 @@ const LoginScreen = ({ navigation, route }) => {
                             <View style={{ width: 200, marginBottom: 8 }}>
                                 <FastImage
                                     style={{ width: 200, height: 100 }}
-                                    source={Loader}
+                                    source={images.welcome_trace_gif}
                                 />
                             </View>
-                            <Image style={{ width: 160, height: 90, objectFit: "contain" }} source={Logo} />
+                            <Image style={{ width: 160, height: 90, objectFit: "contain" }} source={images.trace_logo_words} />
                             <View style={{ padding: 10 }}>
                                 <View style={{ marginVertical: 4 }}>
                                     <Text style={{ fontSize: 22, fontWeight: "bold", textAlign: "center", color: COLORS.darkBlue, textTransform: "uppercase" }}>Let's Sign You In</Text>
@@ -192,7 +182,7 @@ const LoginScreen = ({ navigation, route }) => {
                                     borderRadius: 5,
                                     maxWidth: 380,
                                 }}
-                                icon={LoginIcon}
+                                icon={images.login_icon}
                                 iconStyle={{
                                     marginRight: 10
                                 }}
@@ -211,7 +201,6 @@ const styles = StyleSheet.create({
         height: 40,
         margin: 12,
         padding: 10,
-        // backgroundColor: Colors.lighter,
         borderRadius: 8,
     },
     sectionContainer: {

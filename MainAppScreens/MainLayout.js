@@ -6,6 +6,7 @@ import {
     Image,
     FlatList,
     ActivityIndicator,
+    Dimensions,
 } from "react-native";
 import Animated, {
     useSharedValue,
@@ -19,16 +20,12 @@ import Online_Home from "../miniapps/TrACE_Online/screens/HomeScreen";
 import HomeScreen from "../miniapps/TrACE_KPI/screens/HomeScreen";
 import Video_HomeScreen from "../miniapps/TrACE_Video_View/screens/HomeScreen";
 import LinearGradient from "react-native-linear-gradient";
-import HomeIcon from "../Images/home.png"
-import DonloadIcon from "../Images/file.png"
 import DownloadsScreen from "../miniapps/TrACE_Video_View/screens/DownloadsScreen";
-import { getDownloaded, setDownloaded } from "../Utils/getScreenVisisted";
+import { getDownloaded } from "../Utils/getScreenVisisted";
 import CustomToast from "../Components/CustomToast";
-import DownloadedIcon from "../Images/checkmark.png"
 import { useIsFocused } from "../node_modules/@react-navigation/core";
-import { async } from "../node_modules/fast-glob";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import images from "../Constants/images";
 
 const TabButton = ({
     label,
@@ -90,8 +87,6 @@ const TabButton = ({
     );
 };
 
-
-
 const MainLayout = ({
     drawerAnimationStyle,
     navigation,
@@ -135,8 +130,30 @@ const MainLayout = ({
         };
     });
 
+    const [orientation, setOrientation] = useState()
+
+    const isPortrait = () => {
+        const dim = Dimensions.get('screen');
+        return dim.height >= dim.width;
+    };
+
+    useEffect(() => {
+        // Event Listener for orientation changes
+        Dimensions.addEventListener('change', () => {
+            setOrientation(
+                isPortrait() ? 'portrait' : 'landscape'
+            );
+        });
+    }, [orientation])
+
     useEffect(() => {
         if (isFocused) {
+            const dim = Dimensions.get('screen');
+            if (dim.height >= dim.width) {
+                setOrientation("protrait")
+            } else {
+                setOrientation("landscape")
+            }
             setTimeout(() => {
                 getDownloaded().then((res) => {
                     if (res === "Yes") {
@@ -182,7 +199,6 @@ const MainLayout = ({
         setSelectedTab("Home");
     }, []);
 
-
     return (
         <View style={{ flex: 1 }}>
             {isLoading && (
@@ -209,34 +225,30 @@ const MainLayout = ({
 
                         {/* Footer */}
                         {appName === "KARCO Videos" &&
-                            <View style={{ flex: 1 }}>
-                                <View style={{ flex: 1 }}>
-                                    <FlatList
-                                        ref={flatListRef}
-                                        horizontal
-                                        scrollEnabled={false}
-                                        pagingEnabled
-                                        snapToAlignment="center"
-                                        snapToInterval={SIZES.width}
-                                        showsHorizontalScrollIndicator={false}
-                                        data={TabsData}
-                                        keyExtractor={(item) => `${item}`}
-                                        renderItem={({ item, index }) => {
-                                            return (
-                                                <View
-                                                    key={index}
-                                                    style={{
-                                                        height: SIZES.height,
-                                                        width: SIZES.width,
-                                                    }}
-                                                >
-                                                    {item == "Home" && <Video_HomeScreen ScreenName={screenVisisted} />}
-                                                    {item == "Downloads" && <DownloadsScreen ScreenName={screenVisisted} />}
-                                                </View>
-                                            );
-                                        }}
-                                    />
-                                </View>
+                            <>
+                                <FlatList
+                                    ref={flatListRef}
+                                    horizontal={orientation === "landscape" ? false : true}
+                                    scrollEnabled={false}
+                                    extraData={selectedTab}
+                                    showsHorizontalScrollIndicator={false}
+                                    data={TabsData}
+                                    keyExtractor={(item) => `${item}`}
+                                    renderItem={({ item, index }) => {
+                                        return (
+                                            <View
+                                                key={index}
+                                                style={{
+                                                    height: orientation === "landscape" ? Dimensions.get("screen").height : SIZES.height,
+                                                    width: orientation === "landscape" ? Dimensions.get("window").width : SIZES.width,
+                                                }}
+                                            >
+                                                {selectedTab == "Home" && <Video_HomeScreen ScreenName={screenVisisted} />}
+                                                {selectedTab == "Downloads" && <DownloadsScreen ScreenName={screenVisisted} />}
+                                            </View>
+                                        );
+                                    }}
+                                />
                                 <View
                                     style={{
                                         height: 60,
@@ -273,7 +285,7 @@ const MainLayout = ({
                                     >
                                         <TabButton
                                             label={"Home"}
-                                            icon={HomeIcon}
+                                            icon={images.home_icon}
                                             isFocused={selectedTab == "Home"}
                                             outerContainerStyle={homeFlexStyle}
                                             innerContainerStyle={homeColorStyle}
@@ -286,7 +298,7 @@ const MainLayout = ({
 
                                         <TabButton
                                             label={"Downloads"}
-                                            icon={DonloadIcon}
+                                            icon={images.file_icon}
                                             isFocused={selectedTab == "Downloads"}
                                             outerContainerStyle={searchFlexStyle}
                                             innerContainerStyle={searchColorStyle}
@@ -308,7 +320,7 @@ const MainLayout = ({
                                         }}>
                                         {viewToast === true &&
                                             <CustomToast
-                                                icon={DownloadedIcon}
+                                                icon={images.downloaded_icon}
                                                 iconStyle={{
                                                     tintColor: COLORS.white,
                                                     marginRight: 10,
@@ -329,7 +341,7 @@ const MainLayout = ({
                                             />}
                                     </View>
                                 </View>
-                            </View>
+                            </>
                         }
                     </Animated.View>
                 </View>

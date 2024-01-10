@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
-import AppIcon from "../Images/icon.png"
 import { useTourGuideController, TourGuideZone } from 'rn-tourguide';
 import { getScreenVisited, setScreenVisited } from '../Utils/getOnBoardingScreenVisited';
 import { COLORS } from '../Constants/theme';
+import images from '../Constants/images';
 
 const HomeScreen = ({ navigation }) => {
     const {
@@ -66,12 +66,20 @@ const HomeScreen = ({ navigation }) => {
         <View style={{ flex: 1, backgroundColor: "#004C6B", padding: 10 }}>
             <View style={styles.content}>
                 {LIST_APPS.map((app, idx) => (
-                    <TourGuideZone text={app.tourguide_desc} children={{ color: COLORS.primary }} zone={app.zone} maskOffset={1} borderRadius={4} key={idx} style={{ color: COLORS.primary }}>
+                    <TourGuideZone
+                        text={app.tourguide_desc}
+                        children={{ color: COLORS.primary }}
+                        zone={app.zone}
+                        maskOffset={1}
+                        borderRadius={4}
+                        key={idx}
+                        style={{ color: COLORS.primary }}
+                    >
                         <TouchableOpacity
                             style={{ justifyContent: "center", alignItems: "center", margin: 8 }}
                             onPress={() => navigation.navigate(app.path, app.appName)}
                         >
-                            <Image source={require("../Images/icon.png")} style={{ width: 48, height: 48, borderRadius: 40, marginBottom: 8 }} />
+                            <Image source={images.trace_logo} style={{ width: 48, height: 48, borderRadius: 40, marginBottom: 8 }} />
                             <Text style={styles.appName}>{app && app.appName}</Text>
                         </TouchableOpacity>
                     </TourGuideZone>

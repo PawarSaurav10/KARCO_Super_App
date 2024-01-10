@@ -10,11 +10,10 @@ import {
 import CustomSearch from '../../../Components/CustomSearch';
 import NoDataFound from '../../../Components/NoDataFound';
 import Header from '../../../Components/Header';
-import BackIcon from "../../../Images/left-arrow.png"
 import ListViewCard from '../../../Components/ListViewCard';
 import GridViewCard from '../../../Components/GridViewCard';
-// import { CheckConnectivity } from "../../../Utils/isInternetConnected"
 import NetInfo from "@react-native-community/netinfo";
+import images from '../../../Constants/images';
 
 const ViewAllScreen = ({ navigation, route }) => {
     const [searchedTodoVideoData, setSearchedTodoVideoData] = useState([])
@@ -87,7 +86,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                         style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
                         onPress={() => navigation.goBack()}
                     >
-                        <Image source={BackIcon} style={{ width: 20, height: 20 }} />
+                        <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                     </TouchableOpacity>
                 }
                 title={route.params.listType === "Todo" ? "New Added Video" : "Continue Assessment"}

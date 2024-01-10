@@ -5,21 +5,14 @@ import { Rating } from 'react-native-ratings';
 import CustomInput from "../../../Components/CustomInput"
 import CustomIconButton from '../../../Components/CustomIconButton';
 import { COLORS, SIZES } from '../../../Constants/theme';
-import Rater1 from "../../../Images/raters.png"
-import Rater3 from "../../../Images/raters2.png"
-import Rater2 from "../../../Images/raters3.png"
 import axios from 'axios';
 import { getUserData_1 } from "../../../Utils/getScreenVisisted"
 import { useIsFocused } from '@react-navigation/native';
-import Header from '../../../Components/Header';
-import CloseIcon from "../../../Images/close.png"
-import BackIcon from "../../../Images/left-arrow.png"
 import { getURL } from "../../../baseUrl"
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import SubmitIcon from "../../../Images/submit.png"
 import CustomButton from '../../../Components/CustomButton';
 import NetInfo from "@react-native-community/netinfo";
-import { BlurView } from '../../../node_modules/@react-native-community/blur';
+import images from '../../../Constants/images';
 
 const FeedbackScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused();
@@ -423,7 +416,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                                 style={{ marginHorizontal: 12, justifyContent: "flex-start", flex: 0.04 }}
                                 onPress={() => backAction()}
                             >
-                                <Image source={BackIcon} style={{ width: 20, height: 20 }} />
+                                <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                             </TouchableOpacity>
                             <View style={{ flex: 0.9, justifyContent: "center", alignItems: "center" }}>
                                 <View style={{ paddingHorizontal: 6, paddingVertical: 4, backgroundColor: "red" }}>
@@ -438,7 +431,7 @@ const FeedbackScreen = ({ navigation, route }) => {
 
                     <View style={styles.titleContainer}>
                         <Text style={{ textTransform: "uppercase", fontSize: 18, color: "white" }}>Presentation</Text>
-                        <Image source={Rater1} style={{ width: 140, height: 60, objectFit: "fill" }} />
+                        <Image source={images.raters_icon} style={{ width: 140, height: 60, objectFit: "fill" }} />
                     </View>
                     <View>
                         {presentationFormdata.map((xx, idx) => {
@@ -541,7 +534,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                     </View>
                     <View style={styles.titleContainer}>
                         <Text style={{ textTransform: "uppercase", fontSize: 18, color: "white" }}>Course Objective</Text>
-                        <Image source={Rater2} style={{ width: 50, height: 30, objectFit: "fill" }} />
+                        <Image source={images.raters2_icon} style={{ width: 50, height: 30, objectFit: "fill" }} />
                     </View>
                     <View>
                         {courseObjtFormData.map((xx, idx) => {
@@ -586,7 +579,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                     </View>
                     <View style={styles.titleContainer}>
                         <Text style={{ textTransform: "uppercase", fontSize: 18, color: "white" }}>Course Content</Text>
-                        <Image source={Rater3} style={{ width: 100, height: 60, objectFit: "fill" }} />
+                        <Image source={images.raters3_icon} style={{ width: 100, height: 60, objectFit: "fill" }} />
                     </View>
                     <View>
                         {courseFormdata.map((xx, idx) => {
@@ -733,7 +726,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                             onSubmitClick()
                         }}
                         labelStyle={{ color: COLORS.darkBlue }}
-                        icon={SubmitIcon}
+                        icon={images.submit_icon}
                         iconStyle={{
                             marginRight: 10
                         }}
@@ -783,7 +776,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                                             onPress={() => {
                                                 setIsVisibleModal(!isVisibleModal);
                                             }}>
-                                            <Image source={CloseIcon} style={{ width: 16, height: 16 }} />
+                                            <Image source={images.close_icon} style={{ width: 16, height: 16 }} />
                                         </TouchableOpacity>
                                     </View>
 

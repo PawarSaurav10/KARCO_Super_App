@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Image, FlatList, ActivityIndicator, BackHandler, Dimensions, } from 'react-native'
+import { View, Text, Image, FlatList, ActivityIndicator, BackHandler, Dimensions, ScrollView, } from 'react-native'
 import { COLORS } from '../../../Constants/theme';
 import axios from 'axios';
 import CustomSearch from '../../../Components/CustomSearch';
-import AvatarImg from "../../../Images/profile.png"
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import NoInternetComponent from '../../../Components/NoInternetComponent';
 import NetInfo from "@react-native-community/netinfo";
 import { getURL } from "../../../baseUrl"
 import VideoListView from '../../../Components/VideoListView';
 import NoDataFound from '../../../Components/NoDataFound';
+import images from '../../../Constants/images';
 
 const HomeScreen = (props) => {
     const navigation = useNavigation();
@@ -21,20 +21,9 @@ const HomeScreen = (props) => {
     const [searchedVideo, setSearchedVideo] = useState("")
     const [orientation, setOrientation] = useState()
 
-    /**
-    * Returns true if the screen is in portrait mode
-    */
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
         return dim.height >= dim.width;
-    };
-
-    /**
-     * Returns true of the screen is in landscape mode
-     */
-    const isLandscape = () => {
-        const dim = Dimensions.get('screen');
-        return dim.width >= dim.height;
     };
 
     useEffect(() => {
@@ -45,7 +34,6 @@ const HomeScreen = (props) => {
             );
         });
     }, [orientation])
-
 
     const backAction = () => {
         navigation.reset({
@@ -121,7 +109,7 @@ const HomeScreen = (props) => {
             );
             return () => backHandler.remove();
         }
-    }, [isFocused, props.ScreenName === "Home"])
+    }, [props.ScreenName === "Home", isFocused])
 
     useEffect(() => {
         if (searchedVideo) {
@@ -157,7 +145,7 @@ const HomeScreen = (props) => {
                                     width: 40,
                                     marginRight: 6
                                 }}
-                                source={AvatarImg}
+                                source={images.profile_icon}
                             />
                             <View style={{ marginLeft: 10, }}>
                                 <Text
@@ -174,9 +162,9 @@ const HomeScreen = (props) => {
                         </View>
                     </View>
 
-                    {/* Search Input */}
-                    {!isView &&
-                        < View >
+                    <View style={{ flex: 1, marginBottom: orientation === "landscape" ? 110 : 0 }}>
+                        {/* Search Input */}
+                        {!isView &&
                             <View style={{ margin: 8, padding: 8, }}>
                                 <CustomSearch
                                     label={"Search Videos"}
@@ -187,60 +175,70 @@ const HomeScreen = (props) => {
                                     }}
                                 />
                             </View >
-                        </View>
-                    }
+                        }
 
-                    {!isView &&
-                        <View style={{ marginHorizontal: 6 }}>
-                            {!searchedVideo &&
-                                <FlatList
-                                    refreshing={isLoading}
-                                    onRefresh={onRefresh}
-                                    data={videoList}
-                                    keyExtractor={item => item.id}
-                                    showsHorizontalScrollIndicator={false}
-                                    renderItem={({ item, index }) => (
-                                        <VideoListView
-                                            thumbnail={item.thumbnail}
-                                            videoName={item.name}
-                                            createdDate={item.created}
-                                            OnPress={() => {
-                                                CheckConnectivity()
-                                                navigation.navigate("Video Detail", item.id)
-                                            }}
+                        <ScrollView>
+                            {!isView &&
+                                <View style={{ flex: 1, marginHorizontal: 6 }}>
+                                    {!searchedVideo &&
+                                        <FlatList
+                                            refreshing={isLoading}
+                                            onRefresh={onRefresh}
+                                            data={videoList}
+                                            keyExtractor={item => item.id}
+                                            showsHorizontalScrollIndicator={false}
+                                            renderItem={({ item, index }) => (
+                                                <VideoListView
+                                                    thumbnail={item.thumbnail}
+                                                    videoName={item.name}
+                                                    createdDate={item.created}
+                                                    OnPress={() => {
+                                                        CheckConnectivity()
+                                                        navigation.navigate("Video Detail", item.id)
+                                                    }}
+                                                    orientationType={orientation}
+                                                />
+                                            )}
                                         />
-                                    )}
-                                />}
+                                    }
 
-                            {searchedVideo && searchedVideoData && searchedVideoData.length > 0 ?
-                                <FlatList
-                                    refreshing={isLoading}
-                                    onRefresh={onRefresh}
-                                    data={searchedVideo !== "" && searchedVideoData}
-                                    keyExtractor={item => item.id}
-                                    showsHorizontalScrollIndicator={false}
-                                    renderItem={({ item, index }) => (
-                                        <VideoListView
-                                            thumbnail={item.thumbnail}
-                                            videoName={item.name}
-                                            createdDate={item.created}
-                                            OnPress={() => {
-                                                CheckConnectivity()
-                                                navigation.navigate("Video Detail", item.id)
-                                            }}
+                                    {searchedVideo && searchedVideoData && searchedVideoData.length > 0 &&
+                                        <FlatList
+                                            refreshing={isLoading}
+                                            onRefresh={onRefresh}
+                                            data={searchedVideo !== "" && searchedVideoData}
+                                            keyExtractor={item => item.id}
+                                            showsHorizontalScrollIndicator={false}
+                                            renderItem={({ item, index }) => (
+                                                <VideoListView
+                                                    thumbnail={item.thumbnail}
+                                                    videoName={item.name}
+                                                    createdDate={item.created}
+                                                    OnPress={() => {
+                                                        CheckConnectivity()
+                                                        navigation.navigate("Video Detail", item.id)
+                                                    }}
+                                                    orientationType={orientation}
+                                                />
+                                            )}
                                         />
-                                    )}
-                                /> :
-                                <View>
-                                    <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
-                                </View>}
+                                    }
 
-                        </View>
-                    }
-                    {isView === true && (
-                        <NoInternetComponent />
-                    )}
+                                    {searchedVideo && searchedVideoData && searchedVideoData.length === 0 &&
+                                        <View style={{ flex: 1, marginVertical: orientation === "landscape" ? 0 : 110 }}>
+                                            <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
+                                        </View>
+                                    }
+                                </View>
+                            }
+                        </ScrollView>
+
+                        {isView === true && (
+                            <NoInternetComponent />
+                        )}
+                    </View>
                 </View>
+
             }
         </View>
     )

@@ -2,22 +2,17 @@ import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, Dimensions, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Alert, Modal, ScrollView, BackHandler, PermissionsAndroid } from 'react-native'
 import { WebView } from 'react-native-webview';
 import { COLORS } from '../../../Constants/theme';
-import FavouriteIcon from "../../../Images/heart.png"
-import CalendarIcon from "../../../Images/calendar.png"
 import CustomIconButton from '../../../Components/CustomIconButton';
-import ViewIcon from "../../../Images/show.png"
-import AssesmentIcon from "../../../Images/check-list.png"
 import Header from '../../../Components/Header';
 import axios from 'axios';
 import { getUserData, getUserData_1, getAppLaunched, setAppLaunched } from '../../../Utils/getScreenVisisted';
 import PDFViewer from '../../../Components/PDFViewer';
 import { useIsFocused } from '@react-navigation/native';
-import BackIcon from "../../../Images/left-arrow.png"
 import VideoScreenLoader from '../../../Components/VideoScreenLoader';
 import Pdf from 'react-native-pdf';
-import CloseIcon from "../../../Images/close.png"
 import { getURL } from "../../../baseUrl"
 import NetInfo from "@react-native-community/netinfo";
+import images from '../../../Constants/images';
 
 const VideoDetailScreen = ({ navigation, route }) => {
     const htmlContentPromo = `
@@ -31,7 +26,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
         </div>
       `;
     const isFocused = useIsFocused();
-    const webViewRef = useRef(null);
     const [videoType, setVideoType] = useState("")
     const [isLoading, setIsLoading] = useState(true)
     const [userLoginData, setUserLoginData] = useState({
@@ -42,11 +36,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
     })
     const [viewPdf, setViewPdf] = useState(false)
     const [htmlContent, setHtmlContent] = useState(htmlContentPromo)
-
     const [orientation, setOrientation] = useState()
-    const [canGoBack, setCanGoBack] = useState(true)
-    const [canGoForward, setCanGoForward] = useState(true)
-    const [currentUrl, setCurrentUrl] = useState('')
 
     const backAction = () => {
         navigation.replace("Online_Home", { type: route.params.type })
@@ -122,27 +112,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
         return () => clearTimeout(timer);
     }, []);
 
-
-
-    // const onShouldStartLoadWithRequest = (event) => {
-    //     console.log(event, "event")
-    //     // Check the URL here
-    //     // const url = event.url;
-
-    //     // // If the URL triggers the confirm navigation popup, return false
-    //     // if (url.includes('example.com/confirm-popup')) {
-    //     //     return false;
-    //     // }
-
-    //     // // Allow navigation for other URLs
-    //     // return true;
-    // };
-
-    // const disableNavigationPopup = `
-    // window.addEventListener('beforeunload', function(event) {
-    //   event.stopImmediatePropagation();
-    // }); `
-
     const onPromoViewVideoClick = () => {
         axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoPreViewActivity?VideoId=${route.params.item.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
             .then((response) => { })
@@ -158,18 +127,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
             .then((response) => { })
     }
 
-    // function webViewgoback() {
-    //     if (webViewRef.current) webViewRef.current.goBack();
-    // }
-
-    // function webViewNext() {
-    //     if (webViewRef.current) webViewRef.current.goForward();
-    // }
-
-    // const onSynopsisPress = useCallback(async (url) => {
-    //     await Linking.openURL(url);
-    // }, []);
-
     return (
         <View style={{ flex: 1 }}>
             <ScrollView>
@@ -182,7 +139,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
                             onPress={() => navigation.replace("Online_Home", { type: route.params.type })}
                         >
-                            <Image source={BackIcon} style={{ width: 20, height: 20 }} />
+                            <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                         </TouchableOpacity>
                     }
                     title={route.params.item.VideoName}
@@ -234,7 +191,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             <Image style={{
                                                 height: 16,
                                                 width: 16,
-                                            }} source={CalendarIcon} />
+                                            }} source={images.calendar_icon} />
                                         </View>
                                         <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.item.CreatedDate}</Text>
                                     </View>
@@ -284,7 +241,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     ?
                                     <CustomIconButton
                                         label={"View PDF"}
-                                        icon={ViewIcon}
+                                        icon={images.view_icon}
                                         onPress={() => {
                                             CheckConnectivity()
                                             setViewPdf(!viewPdf)
@@ -304,7 +261,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     :
                                     <CustomIconButton
                                         label={(videoType == "" || videoType == "PROMOKEY") ? "View Full Video" : "View Promo Video"}
-                                        icon={ViewIcon}
+                                        icon={images.view_icon}
                                         onPress={() => {
                                             CheckConnectivity()
                                             onClickPlayVideo()
@@ -333,7 +290,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 {route.params.item.AssessmentStatus == "Pending" &&
                                     <CustomIconButton
                                         label={"Take Assessment"}
-                                        icon={AssesmentIcon}
+                                        icon={images.assessment_icon}
                                         onPress={() => {
                                             CheckConnectivity()
                                             if (route.params.item.HavingAssessment == "Y" && videoType != "") {
@@ -360,7 +317,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 {route.params.item.AssessmentStatus == "Continue" &&
                                     <CustomIconButton
                                         label={"Continue Assessment"}
-                                        icon={AssesmentIcon}
+                                        icon={images.assessment_icon}
                                         onPress={() => {
                                             CheckConnectivity()
                                             navigation.replace("AssessmentNew", { Id: route.params.item.Id, videoPassword: route.params.item.Password, ModuleType: route.params.item.ModuleType })
@@ -378,7 +335,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 {route.params.item.AssessmentStatus == "Feedback" &&
                                     <CustomIconButton
                                         label={"Give Feedback"}
-                                        icon={AssesmentIcon}
+                                        icon={images.assessment_icon}
                                         onPress={() => {
                                             CheckConnectivity()
                                             navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
@@ -412,7 +369,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             onPress={() => {
                                                 setViewPdf(false)
                                             }}>
-                                            <Image source={CloseIcon} style={{ width: 20, height: 20 }} />
+                                            <Image source={images.close_icon} style={{ width: 20, height: 20 }} />
                                         </TouchableOpacity>
                                     </View>
                                     <Pdf

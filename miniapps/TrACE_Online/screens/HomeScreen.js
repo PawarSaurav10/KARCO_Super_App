@@ -16,23 +16,19 @@ import {
     RefreshControl,
 } from "react-native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AvatarImg from "../../../Images/profile.png"
-import NotificationIcon from "../../../Images/notification.png"
 import { COLORS } from '../../../Constants/theme';
 import CustomSearch from '../../../Components/CustomSearch';
-import ToDoIcon from "../../../Images/to-do-list.png"
-import CompletedIcon from "../../../Images/done.png"
 import { getUserData, getScreenVisited, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
 import axios from 'axios';
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import NoDataFound from '../../../Components/NoDataFound';
 import GridViewCard from '../../../Components/GridViewCard';
 import ListViewCard from '../../../Components/ListViewCard';
-import MenuIcon from "../../../Images/menu.png"
 import { getURL } from "../../../baseUrl"
 import HomePageLoader from '../../../Components/HomePageLoader';
 import NetInfo from "@react-native-community/netinfo";
 import _ from "lodash"
+import images from '../../../Constants/images';
 
 const HomePage = (props) => {
     const navigation = useNavigation();
@@ -79,8 +75,6 @@ const HomePage = (props) => {
             );
         });
     }, [orientation])
-
-
 
     const logOut = async () => {
         await AsyncStorage.removeItem("online_screen_visited")
@@ -226,8 +220,6 @@ const HomePage = (props) => {
 
     const ShowContinueAssessmentSection = videoData && videoData.lstToDo && videoData.lstToDo.filter((xx) => xx.AssessmentStatus == "Continue" || xx.AssessmentStatus == "Feedback").length > 0
 
-
-
     return (
         <View style={{ flex: 1 }}>
             {isLoading &&
@@ -236,15 +228,13 @@ const HomePage = (props) => {
 
             {isLoading === false && (
                 <View style={{ flex: 1 }}>
-
-                    {/* <View> */}
                     <View style={{ margin: 10, padding: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                         <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
                             <TouchableOpacity
                                 style={{ marginRight: 8, justifyContent: "flex-start" }}
                                 onPress={() => navigation.openDrawer()}
                             >
-                                <Image source={MenuIcon} style={{ width: 24, height: 24 }} />
+                                <Image source={images.menu_icon} style={{ width: 24, height: 24 }} />
                             </TouchableOpacity>
                             <Image
                                 style={{
@@ -252,7 +242,7 @@ const HomePage = (props) => {
                                     width: 40,
                                     marginRight: 6
                                 }}
-                                source={AvatarImg}
+                                source={images.profile_icon}
                             />
                             <View style={{ marginLeft: 10, }}>
                                 <Text style={{
@@ -302,7 +292,7 @@ const HomePage = (props) => {
                                 setSearchedCompVideo("")
                             }}>
                             <View style={{ marginRight: 4 }}>
-                                <Image source={ToDoIcon} style={{ height: 22, width: 22, }} />
+                                <Image source={images.to_do_list_icon} style={{ height: 22, width: 22, }} />
                             </View>
                             <View>
                                 <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>To Do List</Text>
@@ -323,7 +313,7 @@ const HomePage = (props) => {
                                 setVideoType("COMPLIST")
                                 setSearchedTodoVideo("")
                             }}>
-                            <Image source={CompletedIcon} style={{ height: 22, width: 22, marginRight: 4 }} />
+                            <Image source={images.completed_icon} style={{ height: 22, width: 22, marginRight: 4 }} />
                             <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>Completed List</Text>
                         </Pressable>
                     </View>
@@ -382,8 +372,8 @@ const HomePage = (props) => {
                                                 showsHorizontalScrollIndicator={false}
                                             // extraData={videoType}
                                             />
-
                                         }
+
                                         {videoType == "TODOLIST" && searchedTodoVideo && searchedTodoVideoData && searchedTodoVideoData.length > 0 &&
                                             <FlatList
                                                 key={orientation === "landscape" ? 4 : 2}
@@ -410,11 +400,13 @@ const HomePage = (props) => {
                                                 showsHorizontalScrollIndicator={false}
                                             />
                                         }
+
                                         {videoType == "TODOLIST" && searchedTodoVideo && searchedTodoVideoData && searchedTodoVideoData.length == 0 &&
                                             <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
                                                 <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
                                             </View>
                                         }
+
                                         {videoType == "TODOLIST" && videoData && videoData.lstToDo && videoData.lstToDo.length == 0 &&
                                             <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
                                                 <NoDataFound title={"No Data Available"} desc="No videos have assissgned for you or you have completed all assessment." imageType="NoData" />
@@ -458,6 +450,7 @@ const HomePage = (props) => {
                                             // extraData={videoType}
                                             />
                                         }
+
                                         {videoType == "COMPLIST" && searchedCompVideo && searchedCompVideoData && searchedCompVideoData.length > 0 &&
                                             <FlatList
                                                 key={orientation === "landscape" ? 4 : 2}
@@ -484,11 +477,13 @@ const HomePage = (props) => {
                                                 style={{ margin: 4, padding: 4, flexDirection: "row" }}
                                             />
                                         }
+
                                         {videoType == "COMPLIST" && searchedCompVideo && searchedCompVideoData && searchedCompVideoData.length == 0 &&
                                             <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
                                                 <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
                                             </View>
                                         }
+
                                         {videoType == "COMPLIST" && CompletedList && CompletedList.length == 0 &&
                                             <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
                                                 <NoDataFound title={"No Data Available"} desc="You had not completed any videos yet." imageType="NoData" />
@@ -534,8 +529,6 @@ const HomePage = (props) => {
                             )}
                         </View>
                     </ScrollView>
-                    {/* </View> */}
-
                 </View>
             )}
         </View>

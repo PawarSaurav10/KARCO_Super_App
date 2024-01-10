@@ -4,15 +4,12 @@ import { COLORS } from '../../../Constants/theme';
 import axios from 'axios';
 import { getUserData, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
 import { WebView } from 'react-native-webview';
-import PDFViewer from '../../../Components/PDFViewer';
 import { useIsFocused } from '@react-navigation/native';
 import Header from '../../../Components/Header';
-import BackIcon from "../../../Images/left-arrow.png"
 import { getURL } from "../../../baseUrl"
 import AssessmentScreenLoader from '../../../Components/AssessmentScreenLoader';
 import NetInfo from "@react-native-community/netinfo";
 import { Colors } from '../../../node_modules/react-native/Libraries/NewAppScreen';
-import CloseIcon from "../../../Images/close.png"
 import {
     Canvas,
     Fill,
@@ -22,10 +19,9 @@ import {
 } from "@shopify/react-native-skia";
 import { BlurView } from '@react-native-community/blur';
 import Pdf from 'react-native-pdf';
-// import Pdf from '../../../node_modules/react-native-pdf';
+import images from '../../../Constants/images';
 
 const AssessmentScreen = ({ navigation, route }) => {
-    console.log(route, "route")
     const videoPlay = useRef(null)
     const isFocused = useIsFocused()
     const [playVideo, setPlayVideo] = useState(false)
@@ -351,7 +347,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                             style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
                             onPress={() => backAction()}
                         >
-                            <Image source={BackIcon} style={{ width: 20, height: 20 }} />
+                            <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                         </TouchableOpacity>
                     }
                     title={assessmentData ?.videoDetail ?.VideoName}
@@ -464,7 +460,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                         setPlayVideo(!playVideo);
                                                     }}>
                                                     <View style={{ backgroundColor: "white", width: 24, height: 24, alignItems: 'center', justifyContent: "center", borderRadius: 20 }}>
-                                                        <Image source={CloseIcon} style={{ width: 16, height: 16 }} />
+                                                        <Image source={images.close_icon} style={{ width: 16, height: 16 }} />
                                                     </View>
                                                 </TouchableOpacity>
 
@@ -501,7 +497,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                     onPress={() => {
                                                         setPlayVideo(false)
                                                     }}>
-                                                    <Image source={CloseIcon} style={{ width: 20, height: 20 }} />
+                                                    <Image source={images.close_icon} style={{ width: 20, height: 20 }} />
                                                 </TouchableOpacity>
                                             </View>
                                             <View style={{ flex: 0.97 }}>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native'
-import RightArrowIcon from "../Images/right-arrow.png"
 import { getURL } from '../baseUrl';
 import { COLORS } from '../Constants/theme';
+import images from '../Constants/images';
 
 const GridViewCard = ({ VideoName, VideoCategory, CourseNo, onPress, isVideoCompleted, Status, PosterImage, orientationType }) => {
     const [posterImage, setPosterImage] = useState(`${getURL.video_poster_URL}/${PosterImage}`)
@@ -65,7 +65,7 @@ const GridViewCard = ({ VideoName, VideoCategory, CourseNo, onPress, isVideoComp
                         </View>
                         <Image
                             style={{ width: 12, height: 12 }}
-                            source={RightArrowIcon}
+                            source={images.right_arrow_icon}
                         />
                     </View>
                 </View>

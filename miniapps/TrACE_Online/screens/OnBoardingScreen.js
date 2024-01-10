@@ -1,14 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { View, Text, Image, Animated, TouchableOpacity } from 'react-native'
-import OnBoardingImage1 from "../../../Images/onBoardingImage-1.png"
-import OnBoardingImage2 from "../../../Images/onBoardingImage-2.png"
-import OnBoardingImage3 from "../../../Images/onBoardingImage-4.png"
 import { COLORS, SIZES } from '../../../Constants/theme';
 import CustomButton from '../../../Components/CustomButton';
 import BackIcon from "../../../Images/arrow.png"
 import { setAppLaunced, setOnlineScreenVisited } from "../../../Utils/getScreenVisisted"
 import _ from "lodash"
-
+import images from '../../../Constants/images';
 
 const OnBoardingScreen = ({ navigation }) => {
     const scrollX = useRef(new Animated.Value(0)).current;
@@ -21,26 +18,25 @@ const OnBoardingScreen = ({ navigation }) => {
     const onboarding_screens = [
         {
             id: 1,
-            bannerImage: OnBoardingImage1,
+            bannerImage: images.onBoardingImage_1_icon,
             title: "Online Learning Platform",
             description:
                 "Choose from 100 online video courses with new additions published every month.",
         },
         {
             id: 2,
-            bannerImage: OnBoardingImage2,
+            bannerImage: images.onBoardingImage_2_icon,
             title: "Learn on your Schedule",
             description:
                 "Anywhere,Anytime. Start Learning Today!",
         },
         {
             id: 3,
-            bannerImage: OnBoardingImage3,
+            bannerImage: images.onBoardingImage_3_icon,
             title: "Ready to find a course?",
             description: "Discover the online learning experience",
         },
     ];
-
 
     const ImageDescComponent = ({ item, index }) => {
         return (
