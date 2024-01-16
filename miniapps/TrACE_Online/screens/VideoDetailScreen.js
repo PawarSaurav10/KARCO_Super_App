@@ -13,6 +13,7 @@ import Pdf from 'react-native-pdf';
 import { getURL } from "../../../baseUrl"
 import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
+import CustomAlert from '../../../Components/CustomAlert';
 
 const VideoDetailScreen = ({ navigation, route }) => {
     const htmlContentPromo = `
@@ -20,11 +21,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 <iframe id="iframe" src="${getURL.play_video_URL}/${route.params.item.videokeypromo}" frameborder="0" allowFullscreen="true"  width="100%" height="100%" allowtransparency="true" onload="displayMessage()"/>
             </div>
     `;
+
     const htmlContentFull = `
         <div width="100%" height="auto" allowfullscreen="true">
             <iframe src="${getURL.play_video_URL}/${route.params.item.videokey}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
         </div>
-      `;
+    `;
+
     const isFocused = useIsFocused();
     const [videoType, setVideoType] = useState("")
     const [isLoading, setIsLoading] = useState(true)
@@ -37,6 +40,10 @@ const VideoDetailScreen = ({ navigation, route }) => {
     const [viewPdf, setViewPdf] = useState(false)
     const [htmlContent, setHtmlContent] = useState(htmlContentPromo)
     const [orientation, setOrientation] = useState()
+    const [viewAlert, setViewAlert] = useState({
+        isShow: false,
+        AlertType: ""
+    })
 
     const backAction = () => {
         navigation.replace("Online_Home", { type: route.params.type })
@@ -48,7 +55,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
         return dim.height >= dim.width;
     };
 
-
     useEffect(() => {
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
@@ -58,22 +64,16 @@ const VideoDetailScreen = ({ navigation, route }) => {
         });
     }, [orientation])
 
-    const CheckConnectivity = () => {
+    function CheckConnectivity() {
         // For Android devices
         if (Platform.OS === "android") {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
-                    // Alert.alert("You are online!");
                 } else {
-                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
-                        {
-                            text: 'OK', onPress: () =>
-                                navigation.reset({
-                                    index: 0,
-                                    routes: [{ name: "Home" }],
-                                })
-                        },
-                    ]);
+                    setViewAlert({
+                        isShow: true,
+                        AlertType: "Internet"
+                    })
                 }
             });
         }
@@ -136,7 +136,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     }}
                     leftComponent={
                         <TouchableOpacity
-                            style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
+                            style={{ marginHorizontal: 12, justifyContent: "flex-start", padding: 6 }}
                             onPress={() => navigation.replace("Online_Home", { type: route.params.type })}
                         >
                             <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
@@ -152,34 +152,37 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         <ScrollView
                             contentInsetAdjustmentBehavior="automatic"
                         >
-                            {(videoType == "PROMOKEY" || videoType == "") &&
+                            {route.params.item.ModuleType !== "Circular" && (videoType == "PROMOKEY" || videoType == "") &&
                                 <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
-                                    {route.params.item.ModuleType == "Circular"
-                                        ? <PDFViewer pdf={route.params.item.VideoPath} pageNo={1} />
-                                        : <WebView
-                                            source={{ html: htmlContentPromo }}
-                                            allowsFullscreenVideo={true}
-                                            automaticallyAdjustContentInsets
-                                            mediaPlaybackRequiresUserAction={true}
-                                            startInLoadingState={<ActivityIndicator />}
-                                            minimumFontSize={12} />
-                                    }
+                                    <WebView
+                                        source={{ html: htmlContentPromo }}
+                                        allowsFullscreenVideo={true}
+                                        automaticallyAdjustContentInsets
+                                        mediaPlaybackRequiresUserAction={true}
+                                        startInLoadingState={<ActivityIndicator />}
+                                        minimumFontSize={12}
+                                    />
                                 </View>
                             }
                             {videoType == "FULLKEY" &&
                                 <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
-                                    {route.params.item.ModuleType == "Circular"
-                                        ? <PDFViewer pdf={route.params.item.VideoPath} pageNo={1} />
-                                        : <WebView
-                                            source={{ html: htmlContent }}
-                                            allowsFullscreenVideo={true}
-                                            automaticallyAdjustContentInsets
-                                            mediaPlaybackRequiresUserAction={true}
-                                            startInLoadingState={<ActivityIndicator />}
-                                            minimumFontSize={12} />
-                                    }
+                                    <WebView
+                                        source={{ html: htmlContent }}
+                                        allowsFullscreenVideo={true}
+                                        automaticallyAdjustContentInsets
+                                        mediaPlaybackRequiresUserAction={true}
+                                        startInLoadingState={<ActivityIndicator />}
+                                        minimumFontSize={12}
+                                    />
                                 </View>
                             }
+
+                            {route.params.item.ModuleType == "Circular" && (videoType == "PDF" || videoType == "") &&
+                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
+                                    <PDFViewer pdf={route.params.item.VideoPath} pageNo={1} />
+                                </View>
+                            }
+
                             <View style={{ margin: 20 }}>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1 }}>
                                     <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.item.VideoName}</Text>
@@ -229,7 +232,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             onPress={() => {
                                                 CheckConnectivity()
                                                 setViewPdf(!viewPdf)
-                                                // onSynopsisPress(`https://testtrace.karco.in/Uploads/Synopsis/${route.params.item.SynopsisPath}`)
+                                                // onSynopsisPress(`https://trace.karco.in/Uploads/Synopsis/${route.params.item.SynopsisPath}`)
                                             }}
                                         >
                                             <Text style={{ color: COLORS.blue }}>View Synopsis</Text>
@@ -257,7 +260,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             marginVertical: 6,
                                             borderRadius: 5,
                                         }}
-                                        iconStyle={{ marginRight: 6, tintColor: "white" }} />
+                                        iconStyle={{ marginRight: 6, tintColor: "white" }}
+                                    />
                                     :
                                     <CustomIconButton
                                         label={(videoType == "" || videoType == "PROMOKEY") ? "View Full Video" : "View Promo Video"}
@@ -266,12 +270,10 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             CheckConnectivity()
                                             onClickPlayVideo()
                                             if ((videoType === "PROMOKEY") || (videoType === "")) {
-                                                // webViewNext()
                                                 setHtmlContent(htmlContentFull)
                                                 setVideoType("FULLKEY")
                                                 onFullViewVideoClick()
                                             } else {
-                                                // webViewgoback()
                                                 setHtmlContent(htmlContentPromo)
                                                 setVideoType("PROMOKEY")
                                                 onPromoViewVideoClick()
@@ -285,8 +287,10 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             marginVertical: 6,
                                             borderRadius: 5,
                                         }}
-                                        iconStyle={{ marginRight: 6, tintColor: "white" }} />
+                                        iconStyle={{ marginRight: 6, tintColor: "white" }}
+                                    />
                                 }
+
                                 {route.params.item.AssessmentStatus == "Pending" &&
                                     <CustomIconButton
                                         label={"Take Assessment"}
@@ -311,7 +315,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             marginVertical: 6,
                                             borderRadius: 5,
                                         }}
-                                        iconStyle={{ marginRight: 6 }} />
+                                        iconStyle={{ marginRight: 6 }}
+                                    />
                                 }
 
                                 {route.params.item.AssessmentStatus == "Continue" &&
@@ -329,7 +334,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             alignItems: "center",
                                             borderRadius: 5,
                                         }}
-                                        iconStyle={{ marginRight: 6 }} />
+                                        iconStyle={{ marginRight: 6 }}
+                                    />
                                 }
 
                                 {route.params.item.AssessmentStatus == "Feedback" &&
@@ -347,7 +353,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             alignItems: "center",
                                             borderRadius: 5,
                                         }}
-                                        iconStyle={{ marginRight: 6 }} />
+                                        iconStyle={{ marginRight: 6 }}
+                                    />
                                 }
                             </View>
                             <Modal
@@ -380,9 +387,10 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         source={{ uri: `${route.params.item.ModuleType === "Circular" ? `${getURL.view_PDF_URL}/${route.params.item.VideoPath}` : `${getURL.view_Synopsis_URL}/${route.params.item.SynopsisPath}`}` }}
                                         style={[styles.pdf, { position: "relative" }]}
                                         onError={(error) => {
-                                            Alert.alert('Oops !!', 'File is not View able or corrupted', [
-                                                { text: 'OK', onPress: () => setViewPdf(false) },
-                                            ]);
+                                            setViewAlert({
+                                                isShow: true,
+                                                AlertType: "PDF"
+                                            })
                                         }}
                                         renderActivityIndicator={() =>
                                             <ActivityIndicator color={COLORS.blue} size={"large"} />
@@ -390,6 +398,39 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     />
                                 </View>
                             </Modal>
+                            {viewAlert.isShow && (
+                                <CustomAlert
+                                    isView={viewAlert.isShow}
+                                    Title="Oops !!"
+                                    Content={viewAlert.AlertType === "Internet" ?
+                                        "Your Device is not Connected to Internet, Please Check your Internet Connectivity"
+                                        : "File is not View able or corrupted"}
+                                    buttonContainerStyle={{
+                                        flexDirection: "row",
+                                        justifyContent: "flex-end"
+                                    }}
+                                    ButtonsToShow={[
+                                        {
+                                            text: 'OK',
+                                            onPress: () => {
+                                                if (viewAlert.AlertType === "Internet") {
+                                                    navigation.reset({
+                                                        index: 0,
+                                                        routes: [{ name: "Home" }],
+                                                    })
+                                                } else {
+                                                    setViewPdf(false)
+                                                }
+                                                setViewAlert({
+                                                    isShow: false,
+                                                    AlertType: ""
+                                                })
+                                            },
+                                            toShow: true,
+                                        },
+                                    ]}
+                                />
+                            )}
                         </ScrollView>
                     </View>
                 }

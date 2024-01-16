@@ -6,11 +6,9 @@ import LoginScreen from '../../../MainAppScreens/LoginScreen';
 import VideoDetailScreen from '../screens/VideoDetailScreen';
 import AssessmentScreen from '../screens/AssessmentScreen';
 import FeedbackScreen from '../screens/FeedbackScreen';
-import OnBoardingScreen from '../screens/OnBoardingScreen';
 import ViewAllScreen from '../screens/ViewAllScreen';
 const Online = createStackNavigator();
 import { getOnlineScreenVisited } from "../../../Utils/getScreenVisisted"
-import { NavigationContainer } from '../../../node_modules/@react-navigation/native';
 import DrawerNavigation from '../../../navigation/DrawerNavigation';
 
 const OnlineNavigation = ({ route }) => {
@@ -24,6 +22,7 @@ const OnlineNavigation = ({ route }) => {
             }
         });
     }, [])
+
     return (
         <>
             {initialRoute && (

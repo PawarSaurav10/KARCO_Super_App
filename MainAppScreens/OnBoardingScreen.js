@@ -173,7 +173,7 @@ const OnBoardingScreen = ({ navigation }) => {
                                     }
                                 }}
                             >
-                                <Image source={BackIcon} style={{ width: 20, height: 20 }} />
+                                <Image source={BackIcon} style={{ width: 24, height: 24 }} />
                             </TouchableOpacity>
                         }
                     </View>
@@ -183,8 +183,8 @@ const OnBoardingScreen = ({ navigation }) => {
                             containerStyle={{
                                 borderWidth: 1,
                                 borderRadius: 50,
-                                paddingVertical: 8,
-                                paddingHorizontal: 12,
+                                paddingVertical: 12,
+                                paddingHorizontal: 16,
                                 borderColor: COLORS.primary
                                 // backgroundColor: COLORS.primary,
                             }}

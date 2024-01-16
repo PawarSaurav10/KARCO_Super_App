@@ -14,12 +14,17 @@ import ListViewCard from '../../../Components/ListViewCard';
 import GridViewCard from '../../../Components/GridViewCard';
 import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
+import CustomAlert from '../../../Components/CustomAlert';
 
 const ViewAllScreen = ({ navigation, route }) => {
     const [searchedTodoVideoData, setSearchedTodoVideoData] = useState([])
     const [searchedVideo, setSearchedVideo] = useState()
     const windowWidth = Dimensions.get('window').width;
     const [orientation, setOrientation] = useState()
+    const [viewAlert, setViewAlert] = useState({
+        isShow: false,
+        AlertType: ""
+    })
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -35,16 +40,16 @@ const ViewAllScreen = ({ navigation, route }) => {
         });
     }, [orientation])
 
-    const CheckConnectivity = () => {
+    function CheckConnectivity() {
         // For Android devices
         if (Platform.OS === "android") {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
-                    // Alert.alert("You are online!");
                 } else {
-                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
-                        { text: 'OK', onPress: () => navigation.replace("Home") },
-                    ]);
+                    setViewAlert({
+                        isShow: true,
+                        AlertType: "Internet"
+                    })
                 }
             });
         }
@@ -83,7 +88,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                 }}
                 leftComponent={
                     <TouchableOpacity
-                        style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
+                        style={{ marginHorizontal: 12, justifyContent: "flex-start", padding: 6 }}
                         onPress={() => navigation.goBack()}
                     >
                         <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
@@ -156,7 +161,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                 <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
                             </View>
                         }
-                        {route && route.params && route.params.data.length == 0 &&
+                        {route && route.params && route.params.data && route.params.data.length == 0 &&
                             <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
                                 <NoDataFound title={"No Data Available"} desc="No videos have assissgned for you or you have completed all assessment." imageType="NoData" />
                             </View>
@@ -210,6 +215,34 @@ const ViewAllScreen = ({ navigation, route }) => {
                         )}
                     </View>
                 }
+                
+                {viewAlert.isShow && (
+                    <CustomAlert
+                        isView={viewAlert.isShow}
+                        Title="Oops !!"
+                        Content="Your Device is not Connected to Internet, Please Check your Internet Connectivity"
+                        buttonContainerStyle={{
+                            flexDirection: "row",
+                            justifyContent: "flex-end"
+                        }}
+                        ButtonsToShow={[
+                            {
+                                text: 'OK',
+                                onPress: () => {
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: "Home" }],
+                                    })
+                                    setViewAlert({
+                                        isShow: false,
+                                        AlertType: ""
+                                    })
+                                },
+                                toShow: true,
+                            },
+                        ]}
+                    />
+                )}
             </ScrollView>
         </View>
     )

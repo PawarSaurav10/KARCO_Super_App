@@ -12,6 +12,7 @@ import { getURL } from '../baseUrl';
 import LoginScreenLoader from "../Components/LoginScreenLoader"
 import NetInfo from "@react-native-community/netinfo";
 import images from '../Constants/images';
+import CustomAlert from '../Components/CustomAlert';
 
 const LoginScreen = ({ navigation, route }) => {
     const { passwordVisibility, rightIcon, handlePasswordVisibility } = useTogglePasswordVisibility();
@@ -21,23 +22,21 @@ const LoginScreen = ({ navigation, route }) => {
         password: ""
     })
     const [isLoading, setIsLoading] = useState(false)
+    const [viewAlert, setViewAlert] = useState({
+        isShow: false,
+        AlertType: ""
+    })
 
-    const CheckConnectivity = () => {
+    function CheckConnectivity() {
         // For Android devices
         if (Platform.OS === "android") {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
-                    // Alert.alert("You are online!");
                 } else {
-                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
-                        {
-                            text: 'OK', onPress: () =>
-                                navigation.reset({
-                                    index: 0,
-                                    routes: [{ name: "Home" }],
-                                })
-                        },
-                    ]);
+                    setViewAlert({
+                        isShow: true,
+                        AlertType: "Internet"
+                    })
                 }
             });
         }
@@ -59,7 +58,7 @@ const LoginScreen = ({ navigation, route }) => {
             setIsLoading(true)
             try {
                 if (route.params.appName === "TrACE KPI") {
-                    axios.get(`https://trace.karco.in/api/applogin/CompanyLogin?username=${loginData.userId.trimStart("").trimEnd("")}&password=${loginData.password.trimStart("").trimEnd("")}`)
+                    axios.get(`${getURL.KPI_login_base_URL}/CompanyLogin?username=${loginData.userId.trimStart("").trimEnd("")}&password=${loginData.password.trimStart("").trimEnd("")}`)
                         .then((response) => {
                             if (response.data.CompanyId > 0) {
                                 setIsLoading(false)
@@ -76,7 +75,11 @@ const LoginScreen = ({ navigation, route }) => {
                                 });
                             } else {
                                 setIsLoading(false)
-                                alert("Couldn't Sign In, Your User Name and Password Does'nt Match.")
+                                setViewAlert({
+                                    isShow: true,
+                                    AlertType: "WrongValues"
+                                })
+                                // alert("Couldn't Sign In, Your User Name and Password Does'nt Match.")
                             }
                         })
                 } else {
@@ -99,7 +102,11 @@ const LoginScreen = ({ navigation, route }) => {
                                 setIsLoading(false)
                             } else {
                                 setIsLoading(false)
-                                alert("Couldn't Sign In, Your Username and Password Does'nt Match.")
+                                setViewAlert({
+                                    isShow: true,
+                                    AlertType: "WrongValues"
+                                })
+                                // alert("Couldn't Sign In, Your Username and Password Does'nt Match.")
                             }
                         })
                 }
@@ -108,14 +115,17 @@ const LoginScreen = ({ navigation, route }) => {
             }
         } else {
             setIsLoading(false)
-            Alert.alert('Warning', `Plaese Enter ${loginData.userId === "" ? "Username" : loginData.password === "" ? "Password" : "Username and Password"}`, [
-                { text: 'OK' },
-            ]);
+            setViewAlert({
+                isShow: true,
+                AlertType: "NoDataEntered"
+            })
         }
     }
+
     return (
         <View style={{ flex: 1 }}>
             {isLoading && <LoginScreenLoader />}
+
             {!isLoading &&
                 <ScrollView>
                     <View style={{ flexDirection: 'col', justifyContent: "center" }}>
@@ -130,9 +140,10 @@ const LoginScreen = ({ navigation, route }) => {
                             <View style={{ padding: 10 }}>
                                 <View style={{ marginVertical: 4 }}>
                                     <Text style={{ fontSize: 22, fontWeight: "bold", textAlign: "center", color: COLORS.darkBlue, textTransform: "uppercase" }}>Let's Sign You In</Text>
+                                    <Text style={{ fontSize: 22, fontWeight: "bold", textAlign: "center", color: COLORS.darkBlue, textTransform: "uppercase" }}>{route.params.appName === "TrACE KPI" ? "TrACE Online" : "Shore Online"}</Text>
                                 </View>
                                 <View style={{ marginVertical: 4 }}>
-                                    <Text style={{ fontSize: 16, textAlign: "center", color: COLORS.darkBlue }}>Welcome, Please enter your Log In Details below and Click Login </Text>
+                                    <Text style={{ fontSize: 16, textAlign: "center", color: COLORS.darkBlue }}>Welcome, Please enter your log in details below and Click Login </Text>
                                 </View>
                             </View>
                         </View>
@@ -190,8 +201,37 @@ const LoginScreen = ({ navigation, route }) => {
                         </View>
                     </View>
                 </ScrollView>
-
             }
+
+            {viewAlert.isShow && (
+                <CustomAlert
+                    isView={viewAlert.isShow}
+                    Title={viewAlert.AlertType === "Internet" ? "Oops !!" : "Warning!"}
+                    Content={viewAlert.AlertType === "Internet" ?
+                        "Your Device is not Connected to Internet, Please Check your Internet Connectivity"
+                        : viewAlert.AlertType === "WrongValues" ?
+                            "Couldn't Sign In, Your Username and Password Does'nt Match."
+                            : `Plaese Enter ${loginData.userId === "" ? "Username" : loginData.password === "" ? "Password" : "Username and Password"}`}
+                    ButtonsToShow={[
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                                if (viewAlert.AlertType === "Internet") {
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: "Home" }],
+                                    })
+                                }
+                                setViewAlert({
+                                    isShow: false,
+                                    AlertType: ""
+                                })
+                            },
+                            toShow: true
+                        }
+                    ]}
+                />
+            )}
         </View>
     )
 }
@@ -220,6 +260,10 @@ const styles = StyleSheet.create({
     highlight: {
         fontWeight: '700',
     },
+    alertButton: {
+        backgroundColor: "#004C6B",
+        padding: 10,
+    }
 });
 
 

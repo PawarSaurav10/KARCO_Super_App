@@ -20,9 +20,9 @@ import {
 import { BlurView } from '@react-native-community/blur';
 import Pdf from 'react-native-pdf';
 import images from '../../../Constants/images';
+import CustomAlert from '../../../Components/CustomAlert';
 
 const AssessmentScreen = ({ navigation, route }) => {
-    const videoPlay = useRef(null)
     const isFocused = useIsFocused()
     const [playVideo, setPlayVideo] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState("")
@@ -41,6 +41,10 @@ const AssessmentScreen = ({ navigation, route }) => {
     const [showBlur, setShowBlur] = useState(true);
     const [viewRef, setViewRef] = useState(null);
     const [blurType, setBlurType] = useState('light');
+    const [viewAlert, setViewAlert] = useState({
+        isShow: false,
+        AlertType: ""
+    })
 
     const tintColor = ['#ffffff', '#000000'];
     if (blurType === 'xlight') {
@@ -62,33 +66,23 @@ const AssessmentScreen = ({ navigation, route }) => {
     }, [orientation])
 
     const backAction = () => {
-        Alert.alert('Hold on!', 'Are you sure you want to leave Assessment ?', [
-            {
-                text: 'Cancel',
-                onPress: () => null,
-                style: 'cancel',
-            },
-            { text: 'YES', onPress: () => navigation.replace("Online_Home") },
-        ]);
+        setViewAlert({
+            isShow: true,
+            AlertType: "onBack"
+        })
         return true;
     };
 
-    const CheckConnectivity = () => {
+    function CheckConnectivity() {
         // For Android devices
         if (Platform.OS === "android") {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
-                    // Alert.alert("You are online!");
                 } else {
-                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
-                        {
-                            text: 'OK', onPress: () =>
-                                navigation.reset({
-                                    index: 0,
-                                    routes: [{ name: "Home" }],
-                                })
-                        },
-                    ]);
+                    setViewAlert({
+                        isShow: true,
+                        AlertType: "Internet"
+                    })
                 }
             });
         }
@@ -108,22 +102,10 @@ const AssessmentScreen = ({ navigation, route }) => {
             }).then((res) => {
                 if (res.data.QuestionList.length === 0) {
                     setIsLoading(true)
-                    Alert.alert("Congratulations!", "You have completed the assessment. To generate your certificate, proceed to feedback.", [{
-                        text: 'Proceed To Feedback',
-                        onPress: () => {
-                            callGetOnlineAssessmentApi()
-                            setIsLoading(false)
-                            navigation.replace("Feedback Form", { Id: route.params.Id, videoPassword: route.params.videoPassword })
-                        },
-                    }, {
-                        text: 'Continue Without Feedback',
-                        onPress: () => {
-                            callGetOnlineAssessmentApi()
-                            callFeedbackAPI(route.params.Id, route.params.videoPassword)
-                            setIsLoading(false)
-                            navigation.replace("Online_Home")
-                        },
-                    }])
+                    setViewAlert({
+                        isShow: true,
+                        AlertType: "Success"
+                    })
                 } else {
                     setAssessmentData(res.data)
                 }
@@ -182,49 +164,25 @@ const AssessmentScreen = ({ navigation, route }) => {
     const onCorrectOptionClick = () => {
         if (assessmentData.QuestionList.length === (questioncountIndex + currentQuestion + 1)) {
             setIsLoading(true)
-            Alert.alert("Congratulations!", "You have completed the assessment. To generate your certificate, proceed to feedback.", [{
-                text: 'Continue With Feedback',
-                onPress: () => {
-                    callGetOnlineAssessmentApi()
-                    setIsLoading(false)
-                    navigation.replace("Feedback Form", { Id: route.params.Id, videoPassword: route.params.videoPassword })
-                },
-            },
-            {
-                text: 'Continue Without Feedback',
-                onPress: () => {
-                    callGetOnlineAssessmentApi()
-                    callFeedbackAPI(route.params.Id, route.params.videoPassword)
-                    setIsLoading(false)
-                    navigation.replace("Online_Home")
-                }
-            }
-            ])
+            setViewAlert({
+                isShow: true,
+                AlertType: "Success"
+            })
         } else {
-            Alert.alert("Well Done!", "You have provided the correct answer", [{
-                text: 'Proceed',
-                onPress: () => {
-                    callGetOnlineAssessmentApi()
-                    setSelectedOptions("")
-                    setCurrentQuestion(currentQuestion + 1)
-                    setIsLoading(false)
-                }
-            }])
+            setIsLoading(true)
+            setViewAlert({
+                isShow: true,
+                AlertType: "Correct"
+            })
         }
     }
 
     const onWrongOptionClick = () => {
         setIsLoading(false)
-        Alert.alert("Warning", "This is not a correct option, please watch the video & try again", [{
-            text: 'Proceed',
-            onPress: () => {
-                // videoPlay.current.focus()
-                setPlayVideo(true)
-                setSelectedOptions("")
-                setShowBlur(true)
-                setViewRef(true)
-            },
-        }])
+        setViewAlert({
+            isShow: true,
+            AlertType: "Wrong"
+        })
     }
 
     const callFeedbackAPI = (Id, videoPassword) => {
@@ -344,7 +302,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                     }}
                     leftComponent={
                         <TouchableOpacity
-                            style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
+                            style={{ justifyContent: "flex-start", padding: 6, marginHorizontal: 12 }}
                             onPress={() => backAction()}
                         >
                             <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
@@ -394,25 +352,6 @@ const AssessmentScreen = ({ navigation, route }) => {
                                     </View>
                                     {assessmentData.QuestionList.length >= (questioncountIndex + currentQuestion + 1) && <QuestionCard initialData={questionToShow} questionIndex={currentQuestion + 1} />}
                                 </View>
-                                {/* {playVideo === true &&
-                                    <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200, marginBottom: 40 }}>
-                                        {route.params.ModuleType == "Circular" ?
-                                            <PDFViewer pdf={assessmentData.videoDetail.VideoPath} pageNo={questionToShow ?.ClipTimingFrom} />
-                                            :
-                                            <WebView
-                                                source={{
-                                                    html: `
-                                                    <div width="100%" height="auto" *ngIf="MainVideoPreview">
-                                                        <iframe src="${getURL.play_video_URL}/${assessmentData ?.videoDetail ?.Videokey}?start=${questionToShow ?.ClipTimingFrom}&end=${questionToShow ?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
-                                                    </div>
-                                            `}}
-                                                allowsFullscreenVideo={true}
-                                                mediaPlaybackRequiresUserAction={false}
-                                            />
-                                        }
-                                    </View>
-                                } */}
-                                {/* {showBlur ? renderBlurView() : null} */}
                                 <Modal
                                     animationType="slide"
                                     transparent={true}
@@ -428,8 +367,8 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                 height: '100%',
                                                 marginTop: 'auto',
                                                 backgroundColor: 'rgba(0,0,0,0.6)',
-                                            }}>
-
+                                            }}
+                                        >
                                             <BlurView
                                                 viewRef={viewRef}
                                                 style={{
@@ -463,10 +402,8 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                         <Image source={images.close_icon} style={{ width: 16, height: 16 }} />
                                                     </View>
                                                 </TouchableOpacity>
-
                                                 <View style={{ width: Dimensions.get('window').width - (orientation === "landscape" ? 40 : 20), height: orientation === "landscape" ? 280 : 200 }}>
                                                     <WebView
-                                                        ref={videoPlay}
                                                         source={{ html: htmlContent }}
                                                         allowsFullscreenVideo={true}
                                                         mediaPlaybackRequiresUserAction={true}
@@ -509,9 +446,10 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                     source={{ uri: `${getURL.view_PDF_URL}/${assessmentData.videoDetail.VideoPath}` }}
                                                     style={{ flex: 1, position: "relative" }}
                                                     onError={(error) => {
-                                                        Alert.alert('Oops !!', 'File is not View able or corrupted', [
-                                                            { text: 'OK', onPress: () => setPlayVideo(false) },
-                                                        ]);
+                                                        setViewAlert({
+                                                            isShow: true,
+                                                            AlertType: "PDF"
+                                                        })
                                                     }}
                                                     page={questionToShow ?.ClipTimingFrom}
                                                     renderActivityIndicator={() =>
@@ -523,10 +461,109 @@ const AssessmentScreen = ({ navigation, route }) => {
 
                                     }
                                 </Modal>
+
                             </ScrollView>
                         }
                     </View>
                 }
+                {viewAlert.isShow && (
+                    <CustomAlert
+                        isView={viewAlert.isShow}
+                        Title={viewAlert.AlertType === "Internet" ? "Oops !!" : viewAlert.AlertType === "onBack" ? "Hold on!" : viewAlert.AlertType === "Success" ? "Congratulations!" : viewAlert.AlertType === "Correct" ? "Well Done!" : viewAlert.AlertType === "Wrong" ? "Warning!" : "Oops !!"}
+                        Content={viewAlert.AlertType === "Internet" ?
+                            "Your Device is not Connected to Internet, Please Check your Internet Connectivity"
+                            : viewAlert.AlertType === "onBack" ? "Are you sure you want to leave Assessment ?"
+                                : viewAlert.AlertType === "Success" ? "You have completed the assessment. To generate your certificate, proceed to feedback."
+                                    : viewAlert.AlertType === "Correct" ? "You have provided the correct answer"
+                                        : viewAlert.AlertType === "Wrong" ? "This is not a correct option, please watch the video & try again"
+                                            : viewAlert.AlertType === "PDF" ? "File is not View able or corrupted" : ""}
+                        buttonContainerStyle={{
+                            flexDirection: viewAlert.AlertType === "Success" ? "column" : "row",
+                            justifyContent: "flex-end"
+                        }}
+                        ButtonsToShow={[
+                            {
+                                text: 'CANCEL',
+                                onPress: () => {
+                                    setViewAlert({
+                                        isShow: false,
+                                        AlertType: ""
+                                    })
+                                },
+                                toShow: viewAlert.AlertType === "onBack" ? true : false,
+                            },
+                            {
+                                text: viewAlert.AlertType === "onBack" ? 'YES' : 'OK',
+                                onPress: () => {
+                                    if (viewAlert.AlertType === "Internet") {
+                                        navigation.reset({
+                                            index: 0,
+                                            routes: [{ name: "Home" }],
+                                        })
+                                    } else if (viewAlert.AlertType === "onBack") {
+                                        navigation.replace("Online_Home")
+                                    } else if (viewAlert.AlertType === "PDF") {
+                                        setPlayVideo(false)
+                                    }
+                                    setViewAlert({
+                                        isShow: false,
+                                        AlertType: ""
+                                    })
+                                },
+                                toShow: (viewAlert.AlertType === "Internet" || viewAlert.AlertType === "onBack" || viewAlert.AlertType === "PDF") && true,
+                            },
+                            {
+                                text: 'Proceed',
+                                onPress: () => {
+                                    if (viewAlert.AlertType === "Correct") {
+                                        setIsLoading(false)
+                                        callGetOnlineAssessmentApi()
+                                        setSelectedOptions("")
+                                        setCurrentQuestion(currentQuestion + 1)
+                                    } else if (viewAlert.AlertType === "Wrong") {
+                                        setPlayVideo(true)
+                                        setSelectedOptions("")
+                                        setShowBlur(true)
+                                        setViewRef(true)
+                                        setIsLoading(false)
+                                    }
+                                    setViewAlert({
+                                        isShow: false,
+                                        AlertType: ""
+                                    })
+                                },
+                                toShow: (viewAlert.AlertType === "Correct" || viewAlert.AlertType === "Wrong") && true,
+                            },
+                            {
+                                text: 'Proceed To Feedback',
+                                onPress: () => {
+                                    setIsLoading(false)
+                                    callGetOnlineAssessmentApi()
+                                    navigation.replace("Feedback Form", { Id: route.params.Id, videoPassword: route.params.videoPassword })
+                                    setViewAlert({
+                                        isShow: false,
+                                        AlertType: ""
+                                    })
+                                },
+                                toShow: viewAlert.AlertType === "Success" ? true : false,
+                            },
+                            {
+                                text: 'Continue Without Feedback',
+                                onPress: () => {
+                                    setIsLoading(false)
+                                    callGetOnlineAssessmentApi()
+                                    callFeedbackAPI(route.params.Id, route.params.videoPassword)
+                                    navigation.replace("Online_Home")
+                                    setViewAlert({
+                                        isShow: false,
+                                        AlertType: ""
+                                    })
+                                },
+                                toShow: viewAlert.AlertType === "Success" ? true : false,
+                            },
+                        ]}
+                    />
+                )}
             </ScrollView>
         </View>
     )

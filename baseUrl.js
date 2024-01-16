@@ -7,4 +7,5 @@ export const getURL = {
     VideoView_baseURL : "https://api.spotlightr.com/api/videos",
     vooKey: "DFckqdC6mQy9lKNVNtFkYKH80",
     KPI_base_URL: "https://trace.karco.in/api/AppKPI",
+    KPI_login_base_URL: "https://trace.karco.in/api/applogin",
 }

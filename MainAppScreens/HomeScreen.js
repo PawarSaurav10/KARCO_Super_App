@@ -41,7 +41,6 @@ const HomeScreen = ({ navigation }) => {
         }
     }, [])
 
-
     const LIST_APPS = [
         {
             appName: 'TrACE KPI',
@@ -62,6 +61,7 @@ const HomeScreen = ({ navigation }) => {
             zone: 3
         },
     ];
+    
     return (
         <View style={{ flex: 1, backgroundColor: "#004C6B", padding: 10 }}>
             <View style={styles.content}>

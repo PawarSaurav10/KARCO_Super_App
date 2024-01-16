@@ -65,7 +65,7 @@ const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, i
                                 <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(crt_Date).format("DD MMM YYYY")}</Text>
                             </View>
                         </View>
-                        <TouchableOpacity onPress={() => onDelete(item, true)} style={{ marginLeft: 12, flex: orientationType === "landscape" ? 0.04 : 0.1 }}>
+                        <TouchableOpacity onPress={() => onDelete(item)} style={{ marginLeft: 12, flex: orientationType === "landscape" ? 0.04 : 0.1 }}>
                             <Image source={images.delete_icon} style={{ width: 28, height: 28 }} />
                         </TouchableOpacity>
                     </View>

@@ -34,7 +34,9 @@ const TabButton = ({
     outerContainerStyle,
     innerContainerStyle,
     onPress,
+    textContainerStyle
 }) => {
+    console.log(textContainerStyle, "textContainerStyle")
     return (
         <TouchableWithoutFeedback onPress={onPress}>
             <Animated.View
@@ -50,7 +52,7 @@ const TabButton = ({
                 <Animated.View
                     style={[
                         {
-                            flexDirection: "row",
+                            flexDirection: isFocused ? "row" : "column",
                             width: "75%",
                             height: 40,
                             alignItems: "center",
@@ -70,16 +72,29 @@ const TabButton = ({
                     />
 
                     {isFocused && (
-                        <Text
+                        <Animated.Text
                             numberOfLines={1}
-                            style={{
-                                marginLeft: SIZES.base,
-                                color: COLORS.white,
+                            style={[
+                                { marginLeft: SIZES.base },
+                                textContainerStyle,
                                 // ...FONTS.h3,
-                            }}
+                            ]}
                         >
                             {label}
-                        </Text>
+                        </Animated.Text>
+                    )}
+
+                    {!isFocused && (
+                        <Animated.Text
+                            numberOfLines={1}
+                            style={[
+                                { fontSize: 14 },
+                                textContainerStyle,
+                                // ...FONTS.h3,
+                            ]}
+                        >
+                            {label}
+                        </Animated.Text>
                     )}
                 </Animated.View>
             </Animated.View>
@@ -99,8 +114,10 @@ const MainLayout = ({
     const flatListRef = useRef();
     const homeTabFlex = useSharedValue(1);
     const homeTabColor = useSharedValue(COLORS.white);
+    const homeTextColor = useSharedValue(COLORS.primary)
     const searchTabFlex = useSharedValue(1);
     const searchTabColor = useSharedValue(COLORS.white);
+    const searchTextColor = useSharedValue(COLORS.primary)
     const [isLoading, setIsLoading] = useState(true);
     const [viewToast, setViewToast] = useState(false);
     const [screenVisisted, setScreenVisisted] = useState("Home")
@@ -118,6 +135,12 @@ const MainLayout = ({
         };
     });
 
+    const homeTextStyle = useAnimatedStyle(() => {
+        return {
+            color: homeTextColor.value,
+        };
+    });
+
     const searchFlexStyle = useAnimatedStyle(() => {
         return {
             flex: searchTabFlex.value,
@@ -127,6 +150,12 @@ const MainLayout = ({
     const searchColorStyle = useAnimatedStyle(() => {
         return {
             backgroundColor: searchTabColor.value,
+        };
+    });
+
+    const searchTextStyle = useAnimatedStyle(() => {
+        return {
+            color: searchTextColor.value,
         };
     });
 
@@ -172,11 +201,13 @@ const MainLayout = ({
                 index: 0,
                 animated: false,
             });
-            homeTabFlex.value = withTiming(4, { duration: 500 });
+            homeTabFlex.value = withTiming(2, { duration: 500 });
             homeTabColor.value = withTiming(COLORS.primary, { duration: 500 });
+            homeTextColor.value = withTiming(COLORS.white, { duration: 500 });
         } else {
             homeTabFlex.value = withTiming(1, { duration: 500 });
             homeTabColor.value = withTiming(COLORS.white, { duration: 500 });
+            homeTextColor.value = withTiming(COLORS.primary, { duration: 500 });
         }
 
         if (selectedTab == "Downloads") {
@@ -184,11 +215,13 @@ const MainLayout = ({
                 index: 1,
                 animated: false,
             });
-            searchTabFlex.value = withTiming(4, { duration: 500 });
+            searchTabFlex.value = withTiming(2, { duration: 500 });
             searchTabColor.value = withTiming(COLORS.primary, { duration: 500 });
+            searchTextColor.value = withTiming(COLORS.white, { duration: 500 });
         } else {
             searchTabFlex.value = withTiming(1, { duration: 500 });
             searchTabColor.value = withTiming(COLORS.white, { duration: 500 });
+            searchTextColor.value = withTiming(COLORS.primary, { duration: 500 });
         }
     }, [selectedTab]);
 
@@ -251,13 +284,14 @@ const MainLayout = ({
                                     style={{
                                         height: 60,
                                         justifyContent: "flex-end",
+                                        zIndex: 50
                                     }}
                                 >
                                     {/* Shadow */}
                                     <LinearGradient
                                         start={{ x: 0, y: 0 }}
                                         end={{ x: 0, y: 1 }}
-                                        colors={[COLORS.transparent, COLORS.lightGray1]}
+                                        colors={[COLORS.transparent, COLORS.transparentBlack7]}
                                         style={{
                                             position: "absolute",
                                             top: -15,
@@ -279,6 +313,8 @@ const MainLayout = ({
                                             borderTopLeftRadius: 20,
                                             borderTopRightRadius: 20,
                                             backgroundColor: COLORS.white,
+                                            borderWidth: 1,
+                                            borderColor: COLORS.gray
                                         }}
                                     >
                                         <TabButton
@@ -287,6 +323,7 @@ const MainLayout = ({
                                             isFocused={selectedTab == "Home"}
                                             outerContainerStyle={homeFlexStyle}
                                             innerContainerStyle={homeColorStyle}
+                                            textContainerStyle={homeTextStyle}
                                             onPress={() => {
                                                 setSelectedTab("Home")
                                                 setScreenVisisted("Home")
@@ -300,6 +337,7 @@ const MainLayout = ({
                                             isFocused={selectedTab == "Downloads"}
                                             outerContainerStyle={searchFlexStyle}
                                             innerContainerStyle={searchColorStyle}
+                                            textContainerStyle={searchTextStyle}
                                             onPress={() => {
                                                 setSelectedTab("Downloads")
                                                 setScreenVisisted("Downloads")

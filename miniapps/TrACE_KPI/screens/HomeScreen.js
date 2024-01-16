@@ -17,6 +17,8 @@ import { getURL } from '../../../baseUrl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
+import CustomAlert from '../../../Components/CustomAlert';
+
 
 const HomeScreen = () => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -63,6 +65,10 @@ const HomeScreen = () => {
         ResColor: null,
     })
     const [orientation, setOrientation] = useState()
+    const [viewAlert, setViewAlert] = useState({
+        isShow: false,
+        AlertType: ""
+    })
     const daysData = ["90 Days", "60 Days", "30 Days"]
 
     /**
@@ -101,32 +107,23 @@ const HomeScreen = () => {
     }
 
     const backAction = () => {
-        Alert.alert('Hold on!', 'Are you sure you want to logout of the App?', [
-            {
-                text: 'Cancel',
-                onPress: () => null,
-                style: 'cancel',
-            },
-            { text: 'YES', onPress: () => logOut() },
-        ]);
+        setViewAlert({
+            isShow: true,
+            AlertType: "Logout"
+        })
         return true;
     };
-    const CheckConnectivity = () => {
+
+    function CheckConnectivity() {
         // For Android devices
         if (Platform.OS === "android") {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
-                    // Alert.alert("You are online!");
                 } else {
-                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
-                        {
-                            text: 'OK', onPress: () =>
-                                navigation.reset({
-                                    index: 0,
-                                    routes: [{ name: "Home" }],
-                                })
-                        },
-                    ]);
+                    setViewAlert({
+                        isShow: true,
+                        AlertType: "Internet"
+                    })
                 }
             });
         }
@@ -262,7 +259,7 @@ const HomeScreen = () => {
                 }}
                 leftComponent={
                     <TouchableOpacity
-                        style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
+                        style={{ justifyContent: "flex-start", padding: 6, marginHorizontal: 12 }}
                         onPress={() => navigation.openDrawer()}
                     >
                         <Image source={images.menu_2_icon} style={{ width: 30, height: 30 }} />
@@ -659,10 +656,52 @@ const HomeScreen = () => {
                                 </View>
                             </View>
                         </ScrollView>
-                    </View >
+                        {viewAlert.isShow && (
+                            <CustomAlert
+                                isView={viewAlert.isShow}
+                                Title={viewAlert.AlertType === "Internet" ? "Oops !!" : "Hold on!"}
+                                Content={viewAlert.AlertType === "Internet" ?
+                                    "Your Device is not Connected to Internet, Please Check your Internet Connectivity"
+                                    : "Are you sure you want to logout of the App?"}
+                                buttonContainerStyle={{
+                                    flexDirection: "row"
+                                }}
+                                ButtonsToShow={[
+                                    {
+                                        text: 'Cancel',
+                                        onPress: () => {
+                                            setViewAlert({
+                                                isShow: false,
+                                                AlertType: ""
+                                            })
+                                        },
+                                        toShow: viewAlert.AlertType === "Logout" ? true : false,
+                                    },
+                                    {
+                                        text: 'OK',
+                                        onPress: () => {
+                                            if (viewAlert.AlertType === "Internet") {
+                                                navigation.reset({
+                                                    index: 0,
+                                                    routes: [{ name: "Home" }],
+                                                })
+                                            } else {
+                                                logOut()
+                                            }
+                                            setViewAlert({
+                                                isShow: false,
+                                                AlertType: ""
+                                            })
+                                        },
+                                        toShow: true,
+                                    }
+                                ]}
+                            />
+                        )}
+                    </View>
                 }
-            </View >
-        </SafeAreaView >
+            </View>
+        </SafeAreaView>
     )
 }
 

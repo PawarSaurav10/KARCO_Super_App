@@ -16,7 +16,6 @@ export async function CheckConnectivity() {
     if (Platform.OS === "android") {
         NetInfo.fetch().then(xx => {
             if (xx.isConnected) {
-                // Alert.alert("You are online!");
             } else {
                 Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
                     { text: 'OK', onPress: () => RNExitApp.exitApp() },
@@ -42,8 +41,6 @@ handleFirstConnectivityChange = (isConnected) => {
         Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
             { text: 'OK', onPress: () => RNExitApp.exitApp() },
         ]);
-    } else {
-        // Alert.alert("You are online!");
     }
 };
 

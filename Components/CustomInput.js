@@ -19,7 +19,7 @@ const CustomInput = ({ value, onChangeText, inputType, label, keyboardType, icon
                     <TextInput
                         placeholder={label}
                         keyboardType={keyboardType}
-                        style={{ flex: 1, paddingVertical: 0, width: '90%', fontSize: 16 }}
+                        style={{ flex: 1, paddingVertical: 0, width: '90%', fontSize: 18 }}
                         secureTextEntry={secureTextEntry}
                         value={value}
                         color={textColor}
@@ -27,7 +27,7 @@ const CustomInput = ({ value, onChangeText, inputType, label, keyboardType, icon
                         placeholderTextColor={COLORS.black}
                         enablesReturnKeyAutomatically
                     />
-                    <Pressable onPress={onIconClick}>
+                    <Pressable onPress={onIconClick} style={{ padding: 4 }}>
                         <Image source={icon} style={{ width: 22, height: 22, marginRight: 10 }} />
                     </Pressable>
                 </View>
@@ -37,7 +37,7 @@ const CustomInput = ({ value, onChangeText, inputType, label, keyboardType, icon
                         placeholder={label}
                         keyboardType={"numeric"}
                         inputMode="search"
-                        style={{ flex: 1, paddingVertical: 0, fontSize: 16 }}
+                        style={{ flex: 1, paddingVertical: 0, fontSize: 18 }}
                         onChangeText={onChangeText}
                         value={value}
                         color={textColor}

@@ -13,11 +13,16 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 import CustomButton from '../../../Components/CustomButton';
 import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
+import CustomAlert from '../../../Components/CustomAlert';
 
 const FeedbackScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused();
     const [viewWarnings, setViewWarnings] = useState(false)
     const [viewWarningsImp, setViewWarningsImp] = useState(false)
+    const [viewAlert, setViewAlert] = useState({
+        isShow: false,
+        AlertType: ""
+    })
     const presentationData = [
         {
             key: 1,
@@ -160,33 +165,23 @@ const FeedbackScreen = ({ navigation, route }) => {
     }, [orientation])
 
     const backAction = () => {
-        Alert.alert('Hold on!', 'Are you sure you want to go back?', [
-            {
-                text: 'Cancel',
-                onPress: () => null,
-                style: 'cancel',
-            },
-            { text: 'YES', onPress: () => navigation.replace("Online_Home") },
-        ]);
+        setViewAlert({
+            isShow: true,
+            AlertType: "onBack"
+        })
         return true;
     };
 
-    const CheckConnectivity = () => {
+    function CheckConnectivity() {
         // For Android devices
         if (Platform.OS === "android") {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
-                    // Alert.alert("You are online!");
                 } else {
-                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
-                        {
-                            text: 'OK', onPress: () =>
-                                navigation.reset({
-                                    index: 0,
-                                    routes: [{ name: "Home" }],
-                                })
-                        },
-                    ]);
+                    setViewAlert({
+                        isShow: true,
+                        AlertType: "Internet"
+                    })
                 }
             });
         }
@@ -373,9 +368,10 @@ const FeedbackScreen = ({ navigation, route }) => {
                 axios.get(`${getURL.base_URL}/AppFeedback/SaveFeedbackActivity?FeedbackData=${JSON.stringify(tempSaveData)}&VideoId=${route.params.Id}&username=${userLoginData.userId}&password=${route.params.videoPassword}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}&CompanyId=${userLoginData.companyId}`)
                     .then((res) => {
                         if (res.status === 200) {
-                            Alert.alert("Success", "Thank you for providing your feedback", [{
-                                text: 'OK', onPress: () => navigation.replace("Online_Home")
-                            }])
+                            setViewAlert({
+                                isShow: true,
+                                AlertType: "Success"
+                            })
                         }
                     }).catch((error) => {
                         throw error
@@ -385,35 +381,27 @@ const FeedbackScreen = ({ navigation, route }) => {
             }
         } else {
             if (viewWarningsImp === false && viewWarnings === false) {
-                Alert.alert("Warning", "Fields with * mark are Mandatory", [{
-                    text: 'OK',
-                }])
+                setViewAlert({
+                    isShow: true,
+                    AlertType: "Mandatory"
+                })
             } else {
-                Alert.alert("Warning", "Text Field must not Contains Special Charcters", [{
-                    text: 'OK',
-                }])
+                setViewAlert({
+                    isShow: true,
+                    AlertType: "Characters"
+                })
             }
-
         }
     }
 
     return (
         <View style={{ flex: 1 }}>
-            {/* <Header
-                titleStyle={{
-                    fontSize: 16, fontWeight: "bold"
-                }}
-                leftComponent={
-
-                }
-            // title={"Feedback"}
-            /> */}
             <ScrollView>
                 <View style={{ padding: 8, display: "flex", justifyContent: "center", backgroundColor: "#004C6B", color: "white" }}>
                     <View style={{ marginTop: 10 }}>
                         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16, flex: 1 }}>
                             <TouchableOpacity
-                                style={{ marginHorizontal: 12, justifyContent: "flex-start", flex: 0.04 }}
+                                style={{ justifyContent: "flex-start", padding: 6, marginHorizontal: 12, flex: 0.04 }}
                                 onPress={() => backAction()}
                             >
                                 <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
@@ -855,6 +843,53 @@ const FeedbackScreen = ({ navigation, route }) => {
                         </View>
                     </View>
                 </Modal>
+                {viewAlert.isShow && (
+                    <CustomAlert
+                        isView={viewAlert.isShow}
+                        Title={viewAlert.AlertType === "Internet" ? "Oops !!" : viewAlert.AlertType === "onBack" ? "Hold on!" : viewAlert.AlertType === "Success" ? "Success!" : "Warning!"}
+                        Content={viewAlert.AlertType === "Internet" ?
+                            "Your Device is not Connected to Internet, Please Check your Internet Connectivity"
+                            : viewAlert.AlertType === "onBack" ? "Are you sure you want to go back?"
+                                : viewAlert.AlertType === "Success" ? "Thank you for providing your feedback"
+                                    : viewAlert.AlertType === "Mandatory" ? "Fields with * mark are Mandatory"
+                                        : viewAlert.AlertType === "Characters" ? "Text Field must not Contains Special Characters"
+                                            : ""}
+                        buttonContainerStyle={{
+                            flexDirection: "row",
+                            justifyContent: "flex-end"
+                        }}
+                        ButtonsToShow={[
+                            {
+                                text: 'CANCEL',
+                                onPress: () => {
+                                    setViewAlert({
+                                        isShow: false,
+                                        AlertType: ""
+                                    })
+                                },
+                                toShow: viewAlert.AlertType === "onBack" ? true : false,
+                            },
+                            {
+                                text: viewAlert.AlertType === "onBack" ? 'YES' : 'OK',
+                                onPress: () => {
+                                    if (viewAlert.AlertType === "Internet") {
+                                        navigation.reset({
+                                            index: 0,
+                                            routes: [{ name: "Home" }],
+                                        })
+                                    } else if (viewAlert.AlertType === "onBack" || viewAlert.AlertType === "Success") {
+                                        navigation.replace("Online_Home")
+                                    }
+                                    setViewAlert({
+                                        isShow: false,
+                                        AlertType: ""
+                                    })
+                                },
+                                toShow: true,
+                            },
+                        ]}
+                    />
+                )}
             </ScrollView>
         </View>
     )

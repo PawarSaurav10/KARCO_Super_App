@@ -5,10 +5,6 @@ export const COLORS = {
     primary: "#004C6B", //darkblue
     transparentPrimary: "rgba(227, 120, 75, 0.4)",
     transparentPrimary9: "rgba(255, 238, 233, 0.9)",
-    // orange: "#FFA133",
-    // lightOrange: "#FFA133",
-    // lightOrange2: "#FDDED4",
-    // lightOrange3: "#FFD9AD",
     lightGreen: "#30c735",
     green: "#27AE60",
     red: "#FF1717",
@@ -29,7 +25,6 @@ export const COLORS = {
     lightBlue: "#ADD7FF",
     lightBlue1: "#6FA8DF",
     lightBlue2: "#EBF3FB",
-
     transparent: "transparent",
     transparentWhite1: "rgba(255, 255, 255, 0.1)",
     transparentBlack1: "rgba(0, 0, 0, 0.1)",

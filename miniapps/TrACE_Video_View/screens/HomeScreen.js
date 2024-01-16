@@ -10,6 +10,7 @@ import { getURL } from "../../../baseUrl"
 import VideoListView from '../../../Components/VideoListView';
 import NoDataFound from '../../../Components/NoDataFound';
 import images from '../../../Constants/images';
+import LinearGradient from "react-native-linear-gradient";
 
 const HomeScreen = (props) => {
     const navigation = useNavigation();
@@ -20,6 +21,7 @@ const HomeScreen = (props) => {
     const [searchedVideoData, setSearchedVideoData] = useState([])
     const [searchedVideo, setSearchedVideo] = useState("")
     const [orientation, setOrientation] = useState()
+    const [viewShadow, setViewShadow] = useState(false)
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -49,7 +51,6 @@ const HomeScreen = (props) => {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
                     setIsView(false)
-                    // Alert.alert("You are online!");
                 } else {
                     setIsLoading(false)
                     setIsView(true)
@@ -74,7 +75,6 @@ const HomeScreen = (props) => {
             setIsView(true)
         } else {
             setIsView(false)
-            // Alert.alert("You are online!");
         }
     };
 
@@ -162,22 +162,55 @@ const HomeScreen = (props) => {
                         </View>
                     </View>
 
-                    <View style={{ flex: 1, marginBottom: orientation === "landscape" ? 110 : 0 }}>
+                    <View style={{ flex: 1, marginBottom: orientation === "landscape" ? 110 : 0, position: "relative" }}>
+
                         {/* Search Input */}
                         {!isView &&
-                            <View style={{ margin: 8, padding: 8, }}>
-                                <CustomSearch
-                                    label={"Search Videos"}
-                                    style={{ fontSize: 20 }}
-                                    value={searchedVideo}
-                                    onChangeText={(value) => {
-                                        setSearchedVideo(value)
-                                    }}
-                                />
-                            </View >
+                            <>
+                                <View style={{ margin: 8, padding: 8, }}>
+                                    <CustomSearch
+                                        label={"Search Videos"}
+                                        style={{ fontSize: 20 }}
+                                        value={searchedVideo}
+                                        onChangeText={(value) => {
+                                            setSearchedVideo(value)
+                                        }}
+                                    />
+
+                                </View >
+
+                            </>
                         }
 
-                        <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }}>
+                        {/* Shadow */}
+
+
+                        <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }} disableIntervalMomentum={true}
+                            // onScroll={(event) => {
+                            //     const scrolling = event.nativeEvent.contentOffset.y;
+                            //     console.log(scrolling,"scrolling");
+                            //     if (scrolling > 100) {
+                            //         setViewShadow(true);
+                            //     } else {
+                            //         setViewShadow(false);
+                            //     }
+                            // }}
+                        >
+                            {/* {viewShadow && (
+                                <LinearGradient
+                                    start={{ x: 0, y: 1 }}
+                                    end={{ x: 0, y: 0 }}
+                                    colors={[COLORS.transparent, COLORS.transparentBlack7]}
+                                    style={{
+                                        position: "absolute",
+                                        top: -62,
+                                        left: 0,
+                                        right: 0,
+                                        height: 70,
+                                    }}
+                                />
+                            )} */}
+
                             <View style={{ flex: 1 }}>
                                 {!isView &&
                                     <View style={{ flex: 1, marginHorizontal: 6 }}>

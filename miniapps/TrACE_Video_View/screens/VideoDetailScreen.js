@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Dimensions, Image, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator } from 'react-native'
-import { WebView } from 'react-native-webview';
+import { View, Text, Dimensions, Image, ScrollView, TouchableOpacity, Platform, ActivityIndicator } from 'react-native'
 import { COLORS } from '../../../Constants/theme';
 import CustomIconButton from '../../../Components/CustomIconButton';
 import axios from 'axios';
@@ -17,6 +16,8 @@ import { getURL } from "../../../baseUrl"
 import { setDownloaded } from '../../../Utils/getScreenVisisted';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import images from '../../../Constants/images';
+import CustomAlert from '../../../Components/CustomAlert';
+import CustomVideoPlayer from '../../../Components/CustomVideoPlayer';
 
 const VideoDetailScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused()
@@ -32,6 +33,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
     const [isView, setIsView] = useState(route.params.type === "Downloads" ? false : true)
     const [isLoading, setIsLoading] = useState(route.params.type === "Downloads" ? false : true)
     const [orientation, setOrientation] = useState()
+    const [viewAlert, setViewAlert] = useState(false)
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -55,7 +57,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 NetInfo.fetch().then(xx => {
                     if (xx.isConnected) {
                         setIsView(false)
-                        // Alert.alert("You are online!");
                     } else {
                         setIsView(true)
                     }
@@ -80,7 +81,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 setIsView(true)
             } else {
                 setIsView(false)
-                Alert.alert("You are online!");
             }
         }
     };
@@ -153,190 +153,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
                 })
         } else {
-            Alert.alert('Warning', 'This Video is already downloaded to view downloaded video go to Downloads.', [
-                { text: 'OK', onPress: () => { } },
-            ]);
+            setViewAlert(true)
         }
     }
-
-    const htmlStyles = `
-        <style>
-            .video-js{
-                width: 100% !important;
-                height: 100% !important;
-                background: #004C6B;
-            }
-            //   .container:hover .controls,
-            //   .container:focus-within .controls {
-            //     display: flex;
-            //   }
-            // .container {
-            //     position: relative;
-            //     display: flex;
-            //     width:100%;
-            //     height: 100%;
-            //     justify-content: center;
-            //     align-items: center;
-            // }
-            // .container #video {
-            //     width: 100%;
-            //     height: 100%;
-            //     border-radius: 0px;
-            // }
-            // .container .controls {
-            //     padding: 10px;
-            //     position: absolute;
-            //     bottom: 0px;
-            //     width: 100%;
-            //     display: flex;
-            //     justify-content: space-around;
-            //     opacity: 1;
-            //     background: #004C6B;
-            //     transition: opacity 0.4s;
-            // }
-
-            // .container .controls button {
-            //     background: transparent;
-            //     color: #fff;
-            //     font-weight: bolder;
-            //     text-shadow: 2px 1px 2px #000;
-            //     border: none;
-            //     cursor: pointer;
-            // }
-            // .container .controls .timeline {
-            //     flex: 1;
-            //     display: flex;
-            //     align-items: center;
-            //     border: none;
-            //     // border-right: 3px solid #ccc;
-            //     // border-left: 3px solid #ccc;
-            // }
-            // .container .controls .timeline .bar{
-            //     background: rgb(1, 1, 65);
-            //     height: 10px;
-            //     width: 100%;
-            //     // flex: 1;
-            // }
-            // .container .controls .timeline .bar .inner{
-            //     background: #ccc;
-            //     width: 0%;
-            //     height: 100%;
-            // }
-            // .fa {
-            //     font-size: 28px !important;
-            // }
-
-            .vjs-matrix.video-js .vjs-big-play-button {
-                position: absolute; 
-                left: 0; 
-                right: 0; 
-                margin-left: auto; 
-                margin-right: auto; 
-                width: ${orientation === "landscape" ? "60px" : "80px"}; /* Need a specific value to work */
-                height: ${orientation === "landscape" ? "60px" : "80px"};
-                background-color: #004C6B !important;
-                border-color: #004C6B;
-                border-radius: ${orientation === "landscape" ? "60px" : "80px"};
-            }
-            
-            .vjs-matrix.video-js {
-                color: white;
-                font-size:  ${orientation === "landscape" ? "12px" : "18px"} !important;
-                text-align: "center"
-            }
-
-            .vjs-matrix.video-js .vjs-control-bar{
-                position: absolute;
-                bottom: 0;
-                background-color: #004C6B;
-                height: ${orientation === "landscape" ? "50px" : "72px"};
-                padding: 8px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-        </style>
-    `
-
-    const htmlContent = `
-        <html> 
-            <body> 
-                <head>
-                    <link href="https://vjs.zencdn.net/8.6.1/video-js.min.css" rel="stylesheet" />
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-                </head>
-                <div data-vjs-player>
-                    <video   
-                    id="my_video"
-                    class="vjs-matrix vjs-default-skin video-js "
-                    controls
-                    width="960"
-                    height="264"
-                    poster="${videoDetail && videoDetail.thumbnail}"
-                    data-setup='{"playbackRates": [0.5, 1, 1.5, 2],"fill": true, "responsive": true}'>
-                        <source src="${videoDetail && videoDetail.originalFileURL}"  type="video/mp4">
-                    </video>
-                </div>
-                <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-            </body> 
-        </html>
-    `
-
-    // const htmlContent = `
-    // <html>
-    // <head>
-    //     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    // </head>
-    // <body>
-    //     <div class="container">
-    //         <video onclick="play()" src="${videoDetail && videoDetail.originalFileURL}" id="video" poster="${videoDetail && videoDetail.thumbnail}"></video>
-    //         <div class="controls">
-    //             <button onclick="play()"><i id="fa-play" class="fa fa-play"></i></button>
-    //             <button onclick="play()"><i id="fa-pause" class="fa fa-pause"></i></button>
-    //             <button onclick="rewind()"><i class="fa fa-fast-backward"></i></button>
-    //             <div class="timeline">
-    //                 <div class="bar">
-    //                     <div class="inner"></div>
-    //                 </div>
-    //             </div>
-    //             <button onclick="forward(event)"><i class="fa fa-fast-forward"></i></button>
-    //             <button onclick="fullScreen(event)"><i class="fa fa-expand"></i></button>
-    //             <button onclick="download(event)"><i class="fa fa-cloud-download"></i></button>
-    //         </div>
-    //     </div>
-    //     <script>
-
-    // </script> 
-    // </body>
-    // </html>   
-    // `
-
-    const htmlDownloadContent = `
-        <html> 
-            <body> 
-                <head>
-                    <link href="https://vjs.zencdn.net/8.6.1/video-js.min.css" rel="stylesheet" />
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-                </head>
-                <div data-vjs-player>
-                    <video   
-                    autoplay
-                    id="my_video"
-                    class="vjs-matrix vjs-default-skin video-js "
-                    controls
-                    width="960"
-                    height="264"
-                    data-setup='{"playbackRates": [0.5, 1, 1.5, 2],"fill": true, "responsive": true}'>
-                        <source src="file://${fileContent}"  type="video/mp4">
-                    </video>
-                </div>
-                <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-            </body> 
-        </html>
-    `;
-
-    let rawhtml = htmlStyles + htmlContent
-    let rawhtmlContent = htmlStyles + htmlDownloadContent
 
     return (
         <View style={{ flex: 1 }}>
@@ -356,7 +175,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         }}
                         leftComponent={
                             <TouchableOpacity
-                                style={{ marginHorizontal: 12, justifyContent: "flex-start" }}
+                                style={{ justifyContent: "flex-start", padding: 6, marginHorizontal: 12 }}
                                 onPress={() => navigation.replace(route.params.type !== "Downloads" ? "Video_Home" : "Downloads")}
                             >
                                 <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
@@ -364,21 +183,17 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         }
                         title={route.params.type !== "Downloads" ? (videoDetail && ((videoDetail.name).slice(0, -4)).replace(/[^a-zA-Z0-9 ]+/g, " ")) : (route.params.data.filename).slice(0, -4)}
                     />
+
                     <ScrollView
                         contentInsetAdjustmentBehavior="automatic"
                     >
-                        <View style={{ width: Dimensions.get('screen').width, height: 240 }}>
-                            <WebView
-                                ref={(ref) => (webViewRef = ref)}
-                                allowFileAccess={true}
-                                source={{ html: route.params.type !== "Downloads" ? rawhtml : rawhtmlContent }}
-                                mediaPlaybackRequiresUserAction={route.params.type === "Downloads" ? false : true}
-                                allowsFullscreenVideo={true}
-                                minimumFontSize={orientation === "landscape" ? 16 : 30}
-                                scalesPageToFit={(Platform.OS === 'ios') ? false : true}
-                                javaScriptEnabled={true}
-                            />
-                        </View>
+                        <CustomVideoPlayer
+                            contentType={route.params.type}
+                            orientationType={orientation}
+                            url={route.params.type !== "Downloads" ? videoDetail && videoDetail.originalFileURL : fileContent}
+                            mediaPlaybackRequiresUserAction={route.params.type === "Downloads" ? false : true}
+                            posterUrl={videoDetail && videoDetail.thumbnail}
+                        />
                         <View style={{ margin: 20 }}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                 <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>
@@ -421,6 +236,22 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             }
                         </View>
                     </ScrollView>
+                    {viewAlert && (
+                        <CustomAlert
+                            isView={viewAlert}
+                            Title="Warning!"
+                            Content="This Video is already downloaded to view downloaded video go to Downloads."
+                            ButtonsToShow={[
+                                {
+                                    text: 'OK',
+                                    onPress: () => {
+                                        setViewAlert(false)
+                                    },
+                                    toShow: true,
+                                }
+                            ]}
+                        />
+                    )}
                 </>
             }
 

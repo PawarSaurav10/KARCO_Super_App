@@ -27,7 +27,7 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
                 <View style={{ flexDirection: "row", alignItems: "center", flex: 0.8 }}>
                     <View style={{ marginRight: 8 }}>
                         <Image style={{ height: 70, width: 70, borderRadius: 10, objectFit: "cover" }}
-                            // defaultSource={{ uri: "https://testtrace.karco.in/videos/poster/default.jpg" }}
+                            defaultSource={{ uri: "https://testtrace.karco.in/videos/poster/default.jpg" }}
                             source={{ uri: posterImage }}
                             onError={(error) => {
                                 setPosterImage("https://testtrace.karco.in/videos/poster/default.jpg")

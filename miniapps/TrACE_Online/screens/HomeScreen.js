@@ -29,6 +29,7 @@ import HomePageLoader from '../../../Components/HomePageLoader';
 import NetInfo from "@react-native-community/netinfo";
 import _ from "lodash"
 import images from '../../../Constants/images';
+import CustomAlert from '../../../Components/CustomAlert';
 
 const HomePage = (props) => {
     const navigation = useNavigation();
@@ -50,18 +51,16 @@ const HomePage = (props) => {
     })
     const [userData, setUserData] = useState()
     const [orientation, setOrientation] = useState()
+    const [viewAlert, setViewAlert] = useState({
+        isShow: false,
+        AlertType: ""
+    })
 
-    /**
-    * Returns true if the screen is in portrait mode
-    */
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
         return dim.height >= dim.width;
     };
 
-    /**
-     * Returns true of the screen is in landscape mode
-     */
     const isLandscape = () => {
         const dim = Dimensions.get('screen');
         return dim.width >= dim.height;
@@ -86,36 +85,36 @@ const HomePage = (props) => {
     }
 
     const backAction = () => {
-        Alert.alert('Hold on!', 'Are you sure you want to exit App you will get logout of the App?', [
-            {
-                text: 'Cancel',
-                onPress: () => null,
-                style: 'cancel',
-            },
-            { text: 'YES', onPress: () => logOut() },
-        ]);
+        setViewAlert({
+            isShow: true,
+            AlertType: "onBack"
+        })
         return true;
     };
 
-    const CheckConnectivity = () => {
+    function CheckConnectivity() {
         // For Android devices
         if (Platform.OS === "android") {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
                     // Alert.alert("You are online!");
                 } else {
-                    Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
-                        {
-                            text: 'OK', onPress: () => {
-                                AsyncStorage.removeItem("online_screen_visited")
-                                AsyncStorage.removeItem("userData")
-                                navigation.reset({
-                                    index: 0,
-                                    routes: [{ name: "Home" }],
-                                })
-                            }
-                        },
-                    ]);
+                    setViewAlert({
+                        isShow: true,
+                        AlertType: "Internet"
+                    })
+                    // Alert.alert('Oops !!', 'Your Device is not Connected to Internet, Please Check your Internet Connectivity', [
+                    //     {
+                    //         text: 'OK', onPress: () => {
+                    //             AsyncStorage.removeItem("online_screen_visited")
+                    //             AsyncStorage.removeItem("userData")
+                    //             navigation.reset({
+                    //                 index: 0,
+                    //                 routes: [{ name: "Home" }],
+                    //             })
+                    //         }
+                    //     },
+                    // ]);
                 }
             });
         }
@@ -526,6 +525,47 @@ const HomePage = (props) => {
                                         })}
                                     </View>
                                 </>
+                            )}
+                            {viewAlert.isShow && (
+                                <CustomAlert
+                                    isView={viewAlert.isShow}
+                                    Title={viewAlert.AlertType === "Internet" ? "Oops !!" : "Hold on!"}
+                                    Content={viewAlert.AlertType === "Internet" ? "Your Device is not Connected to Internet, Please Check your Internet Connectivity" : "Are you sure you want to exit App you will get logout of the App?"}
+                                    buttonContainerStyle={{
+                                        flexDirection: "row",
+                                        justifyContent: "flex-end"
+                                    }}
+                                    ButtonsToShow={[
+                                        {
+                                            text: "CANCEL",
+                                            onPress: () => {
+                                                setViewAlert({
+                                                    isShow: false,
+                                                    AlertType: ""
+                                                })
+                                            },
+                                            toShow: viewAlert.AlertType !== "Internet" ? true : false
+                                        },
+                                        {
+                                            text: 'OK',
+                                            onPress: () => {
+                                                if (viewAlert.AlertType === "Internet") {
+                                                    navigation.reset({
+                                                        index: 0,
+                                                        routes: [{ name: "Home" }],
+                                                    })
+                                                } else {
+                                                    logOut()
+                                                }
+                                                setViewAlert({
+                                                    isShow: false,
+                                                    AlertType: ""
+                                                })
+                                            },
+                                            toShow: true,
+                                        },
+                                    ]}
+                                />
                             )}
                         </View>
                     </ScrollView>
