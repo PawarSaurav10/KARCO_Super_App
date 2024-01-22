@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, Alert, Dimensions, ScrollView, BackHandler } from 'react-native'
+import { View, TouchableOpacity, FlatList, Image, ActivityIndicator, Dimensions, ScrollView, BackHandler } from 'react-native'
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import Header from '../../../Components/Header';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
@@ -87,19 +87,6 @@ const DownloadsScreen = (props) => {
     const deleteFile = (item) => {
         setViewAlert(true)
         setVideoItem(item)
-        // Alert.alert('Warning', 'Are you sure do you want to delete this video.', [
-        //     {
-        //         text: 'Cancel',
-        //         style: 'cancel',
-        //     },
-        //     {
-        //         text: 'OK', onPress: () => {
-        //             ReactNativeBlobUtil.fs.unlink(item.path)
-        //             setIsLoading(loading)
-        //             getDirectoryList()
-        //         }
-        //     }
-        // ]);
     }
 
     return (
@@ -196,6 +183,7 @@ const DownloadsScreen = (props) => {
                     {/* </ScrollView> */}
                 </View>
             }
+            
             {viewAlert && (
                 <CustomAlert
                     isView={viewAlert}
@@ -222,7 +210,8 @@ const DownloadsScreen = (props) => {
                             },
                             toShow: true,
                         }
-                    ]} />
+                    ]}
+                />
             )}
         </View>
     )

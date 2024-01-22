@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, Image, FlatList, ActivityIndicator, BackHandler, Dimensions, ScrollView, } from 'react-native'
-import { COLORS } from '../../../Constants/theme';
+import { COLORS, SIZES } from '../../../Constants/theme';
 import axios from 'axios';
 import CustomSearch from '../../../Components/CustomSearch';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
@@ -163,54 +163,21 @@ const HomeScreen = (props) => {
                     </View>
 
                     <View style={{ flex: 1, marginBottom: orientation === "landscape" ? 110 : 0, position: "relative" }}>
-
                         {/* Search Input */}
                         {!isView &&
-                            <>
-                                <View style={{ margin: 8, padding: 8, }}>
-                                    <CustomSearch
-                                        label={"Search Videos"}
-                                        style={{ fontSize: 20 }}
-                                        value={searchedVideo}
-                                        onChangeText={(value) => {
-                                            setSearchedVideo(value)
-                                        }}
-                                    />
-
-                                </View >
-
-                            </>
-                        }
-
-                        {/* Shadow */}
-
-
-                        <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }} disableIntervalMomentum={true}
-                            // onScroll={(event) => {
-                            //     const scrolling = event.nativeEvent.contentOffset.y;
-                            //     console.log(scrolling,"scrolling");
-                            //     if (scrolling > 100) {
-                            //         setViewShadow(true);
-                            //     } else {
-                            //         setViewShadow(false);
-                            //     }
-                            // }}
-                        >
-                            {/* {viewShadow && (
-                                <LinearGradient
-                                    start={{ x: 0, y: 1 }}
-                                    end={{ x: 0, y: 0 }}
-                                    colors={[COLORS.transparent, COLORS.transparentBlack7]}
-                                    style={{
-                                        position: "absolute",
-                                        top: -62,
-                                        left: 0,
-                                        right: 0,
-                                        height: 70,
+                            <View style={{ margin: 8, padding: 8, }}>
+                                <CustomSearch
+                                    label={"Search Videos"}
+                                    style={{ fontSize: 20 }}
+                                    value={searchedVideo}
+                                    onChangeText={(value) => {
+                                        setSearchedVideo(value)
                                     }}
                                 />
-                            )} */}
+                            </View >
+                        }
 
+                        <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }}>
                             <View style={{ flex: 1 }}>
                                 {!isView &&
                                     <View style={{ flex: 1, marginHorizontal: 6 }}>
@@ -257,16 +224,19 @@ const HomeScreen = (props) => {
                                                 )}
                                             />
                                         }
-
                                         {searchedVideo && searchedVideoData && searchedVideoData.length === 0 &&
-                                            <View style={{ flex: 1, justifyContent: "center" }}>
+                                            <View style={{ flex: 1, justifyContent: "center", backgroundColor: "red", marginBottom: 70 }}>
                                                 <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
                                             </View>
                                         }
+
                                     </View>
                                 }
+
                             </View>
+
                         </ScrollView>
+
 
                         {isView === true && (
                             <NoInternetComponent />

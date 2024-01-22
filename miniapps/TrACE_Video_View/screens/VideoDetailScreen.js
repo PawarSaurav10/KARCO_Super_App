@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import CustomVideoPlayer from '../../../Components/CustomVideoPlayer';
+import { Video } from 'react-native-compressor';
 
 const VideoDetailScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused()
@@ -94,6 +95,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
             ])
             axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}&videoID=${route.params}`)
                 .then((res) => {
+                    console.log(res.data.videos.data[0], "video");
                     setVideoDetail(res.data.videos.data[0])
                     setIsLoading(false)
                 })
@@ -104,8 +106,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
         if (route.params.type === "Downloads") {
             CheckConnectivity()
             RNFetchBlob.fs.stat(route.params.data.path)
-            RNFetchBlob.fs.readStream(route.params.data.path, 'utf8')
+            RNFetchBlob.fs.readStream(route.params.data.path)
                 .then((stream) => {
+                    console.log(stream, "stream");
                     setFileContent(stream.path);
                 });
         }
@@ -125,6 +128,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 await ReactNativeBlobUtil.fs
                     .lstat(docPath)
                     .then(response => {
+                        console.log(response, "response");
                         setDirectory(response);
                     })
                     .catch(error => console.error(error));
@@ -134,6 +138,19 @@ const VideoDetailScreen = ({ navigation, route }) => {
     }, []);
 
     const downloadFile = async () => {
+        const result = await Video.compress(
+            videoDetail.originalFileURL,
+            {
+                progressDivider: 10,
+                downloadProgress: (progress) => {
+                    console.log('downloadProgress: ', progress);
+                },
+            },
+            (progress) => {
+                console.log('Compression Progress: ', progress);
+            }
+        );
+        console.log(result, "result")
         CheckConnectivity()
         // let fileExpired = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name && (moment.utc(moment.unix(xx.lastModified / 1000).format("YYYYMMDD")).local().startOf('hours').fromNow() <= "2 days")).length === 0
         let fileDownloaded = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name).length > 0
@@ -146,8 +163,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
                     transform: true
                 })
-                .fetch('GET', `${videoDetail.originalFileURL}`)
+                .fetch('GET', `${result}`)
                 .then((res) => {
+                    console.log(res, "download res");
                     setDownloaded("Yes")
                     setToastHide(true)
                     setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
@@ -190,7 +208,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         <CustomVideoPlayer
                             contentType={route.params.type}
                             orientationType={orientation}
-                            url={route.params.type !== "Downloads" ? videoDetail && videoDetail.originalFileURL : fileContent}
+                            url={route.params.type !== "Downloads" ? videoDetail && videoDetail.url : fileContent}
                             mediaPlaybackRequiresUserAction={route.params.type === "Downloads" ? false : true}
                             posterUrl={videoDetail && videoDetail.thumbnail}
                         />

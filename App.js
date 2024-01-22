@@ -68,7 +68,7 @@ function App() {
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
           backgroundColor={backgroundStyle.backgroundColor}
         />
-        <TourGuideProvider {...{ borderRadius: 8, verticalOffset: 24, maskOffset: 24, color: COLORS.primary,wrapperStyle: style, preventOutsideInteraction: true }}>
+        <TourGuideProvider {...{ borderRadius: 10, verticalOffset: 24, color: COLORS.primary, wrapperStyle: style, preventOutsideInteraction: true }}>
           <NavigationContainer>
             {initialRoute &&
               <MainAppNavigation initialRoute={initialRoute} />

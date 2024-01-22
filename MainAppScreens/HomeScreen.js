@@ -45,7 +45,7 @@ const HomeScreen = ({ navigation }) => {
         {
             appName: 'TrACE KPI',
             path: "KPI_Navigation",
-            tourguide_desc: "TrACE KPI :- This App shows the overview of the company's data in graphical presentation",
+            tourguide_desc: "TrACE KPI :- This App shows the overview of the company's data in Graphical Representation",
             zone: 1
         },
         {
@@ -70,7 +70,7 @@ const HomeScreen = ({ navigation }) => {
                         text={app.tourguide_desc}
                         children={{ color: COLORS.primary }}
                         zone={app.zone}
-                        maskOffset={1}
+                        // maskOffset={20}
                         borderRadius={4}
                         key={idx}
                         style={{ color: COLORS.primary }}

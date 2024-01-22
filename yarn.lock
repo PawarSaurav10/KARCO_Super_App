@@ -6118,6 +6118,11 @@ react-native-chart-kit@^6.12.0:
     paths-js "^0.4.10"
     point-in-polygon "^1.0.1"
 
+react-native-compressor@^1.8.23:
+  version "1.8.23"
+  resolved "https://registry.npmjs.org/react-native-compressor/-/react-native-compressor-1.8.23.tgz"
+  integrity sha512-llqV+BRgRL8xdUDFpYfaP/HSo9sUcqewlzXa6obgoXCTJT8ZmT0zUFYgGTtb0Urz2o2T15PqTij5f2Sg8phPjw==
+
 react-native-countdown-circle-timer@^3.2.1:
   version "3.2.1"
   resolved "https://registry.npmjs.org/react-native-countdown-circle-timer/-/react-native-countdown-circle-timer-3.2.1.tgz"

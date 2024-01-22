@@ -50,18 +50,17 @@ const OnBoardingScreen = ({ navigation }) => {
                 {/* Header */}
                 <View
                     style={{
-                        // flex: 1,
+                        flex: 1,
                         justifyContent: "center",
-                        alignContent: "center"
+                        alignItems: "center"
                     }}
                 >
                     <View
                         style={{
-                            flex: 1,
-                            alignItems: "center",
-                            // justifyContent: "flex-end",
-                            height: "100%",
-                            width: "100%",
+                            flex: 0.6,
+                            margin: 20,
+                            justifyContent: "center",
+                            alignItems: "center"
                         }}
                     >
                         <Image
@@ -69,34 +68,39 @@ const OnBoardingScreen = ({ navigation }) => {
                             resizeMode="contain"
                             style={{
                                 width:
-                                    SIZES.height > 800
+                                    SIZES.height > 620
                                         ? SIZES.width * 1
-                                        : SIZES.width * 1,
+                                        : SIZES.width * 0.7,
                                 height:
-                                    SIZES.height > 800
+                                    SIZES.height > 620
                                         ? SIZES.width * 1
-                                        : SIZES.width * 1,
-                                // marginBottom: -SIZES.padding,
+                                        : SIZES.width * 0.7,
                             }}
                         />
                     </View>
-                    <View
-                        style={{
-                            // flex: 1,
-                            marginTop: 30,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            paddingHorizontal: SIZES.radius,
-                        }}
-                    >
-                        <Text style={{ fontSize: 24, textAlign: "center", fontWeight: "bold", margin: 10, color: COLORS.primary, maxWidth: 200 }}>
+                    <View style={{
+                        flex: 0.4,
+                        marginTop: 24,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingHorizontal: SIZES.radius,
+                    }}>
+                        <Text style={{
+                            fontSize: SIZES.height > 620 ? 24 : 20,
+                            textAlign: "center",
+                            fontWeight: "bold",
+                            margin: 10,
+                            color: COLORS.primary,
+                            maxWidth: 220
+                        }}>
                             {item.title}
                         </Text>
                         <Text style={{
-                            fontSize: 14, textAlign: "center", fontWeight: "bold", margin: 8, color: COLORS.darkGray2,
+                            fontSize: SIZES.height > 620 ? 14 : 12,
+                            fontWeight: "600",
+                            color: COLORS.darkGray2,
                             textAlign: "center",
                             paddingHorizontal: SIZES.padding,
-                            // ...FONTS.body3,
                         }}>
                             {item.description}
                         </Text>
@@ -104,7 +108,6 @@ const OnBoardingScreen = ({ navigation }) => {
                 </View>
             </View>
         )
-
     }
 
     const Dots = () => {
@@ -153,13 +156,14 @@ const OnBoardingScreen = ({ navigation }) => {
 
     return (
         <View style={{ flex: 1, backgroundColor: COLORS.white, padding: 10 }}>
-            <View style={{ flex: 0.1 }}>
+            <View style={{ flex: 0.10, marginBottom: 10 }}>
                 <View style={{
                     paddingHorizontal: 10,
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    marginTop: 10
+                    marginTop: 10,
+                   
                 }}>
                     <View>
                         {currentIndex >= 1 &&
@@ -172,8 +176,9 @@ const OnBoardingScreen = ({ navigation }) => {
                                         })
                                     }
                                 }}
+                                style={{ padding: 10 }}
                             >
-                                <Image source={BackIcon} style={{ width: 24, height: 24 }} />
+                                <Image source={BackIcon} style={{ width: 20, height: 20 }} />
                             </TouchableOpacity>
                         }
                     </View>
@@ -186,12 +191,10 @@ const OnBoardingScreen = ({ navigation }) => {
                                 paddingVertical: 12,
                                 paddingHorizontal: 16,
                                 borderColor: COLORS.primary
-                                // backgroundColor: COLORS.primary,
                             }}
                             labelStyle={{
                                 color: COLORS.primary,
                             }}
-                            // onPress={() => start()}
                             onPress={() => {
                                 navigation.replace("Home")
                             }}
@@ -199,7 +202,7 @@ const OnBoardingScreen = ({ navigation }) => {
                     </View>
                 </View>
             </View>
-            <View style={{ flex: 0.80, justifyContent: "center", alignItems: "center" }}>
+            <View style={{ flex: 0.78, justifyContent: "center", alignItems: "center" }}>
                 <Animated.FlatList
                     ref={flatListRef}
                     horizontal
@@ -221,65 +224,58 @@ const OnBoardingScreen = ({ navigation }) => {
                     }}
                 />
             </View>
-            <View style={{ flex: 0.15 }}>
+            <View style={{ flex: 0.12 }}>
                 <View
                     style={{
-                        height: 100,
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        paddingHorizontal: 10,
+                        marginVertical: 10,
                     }}
                 >
                     <View
                         style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            paddingHorizontal: 10,
-                            marginVertical: SIZES.padding,
+                            justifyContent: "center",
                         }}
                     >
-                        <View
-                            style={{
-                                // flex: 1,
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Dots />
-                        </View>
-                        {currentIndex < onboarding_screens.length - 1 && (
-                            <View>
-                                <CustomButton
-                                    label="Next"
-                                    containerStyle={{
-                                        height: 50,
-                                        width: 140,
-                                        borderRadius: 50,
-                                        backgroundColor: COLORS.primary
-                                    }}
-                                    onPress={() => {
-                                        flatListRef.current.scrollToIndex({
-                                            index: currentIndex + 1,
-                                            Animated: true
-                                        })
-                                    }}
-                                />
-                            </View>
-                        )}
-                        {currentIndex == onboarding_screens.length - 1 && (
-                            <View>
-                                <CustomButton
-                                    label="Get Started"
-                                    containerStyle={{
-                                        height: 50,
-                                        width: 140,
-                                        borderRadius: 50,
-                                        backgroundColor: COLORS.primary
-                                    }}
-                                    onPress={() => {
-                                        navigation.replace("Home")
-                                        // setScreenVisited("Yes");
-                                    }}
-                                />
-                            </View>
-                        )}
+                        <Dots />
                     </View>
+                    {currentIndex < onboarding_screens.length - 1 && (
+                        <View>
+                            <CustomButton
+                                label="Next"
+                                containerStyle={{
+                                    height: 50,
+                                    width: 140,
+                                    borderRadius: 50,
+                                    backgroundColor: COLORS.primary
+                                }}
+                                onPress={() => {
+                                    flatListRef.current.scrollToIndex({
+                                        index: currentIndex + 1,
+                                        Animated: true
+                                    })
+                                }}
+                            />
+                        </View>
+                    )}
+                    {currentIndex == onboarding_screens.length - 1 && (
+                        <View>
+                            <CustomButton
+                                label="Get Started"
+                                containerStyle={{
+                                    height: 50,
+                                    width: 140,
+                                    borderRadius: 50,
+                                    backgroundColor: COLORS.primary
+                                }}
+                                onPress={() => {
+                                    navigation.replace("Home")
+                                    // setScreenVisited("Yes");
+                                }}
+                            />
+                        </View>
+                    )}
                 </View>
             </View>
         </View>

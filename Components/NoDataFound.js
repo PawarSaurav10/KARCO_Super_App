@@ -5,7 +5,7 @@ import images from '../Constants/images';
 
 const NoDataFound = ({ desc, imageType, title }) => {
     return (
-        <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <View style={{ justifyContent: "center", alignItems: "center", backgroundColor: "yellow" }}>
             <View style={{ margin: 8 }}>
                 <Image source={imageType === "searchData" ? images.empty_search_icon : images.empty_box_icon} style={{ width: 200, height: 200 }} />
             </View>

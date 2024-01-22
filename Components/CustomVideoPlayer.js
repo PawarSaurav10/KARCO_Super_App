@@ -76,12 +76,14 @@ const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, media
                     controls
                     width="960"
                     height="264"
+                    preload="auto"
                     poster="${posterUrl}"
-                    data-setup='{"playbackRates": [0.5, 1, 1.5, 2],"fill": true, "responsive": true, "inactivityTimeout": 1000, "volumeControl": false}'>
+                    data-setup='{"playbackRates": [0.5, 1, 1.5, 2],"fill": true, "responsive": true, "inactivityTimeout": 1000, "volumeControl": false, "landscapeFullscreen" :{"enterOnRotate": true}}'>
                         <source src="${url}"  type="video/mp4">
                     </video>
                 </div>
                 <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/videojs-landscape-fullscreen@1.4.6/dist/videojs-landscape-fullscreen.min.js"></script>
             </body>
         </html>
     `
@@ -99,6 +101,7 @@ const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, media
                     id="my_video"
                     class="vjs-matrix vjs-default-skin video-js "
                     controls
+                    preload="auto"
                     width="960"
                     height="264"
                     data-setup='{"playbackRates": [0.5, 1, 1.5, 2],"fill": true, "responsive": true}'>
@@ -114,7 +117,7 @@ const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, media
     let rawhtmlContent = htmlStyles + htmlDownloadContent
 
     return (
-        <View style={{ width: Dimensions.get('screen').width, height: 240 }}>
+        <View style={{ width: Dimensions.get('window').width, height: orientationType === "landscape" ? 280 : 240 }}>
             <WebView
                 allowFileAccess={true}
                 source={{ html: contentType !== "Downloads" ? rawhtml : rawhtmlContent }}

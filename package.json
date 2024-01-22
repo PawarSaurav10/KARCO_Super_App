@@ -27,6 +27,7 @@
     "react-native": "0.72.6",
     "react-native-blob-util": "^0.19.2",
     "react-native-chart-kit": "^6.12.0",
+    "react-native-compressor": "^1.8.23",
     "react-native-countdown-circle-timer": "^3.2.1",
     "react-native-exit-app": "^2.0.0",
     "react-native-fast-image": "^8.6.3",

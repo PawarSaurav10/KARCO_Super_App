@@ -152,6 +152,7 @@ const HomeScreen = () => {
                 backAction,
             )
             if (userLoginData.companyId) {
+
                 axios.get(`${getURL.KPI_base_URL}/GetOverallPercByCompanyId?companyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
                     .then((res) => {
                         setTotalPercentage(res.data)
@@ -381,17 +382,6 @@ const HomeScreen = () => {
                                                 </LinearGradient>
                                             </Defs>
                                             <VictoryBar
-                                                labels={({ datum }) => `${parseFloat(datum.earnings).toFixed(0)}%`}
-                                                sortOrder="ascending"
-                                                animate={{
-                                                    duration: 3000,
-                                                    onLoad: { duration: 2000 },
-                                                }}
-                                                x="quarter" y="earnings"
-                                                cornerRadius={{ top: 4 }}
-                                                barWidth={18}
-                                                height={400}
-                                                style={{ data: { fill: ({ datum }) => datum.earnings >= 70 ? `url(#gradient)` : datum.earnings >= 51 ? `url(#gradient1)` : `url(#gradient2)` } }}
                                                 data={[
                                                     { quarter: "KARCO\nVideo", earnings: OverAllData.KVAvg, color: OverAllData.KVColor },
                                                     { quarter: "Company\n Content", earnings: OverAllData.CCAvg, color: OverAllData.CCColor },
@@ -399,6 +389,17 @@ const HomeScreen = () => {
                                                     { quarter: "Resilience", earnings: OverAllData.ResAvg, color: OverAllData.RespColor },
                                                     { quarter: "Responsive", earnings: OverAllData.RespAvg, color: OverAllData.ResColor }
                                                 ]}
+                                                labels={({ datum }) => `${parseFloat(datum.earnings).toFixed(0)}%`}
+                                                sortOrder="ascending"
+                                                animate={{
+                                                    duration: 1000,
+                                                    onLoad: { duration: 500 },
+                                                }}
+                                                x="quarter" y="earnings"
+                                                cornerRadius={{ top: 4 }}
+                                                barWidth={18}
+                                                height={400}
+                                                style={{ data: { fill: ({ datum }) => datum.earnings >= 70 ? `url(#gradient)` : datum.earnings >= 51 ? `url(#gradient1)` : `url(#gradient2)` } }}
                                             />
                                             <VictoryAxis
                                                 style={{
