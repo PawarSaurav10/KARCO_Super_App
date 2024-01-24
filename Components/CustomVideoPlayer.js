@@ -121,7 +121,7 @@ const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, media
             <WebView
                 allowFileAccess={true}
                 source={{ html: contentType !== "Downloads" ? rawhtml : rawhtmlContent }}
-                mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
+                mediaPlaybackRequiresUserAction={orientationType === "landscape" ? mediaPlaybackRequiresUserAction : false}
                 allowsFullscreenVideo={true}
                 minimumFontSize={orientationType === "landscape" ? 16 : 30}
                 scalesPageToFit={(Platform.OS === 'ios') ? false : true}

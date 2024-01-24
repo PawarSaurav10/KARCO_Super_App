@@ -16,18 +16,8 @@ import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 
 const VideoDetailScreen = ({ navigation, route }) => {
-    const htmlContentPromo = `
-            <div width="100%" height="auto" allowFullScreen = "true">
-                <iframe id="iframe" src="${getURL.play_video_URL}/${route.params.item.videokeypromo}" frameborder="0" allowFullscreen="true"  width="100%" height="100%" allowtransparency="true" onload="displayMessage()"/>
-            </div>
-    `;
-
-    const htmlContentFull = `
-        <div width="100%" height="auto" allowfullscreen="true">
-            <iframe src="${getURL.play_video_URL}/${route.params.item.videokey}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
-        </div>
-    `;
-
+    console.log(route.params.item.videokeypromo, "videokey");
+    const webViewRef = useRef(null);
     const isFocused = useIsFocused();
     const [videoType, setVideoType] = useState("")
     const [isLoading, setIsLoading] = useState(true)
@@ -127,6 +117,55 @@ const VideoDetailScreen = ({ navigation, route }) => {
             .then((response) => { })
     }
 
+    const htmlContentPromo = `
+    <html>
+        <body>
+            <div width="100%" height="auto" allowfullscreen="true">
+                <iframe id="i_frame" class="spotlightr" allow="autoplay" src="${getURL.play_video_URL}/${route.params.item.videokeypromo}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
+            </div>
+            <script src="https://videojs.cdn.spotlightr.com/assets/spotlightr.js"></script>
+        </body>
+    </html>
+    `;
+
+    const htmlContentFull = `
+        <div width="100%" height="auto" allowfullscreen="true">
+            <iframe allow="autoplay" src="${getURL.play_video_URL}/${route.params.item.videokey}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
+        </div>
+    `;
+
+    // const runSpotlightrAPI = () => {
+    //     // Base64 decode the API key if needed
+    //     const apiKey = 'MTMzNzIyMA==';
+    //     // Call the spotlightrAPI function with the parameters
+    //     const scriptToRun = `spotlightrAPI('${apiKey}', 'play');`;
+
+    //     // Execute the script in the WebView
+    //     if (webViewRef.current) {
+    //         webViewRef.current.injectJavaScript(scriptToRun);
+    //     }
+    // };
+
+    const togglePlayPause = () => {
+        console.log("object");
+        const apiKey = route.params.item.videokeypromo;
+        const runFirst = `
+            document.body.style.backgroundColor = 'red';
+            // document.getElementById('i_frame').style.display = 'none';
+            document.getElementById('i_frame').innerHTML=countNum();
+            
+            function countNum() {
+                setTimeout(
+                    function() { 
+                        window.alert('hi');
+                        spotlightrAPI('${apiKey}', 'play');
+                    }, 1000);
+            }
+            true; // note: this is required, or you'll sometimes get silent failures
+        `;
+        webViewRef.current.injectJavaScript(runFirst)
+    };
+
     return (
         <View style={{ flex: 1 }}>
             <ScrollView>
@@ -153,21 +192,29 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             contentInsetAdjustmentBehavior="automatic"
                         >
                             {route.params.item.ModuleType !== "Circular" && (videoType == "PROMOKEY" || videoType == "") &&
-                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
+                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 240 }}>
                                     <WebView
+                                        ref={webViewRef}
                                         source={{ html: htmlContentPromo }}
                                         allowsFullscreenVideo={true}
                                         automaticallyAdjustContentInsets
-                                        mediaPlaybackRequiresUserAction={true}
+                                        // mediaPlaybackRequiresUserAction={true}
                                         startInLoadingState={<ActivityIndicator />}
                                         minimumFontSize={12}
+                                        // injectJavaScript={true}
+                                    // onLoad={runSpotlightrAPI}
+                                    // injectedJavaScript={`
+                                    //     function togglePlay() {
+                                    //             vooAPI('MTMzNzIyMA==','play')
+                                    //     }
+                                    // `}
                                     />
                                 </View>
                             }
                             {videoType == "FULLKEY" &&
-                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
+                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 240 }}>
                                     <WebView
-                                        source={{ html: htmlContent }}
+                                        source={{ html: htmlContentFull }}
                                         allowsFullscreenVideo={true}
                                         automaticallyAdjustContentInsets
                                         mediaPlaybackRequiresUserAction={true}
@@ -178,7 +225,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             }
 
                             {route.params.item.ModuleType == "Circular" && (videoType == "PDF" || videoType == "") &&
-                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 200 }}>
+                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 240 }}>
                                     <PDFViewer pdf={route.params.item.VideoPath} pageNo={1} />
                                 </View>
                             }
@@ -188,8 +235,35 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.item.VideoName}</Text>
                                     {/* <View style={[styles.icon_container, styles.shadowProp]}><Image style={styles.icon} source={FavouriteIcon} /></View> */}
                                 </View>
+                                <View
+                                    style={{
+                                        flex: 1,
+                                        alignSelf: "flex-start",
+                                        flexDirection: "row",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        marginVertical: 10,
+                                        borderRadius: 20,
+                                        paddingHorizontal: 12,
+                                        paddingVertical: 6,
+                                        // width: "50%",
+                                        backgroundColor: `${route.params.item.Category === "OCIMF SIRE VIQ SERIES"
+                                            ? "#FFC239" :
+                                            route.params.item.Category === "SHIP SPECIFIC SERIES"
+                                                ? "#29ABE2" :
+                                                route.params.item.Category === "ACCIDENT / INCIDENT SERIES"
+                                                    ? "#9E005D" :
+                                                    route.params.item.Category === "PERSONAL SAFETY"
+                                                        ? "#f75a24" :
+                                                        route.params.item.Category === "SHIP BOARD OPERATION"
+                                                            ? "#22B573" :
+                                                            "red"
+                                            }`
+                                    }}>
+                                    <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.white }} numberOfLines={1}>{route.params.item.Category}</Text>
+                                </View>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 4 }}>
-                                    <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 10 }}>
+                                    <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
                                         <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
                                             <Image style={{
                                                 height: 16,
@@ -198,47 +272,22 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         </View>
                                         <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.item.CreatedDate}</Text>
                                     </View>
-                                    <View
-                                        style={{
-                                            alignSelf: "flex-start",
-                                            flexDirection: "row",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            marginVertical: 6,
-                                            borderRadius: 20,
-                                            paddingHorizontal: 6,
-                                            paddingVertical: 6,
-                                            // width: "50%",
-                                            backgroundColor: `${route.params.item.Category === "OCIMF SIRE VIQ SERIES"
-                                                ? "#FFC239" :
-                                                route.params.item.Category === "SHIP SPECIFIC SERIES"
-                                                    ? "#29ABE2" :
-                                                    route.params.item.Category === "ACCIDENT / INCIDENT SERIES"
-                                                        ? "#9E005D" :
-                                                        route.params.item.Category === "PERSONAL SAFETY"
-                                                            ? "#f75a24" :
-                                                            route.params.item.Category === "SHIP BOARD OPERATION"
-                                                                ? "#22B573" :
-                                                                "red"
-                                                }`
-                                        }}>
-                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.white }} numberOfLines={1}>{route.params.item.Category}</Text>
-                                    </View>
+
                                 </View>
-                                {route.params.item.ModuleType != "Circular" && (
-                                    <View style={{ fontSize: 12, flexDirection: "row", marginVertical: 10 }}>
-                                        <Text style={{ color: COLORS.darkBlue, fontWeight: "600" }}>Description : </Text>
-                                        <TouchableOpacity style={{ borderBottomWidth: 1, maxWidth: "100%", color: COLORS.blue }}
-                                            onPress={() => {
-                                                CheckConnectivity()
-                                                setViewPdf(!viewPdf)
-                                                // onSynopsisPress(`https://trace.karco.in/Uploads/Synopsis/${route.params.item.SynopsisPath}`)
-                                            }}
-                                        >
-                                            <Text style={{ color: COLORS.blue }}>View Synopsis</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                )}
+                                {/* {route.params.item.ModuleType != "Circular" && ( */}
+                                <View style={{ fontSize: 12, flexDirection: "row", marginBottom: 10 }}>
+                                    <Text style={{ color: COLORS.darkBlue, fontWeight: "600" }}>Description : </Text>
+                                    <TouchableOpacity style={{ borderBottomWidth: 1, maxWidth: "100%", color: COLORS.blue }}
+                                        onPress={() => {
+                                            CheckConnectivity()
+                                            setViewPdf(!viewPdf)
+                                            // onSynopsisPress(`https://trace.karco.in/Uploads/Synopsis/${route.params.item.SynopsisPath}`)
+                                        }}
+                                    >
+                                        <Text style={{ color: COLORS.blue }}>View Synopsis</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                {/* )} */}
                                 <View style={{ borderWidth: 1, borderColor: COLORS.darkBlue, width: "100%", marginVertical: 8 }}></View>
                                 {route.params.item.ModuleType == "Circular"
                                     ?
@@ -269,6 +318,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         onPress={() => {
                                             CheckConnectivity()
                                             onClickPlayVideo()
+                                            // togglePlayPause()
                                             if ((videoType === "PROMOKEY") || (videoType === "")) {
                                                 setHtmlContent(htmlContentFull)
                                                 setVideoType("FULLKEY")

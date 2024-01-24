@@ -229,14 +229,10 @@ const HomeScreen = (props) => {
                                                 <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
                                             </View>
                                         }
-
                                     </View>
                                 }
-
                             </View>
-
                         </ScrollView>
-
 
                         {isView === true && (
                             <NoInternetComponent />

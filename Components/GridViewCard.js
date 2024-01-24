@@ -21,69 +21,67 @@ const GridViewCard = ({ VideoName, VideoCategory, CourseNo, onPress, isVideoComp
                 elevation: 5,
             }]}
         >
-            <View >
-                <View style={{ padding: 10, }}>
+            <View style={{ padding: 10 }}>
+                <View>
+                    <Image
+                        defaultSource={{ uri: "https://testtrace.karco.in/videos/poster/default.jpg" }}
+                        style={{ height: 110, width: "100%", marginBottom: 4, borderRadius: 10, objectFit: "cover" }}
+                        source={{ uri: posterImage }}
+                        onError={(error) => {
+                            setPosterImage("https://testtrace.karco.in/videos/poster/default.jpg")
+                        }} />
+                </View>
+                <View style={{ minHeight: 76 }}>
+                    <Text style={{ fontSize: 15, fontWeight: "bold", textAlign: "left", color: COLORS.darkBlue, flexWrap: "wrap" }} numberOfLines={4}>{VideoName}</Text>
+                </View>
+                <View style={{
+                    alignSelf: "flex-start",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginVertical: 6,
+                    borderRadius: 20,
+                    paddingHorizontal: 8,
+                    paddingVertical: 6,
+                    // width: "50%",
+                    backgroundColor: `${VideoCategory === "OCIMF SIRE VIQ SERIES"
+                        ? "#FFC239" :
+                        VideoCategory === "SHIP SPECIFIC SERIES"
+                            ? "#29ABE2" :
+                            VideoCategory === "ACCIDENT / INCIDENT SERIES"
+                                ? "#9E005D" :
+                                VideoCategory === "PERSONAL SAFETY"
+                                    ? "#f75a24" :
+                                    VideoCategory === "SHIP BOARD OPERATION"
+                                        ? "#22B573" :
+                                        "red"
+                        }`
+                }}>
+                    <Text style={{ fontSize: 10, fontWeight: "bold", color: COLORS.white }} numberOfLines={1}>{VideoCategory}</Text>
+                </View>
+                <View style={{ flex: 1, justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
                     <View>
-                        <Image
-                            defaultSource={{ uri: "https://testtrace.karco.in/videos/poster/default.jpg" }}
-                            style={{ height: 110, width: "100%", marginBottom: 4, borderRadius: 10, objectFit: "cover" }}
-                            source={{ uri: posterImage }}
-                            onError={(error) => {
-                                setPosterImage("https://testtrace.karco.in/videos/poster/default.jpg")
-                            }} />
+                        <Text style={{ fontSize: 12, fontWeight: "bold", color: COLORS.gray }}>{CourseNo}</Text>
                     </View>
-                    <View style={{ minHeight: 70 }}>
-                        <Text style={{ fontSize: 14, fontWeight: "bold", textAlign: "left", color: COLORS.darkBlue, flexWrap: "wrap" }} numberOfLines={4}>{VideoName}</Text>
-                    </View>
-                    <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" }}>
-                        <View style={{ alignSelf: "baseline" }}>
-                            <View style={{
-                                alignSelf: "flex-start",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                marginVertical: 6,
-                                borderRadius: 20,
-                                paddingHorizontal: 4,
-                                paddingVertical: 6,
-                                // width: "50%",
-                                backgroundColor: `${VideoCategory === "OCIMF SIRE VIQ SERIES"
-                                    ? "#FFC239" :
-                                    VideoCategory === "SHIP SPECIFIC SERIES"
-                                        ? "#29ABE2" :
-                                        VideoCategory === "ACCIDENT / INCIDENT SERIES"
-                                            ? "#9E005D" :
-                                            VideoCategory === "PERSONAL SAFETY"
-                                                ? "#f75a24" :
-                                                VideoCategory === "SHIP BOARD OPERATION"
-                                                    ? "#22B573" :
-                                                    "red"
-                                    }`
-                            }}>
-                                <Text style={{ fontSize: 10, fontWeight: "bold", color: COLORS.white }} numberOfLines={1}>{VideoCategory}</Text>
-                            </View>
-                            <Text style={{ fontSize: 12, fontWeight: "bold", color: COLORS.gray }}>{CourseNo}</Text>
-                        </View>
+                    <View>
                         <Image
                             style={{ width: 12, height: 12 }}
                             source={images.right_arrow_icon}
                         />
                     </View>
                 </View>
-                {
-                    isVideoCompleted === true && (
-                        <View style={{
-                            borderBottomLeftRadius: 10,
-                            borderBottomRightRadius: 10,
-                            paddingVertical: 4,
-                            backgroundColor: Status === "Expired" ? "#edc700" : Status === "Completed" ? "#00b569" : Status === "Pending" ? "#ff0000" : "", justifyContent: "center", alignItems: "center"
-                        }}>
-                            <Text style={{ fontSize: 12, fontWeight: 700, color: COLORS.white }}>
-                                {Status === "Expired" ? "Expired" : Status === "Completed" ? "Completed" : Status === "Pending" ? "Pending" : ""}
-                            </Text>
-                        </View>
-                    )
-                }
             </View>
+            {isVideoCompleted === true && (
+                <View style={{
+                    borderBottomLeftRadius: 10,
+                    borderBottomRightRadius: 10,
+                    paddingVertical: 4,
+                    backgroundColor: Status === "Expired" ? "#edc700" : Status === "Completed" ? "#00b569" : Status === "Pending" ? "#ff0000" : "", justifyContent: "center", alignItems: "center"
+                }}>
+                    <Text style={{ fontSize: 12, fontWeight: 700, color: COLORS.white }}>
+                        {Status === "Expired" ? "Expired" : Status === "Completed" ? "Completed" : Status === "Pending" ? "Pending" : ""}
+                    </Text>
+                </View>
+            )}
         </TouchableOpacity>
     )
 }

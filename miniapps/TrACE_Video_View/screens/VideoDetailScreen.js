@@ -42,6 +42,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
     };
 
     useEffect(() => {
+        console.log("object4")
+
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
             setOrientation(
@@ -87,6 +89,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
     };
 
     useEffect(() => {
+        console.log("object3")
         if (isFocused) {
             CheckConnectivity()
             requestMultiple([
@@ -95,7 +98,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
             ])
             axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}&videoID=${route.params}`)
                 .then((res) => {
-                    console.log(res.data.videos.data[0], "video");
                     setVideoDetail(res.data.videos.data[0])
                     setIsLoading(false)
                 })
@@ -103,8 +105,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
     }, [route.params.type !== "Downloads", isFocused])
 
     useEffect(() => {
+        console.log("object2")
         if (route.params.type === "Downloads") {
-            CheckConnectivity()
             RNFetchBlob.fs.stat(route.params.data.path)
             RNFetchBlob.fs.readStream(route.params.data.path)
                 .then((stream) => {
@@ -112,13 +114,15 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     setFileContent(stream.path);
                 });
         }
-    }, [route.params.type === "Downloads"]);
+    }, []);
 
     useEffect(() => {
         if (isFocused) {
+            console.log("object1")
             CheckConnectivity()
             const dim = Dimensions.get('screen');
             if (dim.height >= dim.width) {
+                console.log("object called")
                 setOrientation("protrait")
             } else {
                 setOrientation("landscape")

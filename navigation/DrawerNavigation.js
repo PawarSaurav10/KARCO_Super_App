@@ -166,7 +166,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                                 {userProfileData && userProfileData.Name}
                             </Text>
                             <Text style={{ color: COLORS.gray2, fontSize: 14, textAlign: "left" }}>
-                                {userProfileData && userProfileData.EmailId}
+                                {userProfileData && userProfileData.VesselName}
                             </Text>
                         </View>
                     </View>

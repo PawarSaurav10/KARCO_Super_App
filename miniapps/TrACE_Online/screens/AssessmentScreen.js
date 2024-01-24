@@ -116,12 +116,6 @@ const AssessmentScreen = ({ navigation, route }) => {
         }
     }
 
-    const htmlContent = `
-        <div width="100%" height="auto" allowfullscreen="true">
-            <iframe id="iframe" src="${getURL.play_video_URL}/${assessmentData ?.videoDetail ?.Videokey}?start=${questionToShow ?.ClipTimingFrom}&end=${questionToShow ?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
-        </div>
-    `
-
     useEffect(() => {
         if (isFocused) {
             const dim = Dimensions.get('screen');
@@ -252,6 +246,12 @@ const AssessmentScreen = ({ navigation, route }) => {
 
     const questionToShow = assessmentData && assessmentData.QuestionList.filter((xx) => xx.Status === "N")[currentQuestion]
     const questioncountIndex = assessmentData && assessmentData.QuestionList.length - assessmentData.QStatusNCount
+
+    const htmlContent = `
+        <div width="100%" height="auto" allowfullscreen="true">
+            <iframe id="iframe" src="${getURL.play_video_URL}/${assessmentData ?.videoDetail ?.Videokey}?start=${questionToShow ?.ClipTimingFrom}&end=${questionToShow ?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
+        </div>
+    `
 
     const QuestionCard = ({ initialData, questionIndex }) => {
         return (
