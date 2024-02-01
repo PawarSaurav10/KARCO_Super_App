@@ -33,6 +33,7 @@
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^2.13.4",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-orientation-locker": "^1.6.0",
     "react-native-pdf": "^6.7.1",
     "react-native-permissions": "^3.10.1",
     "react-native-ratings": "^8.1.0",

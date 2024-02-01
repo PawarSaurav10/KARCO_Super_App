@@ -46,14 +46,14 @@ const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, i
 
     return (
         <>
-            {listType === "Downloads" ?
-                <View style={{ flex: 1 }}>
+            {listType == "Downloads" &&
+                <View>
                     <View style={{ flexDirection: "row", padding: 8, alignItems: "center" }}>
                         <TouchableOpacity onPress={() => handleReadFile(item)} style={{ marginRight: 6, flex: orientationType === "landscape" ? 0.08 : 0.2 }}>
                             <Image source={images.play_icon} style={{ height: 60, width: 60, borderRadius: 10, objectFit: "cover" }} />
                         </TouchableOpacity>
                         <View style={{ flex: orientationType === "landscape" ? 0.88 : 0.7, marginLeft: 6 }}>
-                            <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{((videoName).slice(0, -8)).replace(/[^a-zA-Z0-9 ]+/g, " ")}</Text>
+                            <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{(videoName).slice(0, -8).replace(/[^a-zA-Z0-9 ]+/g, " ")}</Text>
                             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 6 }}>
                                 <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
                                     <Image style={{
@@ -78,7 +78,8 @@ const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, i
                         }}
                     />
                 </View>
-                :
+            }
+            {listType != "Downloads" &&
                 <TouchableOpacity onPress={OnPress}>
                     <View style={{ flexDirection: "row", padding: 10, alignItems: "center" }}>
                         <View style={[styles.shadowProp, styles.elevation, { flex: orientationType === "landscape" ? 0.14 : 0.28 }]}>
@@ -86,21 +87,24 @@ const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, i
                         </View>
                         <View style={{ flex: orientationType === "landscape" ? 0.86 : 0.72 }}>
                             <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.darkBlue }}>{((videoName).slice(0, -4)).replace(/[^a-zA-Z0-9 ]+/g, " ")}</Text>
-                            <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 6 }}>
-                                <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
-                                    <Image style={{
-                                        height: 16,
-                                        width: 16,
-                                    }} source={images.calendar_icon} />
+
+                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                                <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 6 }}>
+                                    <View style={{ borderRadius: 35, height: 30, width: 30, borderColor: COLORS.lightGray1, borderWidth: 1, justifyContent: "center", alignItems: "center", backgroundColor: COLORS.white2, marginRight: 6 }}>
+                                        <Image style={{
+                                            height: 16,
+                                            width: 16,
+                                        }} source={images.calendar_icon} />
+                                    </View>
+                                    <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(createdDate).format("DD MMM YYYY")}</Text>
                                 </View>
-                                <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{moment(createdDate).format("DD MMM YYYY")}</Text>
+                                {viewDownloadIcon &&
+                                    <View style={{ alignSelf: "flex-end" }}>
+                                        <Image source={images.downloaded_icon} tintColor={"green"} style={{ width: 24, height: 24 }} />
+                                    </View>
+                                }
                             </View>
                         </View>
-                        {viewDownloadIcon &&
-                            <View style={{ alignSelf: "flex-end" }}>
-                                <Image source={images.downloaded_icon} tintColor={"green"} style={{ width: 24, height: 24 }} />
-                            </View>
-                        }
                     </View>
                     <View
                         style={{

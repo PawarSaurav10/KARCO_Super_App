@@ -23,6 +23,7 @@ import { getScreenVisited } from './Utils/getOnBoardingScreenVisited';
 import { TourGuideProvider } from "rn-tourguide"
 import { COLORS } from './Constants/theme';
 import MainAppNavigation from './navigation/MainAppNavigation';
+import { requestMultiple, PERMISSIONS } from 'react-native-permissions';
 
 const middleware = [thunk];
 const composeEnhancer = window.__REDUX_DEVTOOLS_ENTENSION_COMPOSE__ || compose;
@@ -38,6 +39,10 @@ function App() {
   const [initialRoute, setInitialRoute] = useState()
 
   useEffect(() => {
+    requestMultiple([
+      PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+      PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+    ])
     getScreenVisited().then((res) => {
       if (res === null) {
         setInitialRoute("OnBoardingScreen")

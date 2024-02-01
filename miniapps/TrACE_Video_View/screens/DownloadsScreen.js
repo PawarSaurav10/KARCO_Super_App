@@ -98,7 +98,7 @@ const DownloadsScreen = (props) => {
                 leftComponent={
                     <TouchableOpacity
                         style={{ marginHorizontal: 12, justifyContent: "flex-start", padding: 6 }}
-                        onPress={() => navigation.replace("Video_Home")}
+                        onPress={() => backAction()}
                     >
                         <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                     </TouchableOpacity>
@@ -115,9 +115,9 @@ const DownloadsScreen = (props) => {
             }
 
             {!isLoading &&
-                <View style={{ flex: 1, marginBottom: 70 }}>
+                <View style={{ flex: 1 }}>
                     {directory.length > 0 &&
-                        <View style={{ margin: 8, padding: 8 }}>
+                        <View style={{ margin: 6, padding: 8 }}>
                             <CustomSearch
                                 label={"Search Videos"}
                                 style={{ fontSize: 20 }}
@@ -128,26 +128,22 @@ const DownloadsScreen = (props) => {
                             />
                         </View>
                     }
-
-                    {/* <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }} nestedScrollEnabled={true}> */}
-                    <View style={{ flex: 1, marginBottom: props.ScreenName === "Downloads" ? (orientation === "landscape" ? 50 : 80) : 0 }}>
+                    <View style={{ flex: 1, marginHorizontal: 6, padding: 6 }}>
                         {!searchedVideo && directory.length > 0 &&
-                            <View style={{ margin: 6, padding: 6 }}>
-                                <FlatList
-                                    data={directory}
-                                    keyExtractor={item => item.filename}
-                                    renderItem={({ item, index }) => (
-                                        <VideoListView
-                                            videoName={item.filename}
-                                            createdDate={item.lastModified}
-                                            listType={"Downloads"}
-                                            item={item}
-                                            onDelete={deleteFile}
-                                            orientationType={orientation}
-                                        />
-                                    )}
-                                />
-                            </View>
+                            <FlatList
+                                data={directory}
+                                keyExtractor={item => item.filename}
+                                renderItem={({ item, index }) => (
+                                    <VideoListView
+                                        videoName={item.filename}
+                                        createdDate={item.lastModified}
+                                        listType={"Downloads"}
+                                        item={item}
+                                        onDelete={deleteFile}
+                                        orientationType={orientation}
+                                    />
+                                )}
+                            />
                         }
 
                         {!searchedVideo && directory.length === 0 &&
@@ -157,21 +153,19 @@ const DownloadsScreen = (props) => {
                         }
 
                         {searchedVideo && searchedVideoData && searchedVideoData.length > 0 &&
-                            <View style={{ margin: 6, padding: 6, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                <FlatList
-                                    data={directory}
-                                    keyExtractor={item => item.filename}
-                                    renderItem={({ item, index }) => (
-                                        <VideoListView
-                                            videoName={item.filename}
-                                            createdDate={item.lastModified}
-                                            listType={"Downloads"}
-                                            item={item}
-                                            onDelete={deleteFile}
-                                        />
-                                    )}
-                                />
-                            </View>
+                            <FlatList
+                                data={searchedVideoData}
+                                keyExtractor={item => item.filename}
+                                renderItem={({ item, index }) => (
+                                    <VideoListView
+                                        videoName={item.filename}
+                                        createdDate={item.lastModified}
+                                        listType={"Downloads"}
+                                        item={item}
+                                        onDelete={deleteFile}
+                                    />
+                                )}
+                            />
                         }
 
                         {searchedVideo && searchedVideoData.length === 0 &&
@@ -180,10 +174,9 @@ const DownloadsScreen = (props) => {
                             </View>
                         }
                     </View>
-                    {/* </ScrollView> */}
                 </View>
             }
-            
+
             {viewAlert && (
                 <CustomAlert
                     isView={viewAlert}

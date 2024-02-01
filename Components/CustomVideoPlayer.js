@@ -1,8 +1,15 @@
-import React from 'react'
+import React, { useRef, useMemo } from 'react'
 import { View, Dimensions, Platform } from 'react-native'
 import { WebView } from '../node_modules/react-native-webview';
 
 const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, mediaPlaybackRequiresUserAction }) => {
+    const dim = Dimensions.get('screen');
+    // if (dim.height >= dim.width) {
+    //     setOrientation("protrait")
+    // } else {
+    //     setOrientation("landscape")
+    // }
+
     const htmlStyles = `
         <style>
             .video-js{
@@ -16,48 +23,53 @@ const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, media
                 right: 0; 
                 margin-left: auto; 
                 margin-right: auto; 
-                width: ${orientationType === "landscape" ? "60px" : "100px"}; /* Need a specific value to work */
-                height: ${orientationType === "landscape" ? "60px" : "100px"};
+                width: ${dim.height <= dim.width ? "75px" : "75px"}; /* Need a specific value to work */
+                height: ${dim.height <= dim.width ? "75px" : "75px"};
                 background-color: #004C6B !important;
                 border-color: #004C6B;
-                border-radius: ${orientationType === "landscape" ? "60px" : "100px"};
+                border-radius: ${dim.height <= dim.width ? "75px" : "75px"};
             }
             .vjs-matrix.video-js {
                 color: white;
-                font-size:  ${orientationType === "landscape" ? "12px" : "20px"} !important;
+                font-size:  ${dim.height <= dim.width ? "16px" : "16px"} !important;
                 text-align: "center"
             }
             .vjs-matrix.video-js .vjs-control-bar{
                 position: absolute;
                 bottom: 0;
                 background-color: #004C6B;
-                height: ${orientationType === "landscape" ? "46px" : "72px"};
-                padding: ${orientationType === "landscape" ? "6px" : "8px"};
+                height: ${dim.height <= dim.width ? "59px" : "59px"};
+                padding: ${dim.height <= dim.width ? "6px" : "8px"};
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
             }
             .vjs-matrix.video-js .vjs-playback-rate{
-                font-size: ${orientationType === "landscape" ? "12px" : "20px"};
+                font-size: ${dim.height <= dim.width ? "16px" : "16px"};
                 padding: 12px;
                 width: 50px !important;
             }
             .vjs-matrix.video-js .vjs-play-control{
-                width: 26px !important;
+                width: 30px !important;
                 padding: 16px;
-                font-size: ${orientationType === "landscape" ? "12px" : "20px"} !important;
+                font-size: ${dim.height <= dim.width ? "16px" : "16px"} !important;
             }
             .vjs-matrix.video-js .vjs-fullscreen-control{
-                width: 10px !important;
+                width: 30px !important;
                 padding: 16px;
                 margin: 10px;
-                font-size: ${orientationType === "landscape" ? "12px" : "20px"} !important;
-            }
+                font-size: ${dim.height <= dim.width ? "16px" : "16px"} !important;
+            } 
             .vjs-matrix.video-js .vjs-volume-control{
-                width: 10px !important;
+                width: 30px !important;
                 padding: 16px;
                 margin: 10px;
-                font-size: 20px;
+                font-size: 16px !important;
+            }
+            .vjs-matrix.video-js .vjs-remaining-time{
+                color:"red";
+                top: 0px;
+                font-size: 16px !important;
             }
         </style>
     `
@@ -115,18 +127,32 @@ const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, media
 
     let rawhtml = htmlStyles + htmlContent
     let rawhtmlContent = htmlStyles + htmlDownloadContent
+    const webview =
+        <WebView
+            allowFileAccess={true}
+            source={{ html: contentType !== "Downloads" ? rawhtml : rawhtmlContent }}
+            mediaPlaybackRequiresUserAction={dim.height <= dim.width ? mediaPlaybackRequiresUserAction : false}
+            allowsFullscreenVideo={true}
+            minimumFontSize={20}
+            javaScriptEnabled={true}
+        />
+
+
+    const webviewComponent = useMemo(() => (
+        webview
+    ), [url])
 
     return (
-        <View style={{ width: Dimensions.get('window').width, height: orientationType === "landscape" ? 280 : 240 }}>
-            <WebView
-                allowFileAccess={true}
-                source={{ html: contentType !== "Downloads" ? rawhtml : rawhtmlContent }}
-                mediaPlaybackRequiresUserAction={orientationType === "landscape" ? mediaPlaybackRequiresUserAction : false}
-                allowsFullscreenVideo={true}
-                minimumFontSize={orientationType === "landscape" ? 16 : 30}
-                scalesPageToFit={(Platform.OS === 'ios') ? false : true}
-                javaScriptEnabled={true}
-            />
+        <View style={{ width: Dimensions.get('window').width, height: 240 }}>
+            {/* <WebView
+            allowFileAccess={true}
+            source={{ html: contentType !== "Downloads" ? rawhtml : rawhtmlContent }}
+            mediaPlaybackRequiresUserAction={orientationType === "landscape" ? mediaPlaybackRequiresUserAction : false}
+            allowsFullscreenVideo={true}
+            minimumFontSize={20}
+            javaScriptEnabled={true}
+        /> */}
+            {webviewComponent}
         </View>
     )
 }

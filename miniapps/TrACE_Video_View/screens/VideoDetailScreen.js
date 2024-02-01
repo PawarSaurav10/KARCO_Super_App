@@ -6,7 +6,7 @@ import axios from 'axios';
 import moment from "moment"
 import RNFetchBlob from 'react-native-blob-util';
 import Header from '../../../Components/Header';
-import { PERMISSIONS, check, request, RESULTS, requestMultiple } from 'react-native-permissions';
+import { PERMISSIONS, check, request, RESULTS, requestMultiple, checkMultiple, openSettings } from 'react-native-permissions';
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import CustomToast from '../../../Components/CustomToast';
 import { useIsFocused } from '../../../node_modules/@react-navigation/core';
@@ -18,10 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import CustomVideoPlayer from '../../../Components/CustomVideoPlayer';
-import { Video } from 'react-native-compressor';
 
 const VideoDetailScreen = ({ navigation, route }) => {
-    const isFocused = useIsFocused()
     const [videoDetail, setVideoDetail] = useState(null)
     const [fileContent, setFileContent] = useState(null)
     const [toastHide, setToastHide] = useState(false)
@@ -34,7 +32,10 @@ const VideoDetailScreen = ({ navigation, route }) => {
     const [isView, setIsView] = useState(route.params.type === "Downloads" ? false : true)
     const [isLoading, setIsLoading] = useState(route.params.type === "Downloads" ? false : true)
     const [orientation, setOrientation] = useState()
-    const [viewAlert, setViewAlert] = useState(false)
+    const [viewAlert, setViewAlert] = useState({
+        isShow: false,
+        AlertType: ""
+    })
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -43,7 +44,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         console.log("object4")
-
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
             setOrientation(
@@ -88,96 +88,79 @@ const VideoDetailScreen = ({ navigation, route }) => {
         }
     };
 
+    const docPath = ReactNativeBlobUtil.fs.dirs.DownloadDir;
+    const getDirectoryList = async () => {
+        await ReactNativeBlobUtil.fs
+            .lstat(docPath)
+            .then(response => {
+                setDirectory(response);
+            })
+            .catch(error => console.error(error));
+    };
+
     useEffect(() => {
         console.log("object3")
-        if (isFocused) {
+        getDirectoryList();
+        const dim = Dimensions.get('screen');
+        if (dim.height >= dim.width) {
+            setOrientation("protrait")
+        } else {
+            setOrientation("landscape")
+        }
+        if (route.params.type === "Downloads") {
+            console.log("downloads called")
+            RNFetchBlob.fs.readStream(route.params.data.path, 'utf8')
+            RNFetchBlob.fs.readStream(route.params.data.path)
+                .then((stream) => {
+                    setFileContent(stream.path);
+                });
+        }
+        if (route.params.type !== "Downloads") {
+            console.log("not downloads called")
             CheckConnectivity()
-            requestMultiple([
-                PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-                PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-            ])
             axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}&videoID=${route.params}`)
                 .then((res) => {
                     setVideoDetail(res.data.videos.data[0])
                     setIsLoading(false)
                 })
         }
-    }, [route.params.type !== "Downloads", isFocused])
-
-    useEffect(() => {
-        console.log("object2")
-        if (route.params.type === "Downloads") {
-            RNFetchBlob.fs.stat(route.params.data.path)
-            RNFetchBlob.fs.readStream(route.params.data.path)
-                .then((stream) => {
-                    console.log(stream, "stream");
-                    setFileContent(stream.path);
-                });
-        }
-    }, []);
-
-    useEffect(() => {
-        if (isFocused) {
-            console.log("object1")
-            CheckConnectivity()
-            const dim = Dimensions.get('screen');
-            if (dim.height >= dim.width) {
-                console.log("object called")
-                setOrientation("protrait")
-            } else {
-                setOrientation("landscape")
-            }
-            const docPath = ReactNativeBlobUtil.fs.dirs.DownloadDir;
-            const getDirectoryList = async () => {
-                await ReactNativeBlobUtil.fs
-                    .lstat(docPath)
-                    .then(response => {
-                        console.log(response, "response");
-                        setDirectory(response);
-                    })
-                    .catch(error => console.error(error));
-            };
-            getDirectoryList();
-        }
-    }, []);
+    }, [])
 
     const downloadFile = async () => {
-        const result = await Video.compress(
-            videoDetail.originalFileURL,
-            {
-                progressDivider: 10,
-                downloadProgress: (progress) => {
-                    console.log('downloadProgress: ', progress);
-                },
-            },
-            (progress) => {
-                console.log('Compression Progress: ', progress);
-            }
-        );
-        console.log(result, "result")
         CheckConnectivity()
         // let fileExpired = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name && (moment.utc(moment.unix(xx.lastModified / 1000).format("YYYYMMDD")).local().startOf('hours').fromNow() <= "2 days")).length === 0
         let fileDownloaded = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name).length > 0
         if (fileDownloaded === false) {
-            setToastHide(true)
-            let dirs = RNFetchBlob.fs.dirs
-            RNFetchBlob
-                .config({
-                    fileCache: true,
-                    path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
-                    transform: true
-                })
-                .fetch('GET', `${result}`)
-                .then((res) => {
-                    console.log(res, "download res");
-                    setDownloaded("Yes")
+            checkMultiple([PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+            PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE]).then((statuses) => {
+                if (statuses[PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE] === "denied" || statuses[PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE] === "denied") {
+                    setViewAlert({
+                        isShow: true,
+                        AlertType: "Permissions"
+                    })
+                } else {
                     setToastHide(true)
-                    setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
-                })
+                    let dirs = RNFetchBlob.fs.dirs
+                    RNFetchBlob
+                        .config({
+                            fileCache: true,
+                            path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
+                            transform: true
+                        })
+                        .fetch('GET', `${videoDetail.originalFileURL}`)
+                        .then((res) => {
+                            setDownloaded("Yes")
+                            setToastHide(true)
+                            setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
+                        })
+                }
+            });
+
         } else {
             setViewAlert(true)
         }
     }
+    
 
     return (
         <View style={{ flex: 1 }}>
@@ -203,7 +186,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                             </TouchableOpacity>
                         }
-                        title={route.params.type !== "Downloads" ? (videoDetail && ((videoDetail.name).slice(0, -4)).replace(/[^a-zA-Z0-9 ]+/g, " ")) : (route.params.data.filename).slice(0, -4)}
+                        title={route.params.type !== "Downloads" ? (videoDetail && ((videoDetail.name).slice(0, -4)).replace(/[^a-zA-Z0-9 ]+/g, " ")) : ((route.params.data.filename).slice(0, -8)).replace(/[^a-zA-Z0-9 ]+/g, " ")}
                     />
 
                     <ScrollView
@@ -212,16 +195,16 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         <CustomVideoPlayer
                             contentType={route.params.type}
                             orientationType={orientation}
-                            url={route.params.type !== "Downloads" ? videoDetail && videoDetail.url : fileContent}
+                            url={route.params.type !== "Downloads" ? videoDetail && videoDetail.originalFileURL : fileContent}
                             mediaPlaybackRequiresUserAction={route.params.type === "Downloads" ? false : true}
                             posterUrl={videoDetail && videoDetail.thumbnail}
+                            sharedCookiesEnabled={true}
                         />
                         <View style={{ margin: 20 }}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                 <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>
-                                    {route.params.type !== "Downloads" ? (videoDetail && ((videoDetail.name).slice(0, -4)).replace(/[^a-zA-Z0-9 ]+/g, " ")) : (route.params.data.filename).slice(0, -4)}
+                                    {route.params.type !== "Downloads" ? (videoDetail && ((videoDetail.name).slice(0, -4)).replace(/[^a-zA-Z0-9 ]+/g, " ")) : ((route.params.data.filename).slice(0, -8)).replace(/[^a-zA-Z0-9 ]+/g, " ")}
                                 </Text>
-                                {/* <View style={[styles.icon_container, styles.shadowProp]}><Image style={styles.icon} source={FavouriteIcon} /></View> */}
                             </View>
                             {route.params.type !== "Downloads" &&
                                 <>
@@ -258,18 +241,33 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             }
                         </View>
                     </ScrollView>
-                    {viewAlert && (
+                    {viewAlert.isShow && (
                         <CustomAlert
-                            isView={viewAlert}
+                            isView={viewAlert.isShow}
                             Title="Warning!"
-                            Content="This Video is already downloaded to view downloaded video go to Downloads."
+                            Content={viewAlert.AlertType !== "Permissions" ? "This Video is already downloaded to view downloaded video go to Downloads."
+                                : "Video can't be downloaded, allow permissions to access photos and media on your device"}
                             ButtonsToShow={[
                                 {
                                     text: 'OK',
                                     onPress: () => {
-                                        setViewAlert(false)
+                                        setViewAlert({
+                                            isShow: false,
+                                            AlertType: ""
+                                        })
                                     },
-                                    toShow: true,
+                                    toShow: viewAlert.AlertType !== "Permissions" ? true : false,
+                                },
+                                {
+                                    text: 'GO TO SETTINGS',
+                                    onPress: () => {
+                                        openSettings().catch(() => console.warn('cannot open settings'));
+                                        setViewAlert({
+                                            isShow: false,
+                                            AlertType: ""
+                                        })
+                                    },
+                                    toShow: viewAlert.AlertType === "Permissions" ? true : false,
                                 }
                             ]}
                         />
