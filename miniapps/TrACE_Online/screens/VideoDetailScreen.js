@@ -192,7 +192,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             contentInsetAdjustmentBehavior="automatic"
                         >
                             {route.params.item.ModuleType !== "Circular" && (videoType == "PROMOKEY" || videoType == "") &&
-                                <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 240 }}>
+                                <View style={{ width: Dimensions.get('window').width, height: orientation === "landscape" ? 280 : 240 }}>
                                     <WebView
                                         ref={webViewRef}
                                         source={{ html: htmlContentPromo }}

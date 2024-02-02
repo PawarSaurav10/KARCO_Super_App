@@ -67,9 +67,11 @@ const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, media
                 font-size: 16px !important;
             }
             .vjs-matrix.video-js .vjs-remaining-time{
-                color:"red";
                 top: 0px;
                 font-size: 16px !important;
+            }
+            .vjs-matrix.video-js.vjs-paused .vjs-big-play-button {
+               display: block;
             }
         </style>
     `
@@ -133,7 +135,7 @@ const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, media
             source={{ html: contentType !== "Downloads" ? rawhtml : rawhtmlContent }}
             mediaPlaybackRequiresUserAction={dim.height <= dim.width ? mediaPlaybackRequiresUserAction : false}
             allowsFullscreenVideo={true}
-            minimumFontSize={20}
+            minimumFontSize={24}
             javaScriptEnabled={true}
         />
 
@@ -143,7 +145,7 @@ const CustomVideoPlayer = ({ contentType, orientationType, url, posterUrl, media
     ), [url])
 
     return (
-        <View style={{ width: Dimensions.get('window').width, height: 240 }}>
+        <View style={{ width: Dimensions.get('window').width, height: orientationType === "landscape" ? 280 : 240 }}>
             {/* <WebView
             allowFileAccess={true}
             source={{ html: contentType !== "Downloads" ? rawhtml : rawhtmlContent }}
