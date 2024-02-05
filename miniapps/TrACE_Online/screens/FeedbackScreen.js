@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { View, Text, ScrollView, Image, Alert, BackHandler, Modal, StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
-import CheckBox from '@react-native-community/checkbox';
+// import CheckBox from '@react-native-community/checkbox';
 import { Rating } from 'react-native-ratings';
 import CustomInput from "../../../Components/CustomInput"
 import CustomIconButton from '../../../Components/CustomIconButton';
@@ -14,6 +14,7 @@ import CustomButton from '../../../Components/CustomButton';
 import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
+import CustomRadioButton from '../../../Components/CustomRadioButton';
 
 const FeedbackScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused();
@@ -397,14 +398,14 @@ const FeedbackScreen = ({ navigation, route }) => {
     return (
         <View style={{ flex: 1 }}>
             <ScrollView>
-                <View style={{ padding: 8, display: "flex", justifyContent: "center", backgroundColor: "#004C6B", color: "white" }}>
+                <View style={{ padding: 8, display: "flex", justifyContent: "center", backgroundColor: COLORS.white2 }}>
                     <View style={{ marginTop: 10 }}>
                         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16, flex: 1 }}>
                             <TouchableOpacity
                                 style={{ justifyContent: "flex-start", padding: 6, marginHorizontal: 12, flex: 0.04 }}
                                 onPress={() => backAction()}
                             >
-                                <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
+                                <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} tintColor="black" />
                             </TouchableOpacity>
                             <View style={{ flex: 0.9, justifyContent: "center", alignItems: "center" }}>
                                 <View style={{ paddingHorizontal: 6, paddingVertical: 4, backgroundColor: "red" }}>
@@ -418,28 +419,34 @@ const FeedbackScreen = ({ navigation, route }) => {
                     </View>
 
                     <View style={styles.titleContainer}>
-                        <Text style={{ textTransform: "uppercase", fontSize: 18, color: "white" }}>Presentation</Text>
-                        <Image source={images.raters_icon} style={{ width: 140, height: 60, objectFit: "fill" }} />
+                        <Text style={{ textTransform: "uppercase", fontSize: 18, color: COLORS.white, fontWeight: "700" }}>Presentation</Text>
+                         <Image source={images.raters_icon} style={{ width: 140, height: 60, objectFit: "fill" }} />
+                        {/* <View style={{ flexDirection: "row" }}>
+                            <Text style={{ color: "#ff0000", fontWeight: "700", margin: 4, fontSize: 12 }}>NA</Text>
+                            <Text style={{ color: "#ff8f00", fontWeight: "700", margin: 4, fontSize: 12  }}>Un-acc</Text>
+                            <Text style={{ color: "#edc900", fontWeight: "700", margin: 4, fontSize: 12  }}>Poor</Text>
+                            <Text style={{ color: "#489b00", fontWeight: "700", margin: 4, fontSize: 12  }}>Good</Text>
+                            <Text style={{ color: "#00b569", fontWeight: "700", margin: 4, fontSize: 12  }}>Exce</Text>
+                        </View> */}
                     </View>
                     <View>
                         {presentationFormdata.map((xx, idx) => {
                             return (
                                 <View key={idx} style={styles.questionContainer}>
                                     <View style={{ flexDirection: "row" }}>
-                                        <Text style={{ color: "white" }}>{idx + 1}. {xx.title} </Text><Text style={{ color: "red" }}>*</Text>
+                                        <Text style={{ color: COLORS.primary, fontWeight: "700" }}>{idx + 1}. {xx.title} </Text><Text style={{ color: "red" }}>*</Text>
                                     </View>
 
                                     <View style={styles.radioButtonContainer}>
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            disabled={false}
-                                            value={xx.isNA}
-                                            onValueChange={(e) => {
+
+                                        <CustomRadioButton
+                                            selected={xx.isNA}
+                                            onPress={() => {
                                                 let tempData = [...presentationFormdata];
                                                 let tempIndex = presentationFormdata.findIndex(
                                                     (aa) => aa.key === xx.key
                                                 );
-                                                tempData[tempIndex].isNA = e;
+                                                tempData[tempIndex].isNA = true;
                                                 tempData[tempIndex].isUnacceptable = false;
                                                 tempData[tempIndex].isPoor = false;
                                                 tempData[tempIndex].isGood = false;
@@ -447,45 +454,40 @@ const FeedbackScreen = ({ navigation, route }) => {
                                                 setPresentationFormData(tempData);
                                             }}
                                         />
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            disabled={false}
-                                            value={xx.isUnacceptable}
-                                            onValueChange={(e) => {
+
+                                        <CustomRadioButton
+                                            selected={xx.isUnacceptable}
+                                            onPress={() => {
                                                 let tempData = [...presentationFormdata];
                                                 let tempIndex = presentationFormdata.findIndex(
                                                     (aa) => aa.key === xx.key
                                                 );
                                                 tempData[tempIndex].isNA = false;
-                                                tempData[tempIndex].isUnacceptable = e;
+                                                tempData[tempIndex].isUnacceptable = true;
                                                 tempData[tempIndex].isPoor = false;
                                                 tempData[tempIndex].isGood = false;
                                                 tempData[tempIndex].isExcellent = false;
                                                 setPresentationFormData(tempData);
                                             }}
                                         />
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            disabled={false}
-                                            value={xx.isPoor}
-                                            onValueChange={(e) => {
+                                        <CustomRadioButton
+                                            selected={xx.isPoor}
+                                            onPress={() => {
                                                 let tempData = [...presentationFormdata];
                                                 let tempIndex = presentationFormdata.findIndex(
                                                     (aa) => aa.key === xx.key
                                                 );
                                                 tempData[tempIndex].isNA = false;
                                                 tempData[tempIndex].isUnacceptable = false;
-                                                tempData[tempIndex].isPoor = e;
+                                                tempData[tempIndex].isPoor = true;
                                                 tempData[tempIndex].isGood = false;
                                                 tempData[tempIndex].isExcellent = false;
                                                 setPresentationFormData(tempData);
                                             }}
                                         />
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            disabled={false}
-                                            value={xx.isGood}
-                                            onValueChange={(e) => {
+                                        <CustomRadioButton
+                                            selected={xx.isGood}
+                                            onPress={() => {
                                                 let tempData = [...presentationFormdata];
                                                 let tempIndex = presentationFormdata.findIndex(
                                                     (aa) => aa.key === xx.key
@@ -493,16 +495,14 @@ const FeedbackScreen = ({ navigation, route }) => {
                                                 tempData[tempIndex].isNA = false;
                                                 tempData[tempIndex].isUnacceptable = false;
                                                 tempData[tempIndex].isPoor = false;
-                                                tempData[tempIndex].isGood = e;
+                                                tempData[tempIndex].isGood = true;
                                                 tempData[tempIndex].isExcellent = false;
                                                 setPresentationFormData(tempData);
                                             }}
                                         />
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            disabled={false}
-                                            value={xx.isExcellent}
-                                            onValueChange={(e) => {
+                                        <CustomRadioButton
+                                            selected={xx.isExcellent}
+                                            onPress={() => {
                                                 let tempData = [...presentationFormdata];
                                                 let tempIndex = presentationFormdata.findIndex(
                                                     (aa) => aa.key === xx.key
@@ -511,7 +511,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                                                 tempData[tempIndex].isUnacceptable = false;
                                                 tempData[tempIndex].isPoor = false;
                                                 tempData[tempIndex].isGood = false;
-                                                tempData[tempIndex].isExcellent = e;
+                                                tempData[tempIndex].isExcellent = true;
                                                 setPresentationFormData(tempData);
                                             }}
                                         />
@@ -521,42 +521,42 @@ const FeedbackScreen = ({ navigation, route }) => {
                         })}
                     </View>
                     <View style={styles.titleContainer}>
-                        <Text style={{ textTransform: "uppercase", fontSize: 18, color: "white" }}>Course Objective</Text>
-                        <Image source={images.raters2_icon} style={{ width: 50, height: 30, objectFit: "fill" }} />
+                        <Text style={{ textTransform: "uppercase", fontSize: 18, color: COLORS.white, fontWeight: "700" }}>Course Objective</Text>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={{ color: "#ff0000", margin: 6, fontWeight: "700", fontSize: 12 }}>No</Text>
+                            <Text style={{ color: "#00b569", margin: 6, fontWeight: "700", fontSize: 12 }}>Yes</Text>
+                            {/* <Image source={images.raters3_icon} style={{ width: 50, height: 30, objectFit: "fill" }} /> */}
+                        </View>
                     </View>
                     <View>
                         {courseObjtFormData.map((xx, idx) => {
                             return (
                                 <View key={idx} style={styles.questionContainer}>
                                     <View style={{ flexDirection: "row" }}>
-                                        <Text style={{ width: 250, color: "white" }}>{idx + 1}. {xx.title} </Text><Text style={{ color: "red" }}>*</Text>
+                                        <Text style={{ width: 220, color: COLORS.primary, fontWeight: "700" }}>{idx + 1}. {xx.title} </Text><Text style={{ color: "red" }}>*</Text>
                                     </View>
                                     <View style={styles.radioButtonContainer}>
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            // disabled={false}
-                                            value={xx.No}
-                                            onValueChange={(e) => {
+                                        <CustomRadioButton
+                                            selected={xx.No}
+                                            onPress={() => {
                                                 let tempData = [...courseObjtFormData];
                                                 let tempIndex = courseObjtFormData.findIndex(
                                                     (aa) => aa.key === xx.key
                                                 );
-                                                tempData[tempIndex].No = e;
+                                                tempData[tempIndex].No = true;
                                                 tempData[tempIndex].Yes = false;
                                                 setCourseObjtFormData(tempData);
                                             }}
                                         />
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            // disabled={false}
-                                            value={xx.Yes}
-                                            onValueChange={(e) => {
+                                        <CustomRadioButton
+                                            selected={xx.Yes}
+                                            onPress={() => {
                                                 let tempData = [...courseObjtFormData];
                                                 let tempIndex = courseObjtFormData.findIndex(
                                                     (aa) => aa.key === xx.key
                                                 );
                                                 tempData[tempIndex].No = false;
-                                                tempData[tempIndex].Yes = e;
+                                                tempData[tempIndex].Yes = true;
                                                 setCourseObjtFormData(tempData);
                                             }}
                                         />
@@ -566,59 +566,58 @@ const FeedbackScreen = ({ navigation, route }) => {
                         })}
                     </View>
                     <View style={styles.titleContainer}>
-                        <Text style={{ textTransform: "uppercase", fontSize: 18, color: "white" }}>Course Content</Text>
-                        <Image source={images.raters3_icon} style={{ width: 100, height: 60, objectFit: "fill" }} />
+                        <Text style={{ textTransform: "uppercase", fontSize: 18, color: COLORS.white, fontWeight: "700" }}>Course Content</Text>
+                        <Image source={images.raters2_icon} style={{ width: 100, height: 60, objectFit: "fill" }} />
+                        {/* <View style={{ flexDirection: "row" }}>
+                            <Text style={{ color: "#ff0000", fontWeight: "700", margin: 4, fontSize: 12 }}>In-ad</Text>
+                            <Text style={{ color: "#edc900", fontWeight: "700", margin: 4, fontSize: 12  }}>Adeq</Text>
+                            <Text style={{ color: "#00b569", fontWeight: "700", margin: 4, fontSize: 12  }}>Exce</Text>
+                        </View> */}
                     </View>
                     <View>
                         {courseFormdata.map((xx, idx) => {
                             return (
                                 <View key={idx} style={styles.questionContainer}>
                                     <View style={{ flexDirection: "row" }}>
-                                        <Text style={{ color: "white" }}>{idx + 1}. {xx.title} </Text><Text style={{ color: "red" }}>*</Text>
+                                        <Text style={{ color: COLORS.primary, fontWeight: "700" }}>{idx + 1}. {xx.title} </Text><Text style={{ color: "red" }}>*</Text>
                                     </View>
                                     <View style={styles.radioButtonContainer}>
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            disabled={false}
-                                            value={xx.isInadequate}
-                                            onValueChange={(e) => {
+                                        <CustomRadioButton
+                                            selected={xx.isInadequate}
+                                            onPress={() => {
                                                 let tempData = [...courseFormdata];
                                                 let tempIndex = courseFormdata.findIndex(
                                                     (aa) => aa.key === xx.key
                                                 );
-                                                tempData[tempIndex].isInadequate = e;
+                                                tempData[tempIndex].isInadequate = true;
                                                 tempData[tempIndex].isAdequate = false;
                                                 tempData[tempIndex].isExcessive = false;
                                                 setCourseFormData(tempData);
                                             }}
                                         />
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            disabled={false}
-                                            value={xx.isAdequate}
-                                            onValueChange={(e) => {
+                                        <CustomRadioButton
+                                            selected={xx.isAdequate}
+                                            onPress={() => {
                                                 let tempData = [...courseFormdata];
                                                 let tempIndex = courseFormdata.findIndex(
                                                     (aa) => aa.key === xx.key
                                                 );
                                                 tempData[tempIndex].isInadequate = false;
-                                                tempData[tempIndex].isAdequate = e;
+                                                tempData[tempIndex].isAdequate = true;
                                                 tempData[tempIndex].isExcessive = false;
                                                 setCourseFormData(tempData);
                                             }}
                                         />
-                                        <CheckBox
-                                            // tintColors={"white"}
-                                            disabled={false}
-                                            value={xx.isExcessive}
-                                            onValueChange={(e) => {
+                                        <CustomRadioButton
+                                            selected={xx.isExcessive}
+                                            onPress={() => {
                                                 let tempData = [...courseFormdata];
                                                 let tempIndex = courseFormdata.findIndex(
                                                     (aa) => aa.key === xx.key
                                                 );
                                                 tempData[tempIndex].isInadequate = false;
                                                 tempData[tempIndex].isAdequate = false;
-                                                tempData[tempIndex].isExcessive = e;
+                                                tempData[tempIndex].isExcessive = true;
                                                 setCourseFormData(tempData);
                                             }}
                                         />
@@ -629,17 +628,17 @@ const FeedbackScreen = ({ navigation, route }) => {
                     </View>
                     <View style={styles.titleContainer}>
                         <View style={{ flexDirection: "row" }}>
-                            <Text style={{ textTransform: "uppercase", fontSize: 18, color: "white" }}>Suggestions </Text>
-                            <Text style={{ fontSize: 16, color: "white" }}>(Optional)</Text>
+                            <Text style={{ textTransform: "uppercase", fontSize: 18, color: COLORS.white, fontWeight: "700" }}>Suggestions </Text>
+                            <Text style={{ fontSize: 16, color: COLORS.white, }}>(Optional)</Text>
                         </View>
                     </View>
                     <View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>
-                            <Text style={{ color: "white" }}>1. What was the most relevant part of the course ? </Text>
-                            <CustomInput value={feedbackFormData.Relevant_Part_Dtl} textColor={COLORS.white} onChangeText={(value) => {
+                            <Text style={{ color: COLORS.primary, fontWeight: "700" }}>1. What was the most relevant part of the course ? </Text>
+                            <CustomInput inputType={"Feedback"} value={feedbackFormData.Relevant_Part_Dtl} textColor={COLORS.primary} onChangeText={(value) => {
                                 validateString(value);
                                 setFeedbackFormData({ ...feedbackFormData, Relevant_Part_Dtl: value === null ? "" : value })
-                                // setViewWarnings(false)
+                                // setViewWarnings(false) 
                             }} />
                             {
                                 feedbackFormData.Relevant_Part_Dtl !== "" && viewWarnings === true &&
@@ -647,8 +646,8 @@ const FeedbackScreen = ({ navigation, route }) => {
                             }
                         </View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6, }}>
-                            <Text style={{ color: "white" }}>2. Which part might be improved and why ? </Text>
-                            <CustomInput inputMode={"text"} value={feedbackFormData.Improvement_Dtl} textColor={COLORS.white} onChangeText={(value) => {
+                            <Text style={{ color: COLORS.primary, fontWeight: "700" }}>2. Which part might be improved and why ? </Text>
+                            <CustomInput inputType={"Feedback"} inputMode={"text"} value={feedbackFormData.Improvement_Dtl} textColor={COLORS.primary} onChangeText={(value) => {
                                 validateString1(value);
                                 setFeedbackFormData({ ...feedbackFormData, Improvement_Dtl: value === null ? "" : value })
                                 setViewWarningsImp(false)
@@ -660,11 +659,11 @@ const FeedbackScreen = ({ navigation, route }) => {
                         </View>
                     </View>
                     <View style={styles.titleContainer}>
-                        <Text style={{ textTransform: "uppercase", fontSize: 18, color: "white" }}>Overall Rating</Text>
+                        <Text style={{ textTransform: "uppercase", fontSize: 18, color: COLORS.white, fontWeight: "700" }}>Overall Rating</Text>
                     </View>
                     <View>
                         <View style={{ paddingVertical: 6, paddingHorizontal: 4, marginBottom: 6 }}>
-                            <Text style={{ color: "white" }}>
+                            <Text style={{ color: COLORS.primary, fontWeight: "700" }}>
                                 Please provide an overall rating based on your experience of using and learning this module on this platform.
                                 {/* <Text style={{ color: "red" }}>*</Text> */}
                             </Text>
@@ -676,8 +675,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                                 type='star'
                                 ratingCount={5}
                                 imageSize={24}
-                                tintColor="#004C6B"
-                                ratingBackgroundColor="#004C6B"
+                                // tintColor="#004C6B"
                                 // style={{ paddingVertical: 10, backgroundColor: "#004C6B" }}
                                 onFinishRating={(ratingData) => ratingCompleted(ratingData)}
                             />
@@ -697,12 +695,12 @@ const FeedbackScreen = ({ navigation, route }) => {
                             setIsVisibleModal(true)
                             setViewRef(true)
                         }}
-                        labelStyle={{ color: COLORS.white, fontSize: 14, textTransform: "uppercase", borderBottomWidth: 2, borderBottomColor: COLORS.white }}
+                        labelStyle={{ color: COLORS.primary, fontSize: 14, textTransform: "uppercase", borderBottomWidth: 2, borderBottomColor: COLORS.primary }}
                     />
                     <CustomIconButton
                         label={"SUBMIT"}
                         containerStyle={{
-                            backgroundColor: "white",
+                            backgroundColor: COLORS.primary,
                             width: "100%",
                             padding: 16,
                             alignItems: "center",
@@ -713,7 +711,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                             CheckConnectivity()
                             onSubmitClick()
                         }}
-                        labelStyle={{ color: COLORS.darkBlue }}
+                        labelStyle={{ color: COLORS.white2 }}
                         icon={images.submit_icon}
                         iconStyle={{
                             marginRight: 10
@@ -940,7 +938,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: "center",
         marginBottom: 16,
-        color: "white"
+        color: COLORS.primary,
+        fontWeight: "700"
     },
     radioButtonContainer: {
         flexDirection: "row",
@@ -954,7 +953,10 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: 6,
-        backgroundColor: "#003A4E"
+        backgroundColor: "#003A4E",
+        borderRadius: 4
+        // backgroundColor: "#f5f5f5"
+        // backgroundColor: COLORS.lightGray1
     },
     questionContainer: {
         paddingVertical: 6,

@@ -318,6 +318,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         onPress={() => {
                                             CheckConnectivity()
                                             onClickPlayVideo()
+                                            spotlightrAPI('MTM1MjA5MA==', 'play')
                                             // togglePlayPause()
                                             if ((videoType === "PROMOKEY") || (videoType === "")) {
                                                 setHtmlContent(htmlContentFull)

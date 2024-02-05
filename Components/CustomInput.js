@@ -37,7 +37,7 @@ const CustomInput = ({ value, onChangeText, inputType, label, keyboardType, icon
                         placeholder={label}
                         keyboardType={"numeric"}
                         inputMode="search"
-                        style={{ flex: 1, paddingVertical: 0, fontSize: 18 }}
+                        style={{ flex: 1, paddingVertical: 0, fontSize: inputType === "Feedback" ? 14 : 18 }}
                         onChangeText={onChangeText}
                         value={value}
                         color={textColor}
