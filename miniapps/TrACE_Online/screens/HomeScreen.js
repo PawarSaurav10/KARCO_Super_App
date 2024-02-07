@@ -30,6 +30,10 @@ import NetInfo from "@react-native-community/netinfo";
 import _ from "lodash"
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
+import * as Progress from 'react-native-progress';
+import { CountdownCircleTimer } from '../../../node_modules/react-native-countdown-circle-timer/lib';
+import moment from "moment"
+import InProgressCard from '../../../Components/InProgressCard';
 
 const HomePage = (props) => {
     const navigation = useNavigation();
@@ -55,6 +59,29 @@ const HomePage = (props) => {
         isShow: false,
         AlertType: ""
     })
+
+    const [assessmentData, setAssessmentData] = useState(null)
+    const [reversedArray, setReversedArray] = useState()
+
+    async function fetchOnlineAssessmentData() {
+        if (userLoginData.userId !== null) {
+            await axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment`, {
+                params: {
+                    VideoId: revArray[0].Id,
+                    username: userLoginData.userId,
+                    password: revArray[0].Password,
+                    CrewId: userLoginData.crewId,
+                    VesselId: userLoginData.vesselId,
+                }
+            }).then((res) => {
+                setAssessmentData(res.data)
+            }).catch((error) => {
+                throw error
+            })
+        }
+    }
+
+
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -219,6 +246,19 @@ const HomePage = (props) => {
 
     const ShowContinueAssessmentSection = videoData && videoData.lstToDo && videoData.lstToDo.filter((xx) => xx.AssessmentStatus == "Continue" || xx.AssessmentStatus == "Feedback").length > 0
 
+    let MinimumTimeLeft = videoData && videoData.lstToDo && videoData.lstToDo.filter((xx) => xx.AssessmentStatus == "Continue" || xx.AssessmentStatus == "Feedback")
+    let revArray = _.reverse(MinimumTimeLeft);
+    // let remainingSeconds = moment(reversedArray[0].TimeLeft, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds')
+
+    useEffect(() => {
+        fetchOnlineAssessmentData()
+    }, [revArray,qusetionAnswered])
+
+    let qusetionAnswered = assessmentData && assessmentData ?.QuestionList.length - assessmentData ?.QStatusNCount;
+    let totalQuestion = assessmentData && assessmentData ?.QuestionList.length;
+    let progress = (qusetionAnswered / totalQuestion)
+    let percentage = progress * 100
+
     return (
         <View style={{ flex: 1 }}>
             {isLoading &&
@@ -273,6 +313,24 @@ const HomePage = (props) => {
                             }}
                         />
                     </View>
+                    {ShowContinueAssessmentSection && revArray.length > 0 &&
+                        <View>
+                            <View style={[styles.section_header_container, { marginVertical: 8 }]}>
+                                <Text style={{ fontSize: 18, fontWeight: "700", color: COLORS.primary }}>Lift-Off ! Submit your work</Text>
+                            </View>
+                            <InProgressCard
+                                VideoCategory={revArray[0].Category}
+                                VideoId={revArray[0].Id}
+                                VideoName={revArray[0].VideoName}
+                                videoPassword={revArray[0].Password}
+                                remainingTime={revArray[0].TimeLeft}
+                                userLoginData={userLoginData}
+                                NoOfQuestionAnswered={qusetionAnswered}
+                                // ProgressNo={progress}
+                                Percentage={percentage}
+                                TotalQuestion={totalQuestion} />
+                        </View>
+                    }
 
                     <View style={{ margin: 4, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
                         <Pressable

@@ -16,7 +16,6 @@ import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 
 const VideoDetailScreen = ({ navigation, route }) => {
-    console.log(route.params.item.videokeypromo, "videokey");
     const webViewRef = useRef(null);
     const isFocused = useIsFocused();
     const [videoType, setVideoType] = useState("")
@@ -318,7 +317,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         onPress={() => {
                                             CheckConnectivity()
                                             onClickPlayVideo()
-                                            spotlightrAPI('MTM1MjA5MA==', 'play')
+                                            // spotlightrAPI('MTM1MjA5MA==', 'play')
                                             // togglePlayPause()
                                             if ((videoType === "PROMOKEY") || (videoType === "")) {
                                                 setHtmlContent(htmlContentFull)

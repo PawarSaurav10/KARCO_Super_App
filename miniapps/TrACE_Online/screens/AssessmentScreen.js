@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Alert, BackHandler, Image, ActivityIndicator, Modal } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Alert, BackHandler, Image, ActivityIndicator, Modal, ProgressBarAndroid } from 'react-native'
 import { COLORS } from '../../../Constants/theme';
 import axios from 'axios';
 import { getUserData, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
@@ -21,6 +21,8 @@ import { BlurView } from '@react-native-community/blur';
 import Pdf from 'react-native-pdf';
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
+import * as Progress from 'react-native-progress';
+import CustomRadioButton from '../../../Components/CustomRadioButton';
 
 const AssessmentScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused()
@@ -253,37 +255,102 @@ const AssessmentScreen = ({ navigation, route }) => {
         </div>
     `
 
+    let progress = (currentQuestion === 0 ? (questioncountIndex === 0 ? 1 : questioncountIndex + (currentQuestion === 0 ? 1 : currentQuestion)) : (questioncountIndex === 0 ? currentQuestion + 1 : questioncountIndex + (currentQuestion === 0 ? 1 : currentQuestion) + 1)) / (assessmentData && assessmentData.QuestionList.length)
+
     const QuestionCard = ({ initialData, questionIndex }) => {
         return (
             <View style={{ padding: 6 }}>
                 {initialData !== null &&
                     <>
-                        <Text style={{ fontSize: 18, fontWeight: "600", textAlign: "left", marginBottom: 20, color: COLORS.darkBlue }}>{initialData ?.Question}</Text>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                            <Text style={{ fontSize: 16, color: COLORS.gray, fontWeight: "500" }}>QUESTION {currentQuestion === 0 ?
+                                (questioncountIndex === 0 ? 1 : questioncountIndex + (currentQuestion === 0 ? 1 : currentQuestion))
+                                : (questioncountIndex === 0 ? currentQuestion + 1 : questioncountIndex + (currentQuestion === 0 ? 1 : currentQuestion) + 1)
+                            } OF {assessmentData && assessmentData.QuestionList.length}</Text>
+                            <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                <View style={{
+                                    width: 28,
+                                    height: 28,
+                                    borderRadius: 20,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    backgroundColor: `${questionToShow ?.Weightage === "A" ?
+                                        "#ee3024"
+                                        : questionToShow ?.Weightage === "B" ?
+                                            "#ea7d22"
+                                            : questionToShow ?.Weightage === "C" ?
+                                                "#fbb03b" : ""}`
+                                }}>
+                                    <Text style={{ color: "white" }}>{questionToShow ?.Weightage}</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={{ width: Dimensions.get("window").width, marginBottom: 10 }}>
+                            <Progress.Bar progress={progress} animationType="timing" width={300} height={6} color="green" borderWidth={1} />
+                        </View>
+                        <View style={styles.question_container}>
+                            <Text style={styles.question_text}>{initialData ?.Question}</Text>
+                        </View>
+                        <View style={{
+                            marginBottom: 20, marginTop: -1, marginHorizontal: 6, borderRadius: 6
+                        }}>
+                            <View style={styles.triangle}></View>
+                        </View>
                         <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "A" ? COLORS.primary : COLORS.white2 }]}
                             onPress={() => {
                                 onOptionClick("A", initialData, questionIndex)
+
                             }}>
-                            <Text style={[styles.options_text, { color: selectedOptions == "A" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionA}</Text>
+                            <View style={{ marginRight: 2 }}>
+                                <CustomRadioButton selected={selectedOptions === "A" ? true : false} onPress={() => {
+                                    onOptionClick("A", initialData, questionIndex)
+                                }} />
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Text style={[styles.options_text, { color: selectedOptions == "A" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionA}</Text>
+                            </View>
+
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "B" ? COLORS.primary : COLORS.white2 }]}
                             onPress={() => {
                                 onOptionClick("B", initialData, questionIndex)
                             }}>
-                            <Text style={[styles.options_text, { color: selectedOptions == "B" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionB}</Text>
+                            <View style={{ marginRight: 2 }}>
+                                <CustomRadioButton selected={selectedOptions === "B" ? true : false} onPress={() => {
+                                    onOptionClick("B", initialData, questionIndex)
+                                }} />
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Text style={[styles.options_text, { color: selectedOptions == "B" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionB}</Text>
+                            </View>
                         </TouchableOpacity>
                         {((initialData ?.OptionC !== "NA") && (initialData ?.OptionC !== "N A") && (initialData ?.OptionC !== "") && (initialData ?.OptionC !== "NA.")) && (
                             <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "C" ? COLORS.primary : COLORS.white2 }]}
                                 onPress={() => {
                                     onOptionClick("C", initialData, questionIndex)
                                 }}>
-                                <Text style={[styles.options_text, { color: selectedOptions == "C" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionC}</Text>
+                                <View style={{ marginRight: 2 }}>
+                                    <CustomRadioButton selected={selectedOptions === "C" ? true : false} onPress={() => {
+                                        onOptionClick("C", initialData, questionIndex)
+                                    }} />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={[styles.options_text, { color: selectedOptions == "C" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionC}</Text>
+                                </View>
                             </TouchableOpacity>)}
                         {((initialData ?.OptionD !== "NA") && (initialData ?.OptionD !== "N A") && (initialData ?.OptionD !== "") && (initialData ?.OptionD !== "NA.")) && (
                             <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "D" ? COLORS.primary : COLORS.white2 }]}
                                 onPress={() => {
                                     onOptionClick("D", initialData, questionIndex)
                                 }}>
-                                <Text style={[styles.options_text, { color: selectedOptions == "D" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionD}</Text>
+                                <View style={{ marginRight: 2 }}>
+                                    <CustomRadioButton selected={selectedOptions === "D" ? true : false} onPress={() => {
+                                        onOptionClick("D", initialData, questionIndex)
+                                    }} />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={[styles.options_text, { color: selectedOptions == "D" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionD}</Text>
+                                </View>
                             </TouchableOpacity>
                         )}
                     </>
@@ -319,12 +386,13 @@ const AssessmentScreen = ({ navigation, route }) => {
                     <View style={{ flex: 1 }}>
                         {questionToShow !== null &&
                             <ScrollView style={{ flex: 1 }} contentInsetAdjustmentBehavior="automatic">
+
                                 <View style={{ backgroundColor: "white", padding: 14 }}>
-                                    <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: COLORS.blue }}>
-                                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                    {/* <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: COLORS.blue }}> */}
+                                    {/* <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                                             <Text style={{ color: COLORS.darkBlue, fontSize: 14, fontWeight: "bold" }}>{assessmentData ?.videoDetail ?.VideoCode}</Text>
-                                        </View>
-                                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                        </View> */}
+                                    {/* <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                                             <Text style={{ textTransform: "uppercase", fontSize: 16, color: COLORS.darkBlue }}>
                                                 {currentQuestion === 0 ?
                                                     (questioncountIndex === 0 ? 1 : questioncountIndex + (currentQuestion === 0 ? 1 : currentQuestion))
@@ -348,9 +416,11 @@ const AssessmentScreen = ({ navigation, route }) => {
                                             }}>
                                                 <Text style={{ color: "white" }}>{questionToShow ?.Weightage}</Text>
                                             </View>
-                                        </View>
-                                    </View>
-                                    {assessmentData.QuestionList.length >= (questioncountIndex + currentQuestion + 1) && <QuestionCard initialData={questionToShow} questionIndex={currentQuestion + 1} />}
+                                        </View> */}
+                                    {/* </View> */}
+                                    {assessmentData.QuestionList.length >= (questioncountIndex + currentQuestion + 1) &&
+                                        <QuestionCard initialData={questionToShow} questionIndex={currentQuestion + 1} />
+                                    }
                                 </View>
                                 <Modal
                                     animationType="slide"
@@ -369,30 +439,22 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                 backgroundColor: 'rgba(0,0,0,0.6)',
                                             }}
                                         >
-                                            <BlurView
-                                                viewRef={viewRef}
-                                                style={{
-                                                    position: 'absolute',
-                                                    left: 0,
-                                                    top: 0,
-                                                    bottom: 0,
-                                                    right: 0,
-                                                }}
-                                                blurType={"light"}
-                                                blurAmount={1}
-                                                overlayColor={'rgba(0,0,0,0.6)'}
-                                            />
-                                            <View style={{
-                                                position: 'absolute', top: 0, left: 10, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', width: Dimensions.get('screen').width - 20,
-                                                shadowColor: '#000',
-                                                shadowOffset: {
-                                                    width: 10,
-                                                    height: 10,
-                                                },
-                                                shadowOpacity: 0.50,
-                                                shadowRadius: 6,
-                                                elevation: 5,
-                                            }}>
+                                            {showBlur &&
+                                                <BlurView
+                                                    viewRef={viewRef}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        left: 0,
+                                                        top: 0,
+                                                        bottom: 0,
+                                                        right: 0,
+                                                    }}
+                                                    blurType={"light"}
+                                                    blurAmount={1}
+                                                    overlayColor={'rgba(0,0,0,0.6)'}
+                                                />
+                                            }
+                                            <View style={styles.modal_container}>
                                                 <TouchableOpacity
                                                     style={{ flex: orientation === "landscape" ? 0.6 : 0.07, marginLeft: "auto", padding: 4 }}
                                                     onPress={() => {
@@ -410,14 +472,12 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                         allowsInlineMediaPlayback={true}
                                                         domStorageEnabled={true}
                                                         allowFileAccess={false}
-                                                        // startInLoadingState={true}
                                                         startInLoadingState={<ActivityIndicator />}
                                                         automaticallyAdjustContentInsets
                                                         minimumFontSize={18}
                                                     />
                                                 </View>
                                             </View>
-
                                         </View>
                                     }
                                     {assessmentData.videoDetail.ModuleType == "Company Content" &&
@@ -458,10 +518,8 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                 />
                                             </View>
                                         </View>
-
                                     }
                                 </Modal>
-
                             </ScrollView>
                         }
                     </View>
@@ -570,18 +628,55 @@ const AssessmentScreen = ({ navigation, route }) => {
 }
 
 const styles = StyleSheet.create({
+    question_container: {
+        marginTop: 10,
+        marginHorizontal: 6,
+        backgroundColor: COLORS.primary,
+        paddingHorizontal: 12,
+        paddingVertical: 22,
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
+        shadowColor: COLORS.primary,
+        shadowOffset: {
+            width: 0,
+            height: 6,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 6,
+        elevation: 5,
+    },
+    question_text: {
+        fontFamily: "Segoe UI Bold",
+        fontSize: 21,
+        fontWeight: "600",
+        textAlign: "center",
+        color: COLORS.white2
+    },
     options_container: {
-        borderColor: "#004C6B",
-        borderWidth: 1,
-        margin: 4,
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        borderColor: COLORS.primary,
+        borderWidth: 1.2,
+        marginHorizontal: 4,
+        marginVertical: 6,
         paddingVertical: 12,
         paddingHorizontal: 12,
-        borderRadius: 8
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 6,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 6,
+        elevation: 5,
     },
     options_text: {
+        fontFamily: "Segoe UI semibold",
         fontSize: 16,
         fontWeight: "bold",
-        color: "#004C6B",
+        color: COLORS.primary,
         textAlign: "left"
     },
     footer: {
@@ -595,6 +690,33 @@ const styles = StyleSheet.create({
         // justifyContent: "center", 
         // alignItems: 'center'
     },
+    triangle: {
+        backgroundColor: "transparent",
+        borderRightWidth: Dimensions.get("window").width - 60,
+        // borderBottomWidth: 80,
+        borderTopWidth: 36,
+        borderLeftColor: "transparent",
+        borderRightColor: "transparent",
+        borderTopColor: COLORS.primary,
+    },
+    modal_container: {
+        position: 'absolute',
+        top: 0,
+        left: 10,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: Dimensions.get('screen').width - 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 10,
+            height: 10,
+        },
+        shadowOpacity: 0.50,
+        shadowRadius: 6,
+        elevation: 5,
+    }
 })
 
 export default AssessmentScreen

@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import { COLORS } from '../Constants/theme';
 
 const CustomRadioButton = ({ selected, style, onPress }) => {
-    console.log(selected,onPress)
     return (
         <TouchableOpacity onPress={onPress}>
             <View style={[{
