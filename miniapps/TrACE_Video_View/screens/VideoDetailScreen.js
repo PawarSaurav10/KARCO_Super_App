@@ -6,10 +6,9 @@ import axios from 'axios';
 import moment from "moment"
 import RNFetchBlob from 'react-native-blob-util';
 import Header from '../../../Components/Header';
-import { PERMISSIONS, check, request, RESULTS, requestMultiple, checkMultiple, openSettings } from 'react-native-permissions';
+import { openSettings, checkMultiple, PERMISSIONS, check } from 'react-native-permissions';
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import CustomToast from '../../../Components/CustomToast';
-import { useIsFocused } from '../../../node_modules/@react-navigation/core';
 import NetInfo from "@react-native-community/netinfo";
 import NoInternetComponent from '../../../Components/NoInternetComponent';
 import { getURL } from "../../../baseUrl"
@@ -43,7 +42,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
     };
 
     useEffect(() => {
-        console.log("object4")
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
             setOrientation(
@@ -99,7 +97,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
     };
 
     useEffect(() => {
-        console.log("object3")
         getDirectoryList();
         const dim = Dimensions.get('screen');
         if (dim.height >= dim.width) {
@@ -108,7 +105,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
             setOrientation("landscape")
         }
         if (route.params.type === "Downloads") {
-            console.log("downloads called")
             RNFetchBlob.fs.readStream(route.params.data.path, 'utf8')
             RNFetchBlob.fs.readStream(route.params.data.path)
                 .then((stream) => {
@@ -116,9 +112,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 });
         }
         if (route.params.type !== "Downloads") {
-            console.log("not downloads called")
             CheckConnectivity()
             axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}&videoID=${route.params}`)
+
                 .then((res) => {
                     setVideoDetail(res.data.videos.data[0])
                     setIsLoading(false)
@@ -127,40 +123,71 @@ const VideoDetailScreen = ({ navigation, route }) => {
     }, [])
 
     const downloadFile = async () => {
+        const OsVer = Platform.constants['Release'];
         CheckConnectivity()
         // let fileExpired = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name && (moment.utc(moment.unix(xx.lastModified / 1000).format("YYYYMMDD")).local().startOf('hours').fromNow() <= "2 days")).length === 0
         let fileDownloaded = directory.filter((xx) => (xx.filename).slice(0, -4) === videoDetail.name).length > 0
         if (fileDownloaded === false) {
-            checkMultiple([PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-            PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE]).then((statuses) => {
-                if (statuses[PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE] === "denied" || statuses[PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE] === "denied") {
-                    setViewAlert({
-                        isShow: true,
-                        AlertType: "Permissions"
-                    })
-                } else {
-                    setToastHide(true)
-                    let dirs = RNFetchBlob.fs.dirs
-                    RNFetchBlob
-                        .config({
-                            fileCache: true,
-                            path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
-                            transform: true
-                        })
-                        .fetch('GET', `${videoDetail.originalFileURL}`)
-                        .then((res) => {
-                            setDownloaded("Yes")
+            if (OsVer > 12) {
+                check(PERMISSIONS.ANDROID.READ_MEDIA_VIDEO)
+                    .then((result) => {
+                        console.log(result);
+                        if (result === "granted") {
                             setToastHide(true)
-                            setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
-                        })
-                }
-            });
+                            let dirs = RNFetchBlob.fs.dirs
+                            RNFetchBlob
+                                .config({
+                                    fileCache: true,
+                                    path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
+                                    transform: true
+                                })
+                                .fetch('GET', `${videoDetail.originalFileURL}`)
+                                .then((res) => {
+                                    setDownloaded("Yes")
+                                    setToastHide(true)
+                                    setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
+                                })
+                        } else {
+                            setViewAlert({
+                                isShow: true,
+                                AlertType: "Permissions"
+                            })
+                        }
+                    });
+            } else {
+                checkMultiple(
+                    [PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+                    PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE])
+                    .then((statuses) => {
+                        console.log(statuses);
+                        if (statuses[PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE] === "denied" || statuses[PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE] === "denied") {
+                            setViewAlert({
+                                isShow: true,
+                                AlertType: "Permissions"
+                            })
+                        } else {
+                            setToastHide(true)
+                            let dirs = RNFetchBlob.fs.dirs
+                            RNFetchBlob
+                                .config({
+                                    fileCache: true,
+                                    path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
+                                    transform: true
+                                })
+                                .fetch('GET', `${videoDetail.originalFileURL}`)
+                                .then((res) => {
+                                    setDownloaded("Yes")
+                                    setToastHide(true)
+                                    setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
+                                })
+                        }
+                    });
+            }
 
         } else {
             setViewAlert(true)
         }
     }
-    
 
     return (
         <View style={{ flex: 1 }}>
@@ -181,7 +208,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         leftComponent={
                             <TouchableOpacity
                                 style={{ justifyContent: "flex-start", padding: 6, marginHorizontal: 12 }}
-                                onPress={() => navigation.replace(route.params.type !== "Downloads" ? "Video_Home" : "Downloads")}
+                                onPress={() =>
+                                    navigation.goBack()
+                                }
                             >
                                 <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                             </TouchableOpacity>
@@ -189,9 +218,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         title={route.params.type !== "Downloads" ? (videoDetail && ((videoDetail.name).slice(0, -4)).replace(/[^a-zA-Z0-9 ]+/g, " ")) : ((route.params.data.filename).slice(0, -8)).replace(/[^a-zA-Z0-9 ]+/g, " ")}
                     />
 
-                    <ScrollView
-                        contentInsetAdjustmentBehavior="automatic"
-                    >
+                    <ScrollView contentInsetAdjustmentBehavior="automatic">
                         <CustomVideoPlayer
                             contentType={route.params.type}
                             orientationType={orientation}

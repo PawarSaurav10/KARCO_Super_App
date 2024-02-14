@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
-
+import LinearGradient1 from "react-native-linear-gradient";
 
 const HomeScreen = () => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -155,7 +155,8 @@ const HomeScreen = () => {
 
                 axios.get(`${getURL.KPI_base_URL}/GetOverallPercByCompanyId?companyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
                     .then((res) => {
-                        setTotalPercentage(res.data)
+                        let percentage = res.data / 100
+                        setTotalPercentage(percentage)
                     })
 
                 axios.get(`${getURL.KPI_base_URL}/GetIndividualPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
@@ -172,7 +173,7 @@ const HomeScreen = () => {
                             RespColor: res.data.RespColor,
                             ResColor: res.data.ResColor,
                         })
-                        // setIsLoading(false)
+                        setIsLoading(false)
                     })
 
                 axios.get(`${getURL.KPI_base_URL}/GetTopBottomPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? 1 : 2}`)
@@ -240,12 +241,9 @@ const HomeScreen = () => {
             }
             return () => {
                 backHandler.remove();
-                setIsLoading(false)
             }
         }
-    }, [userLoginData, buttonType])
-
-    const Percentage = totalPercentage / 100
+    }, [userLoginData.companyId, buttonType])
 
     return (
         <SafeAreaView
@@ -274,28 +272,42 @@ const HomeScreen = () => {
                 }
                 {!isLoading &&
                     <View style={{ flex: 1 }}>
-                        <View style={{ backgroundColor: COLORS.white2 }}>
-                            <View style={{ margin: 10, flexDirection: "row" }}>
-                                <TouchableOpacity style={buttonType == "Overall" ? styles.active_circle_button : styles.circle_button}
-                                    onPress={() => {
-                                        CheckConnectivity()
-                                        setButtonType("Overall")
-                                        setSelectedDays("90 Days")
-                                        setPerformanceType("Top")
-                                        setIsLoading(true)
-                                    }}>
-                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: `${buttonType == "Overall" ? "#004C6B" : "#898B9A"}` }}>Overall</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={buttonType == "Monthly" ? styles.active_circle_button : styles.circle_button}
-                                    onPress={() => {
-                                        CheckConnectivity()
-                                        setButtonType("Monthly")
-                                        setSelectedDays("90 Days")
-                                        setPerformanceType("Top")
-                                        setIsLoading(true)
-                                    }}>
-                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: `${buttonType == "Monthly" ? "#004C6B" : "#898B9A"}` }}>Monthly</Text>
-                                </TouchableOpacity>
+                        <View style={{ zIndex: 50 }}>
+                            <LinearGradient1
+                                start={{ x: 0, y: 1 }}
+                                end={{ x: 0, y: 0 }}
+                                colors={[COLORS.transparent, COLORS.transparentBlack7]}
+                                style={{
+                                    position: "absolute",
+                                    top: 5,
+                                    left: 0,
+                                    right: 0,
+                                    height: 65,
+                                }}
+                            />
+                            <View style={{ backgroundColor: COLORS.white2, position: "relative" }}>
+                                <View style={{ margin: 10, flexDirection: "row", position: "relative" }}>
+                                    <TouchableOpacity style={buttonType == "Overall" ? styles.active_circle_button : styles.circle_button}
+                                        onPress={() => {
+                                            CheckConnectivity()
+                                            setButtonType("Overall")
+                                            setSelectedDays("90 Days")
+                                            setPerformanceType("Top")
+                                            setIsLoading(true)
+                                        }}>
+                                        <Text style={{ fontSize: 16, fontWeight: "bold", color: `${buttonType == "Overall" ? "#004C6B" : "#898B9A"}` }}>Overall</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={buttonType == "Monthly" ? styles.active_circle_button : styles.circle_button}
+                                        onPress={() => {
+                                            CheckConnectivity()
+                                            setButtonType("Monthly")
+                                            setSelectedDays("90 Days")
+                                            setPerformanceType("Top")
+                                            setIsLoading(true)
+                                        }}>
+                                        <Text style={{ fontSize: 16, fontWeight: "bold", color: `${buttonType == "Monthly" ? "#004C6B" : "#898B9A"}` }}>Monthly</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
                         <ScrollView>
@@ -305,20 +317,21 @@ const HomeScreen = () => {
                                 padding: 12,
                             }}>
                                 {/* Overall Progress Chart */}
-                                <View style={{ backgroundColor: "white", padding: 10, borderRadius: 10 }}>
-                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: "black", textAlign: "center" }}>{buttonType} Completion Status</Text>
+                                <View style={styles.card}>
+                                    <Text style={styles.graphTitle}>{buttonType} Completion Status</Text>
+                                    <View style={styles.graph_title_border} />
                                     <View style={{ flexDirection: "row", justifyContent: "center", margin: 10, alignItems: "center" }}>
                                         <View style={{ position: "absolute", zIndex: 10 }}>
-                                            <Text style={{ fontSize: 52, textAlign: "center", fontWeight: "bold", color: `${Percentage >= 0.7 ? "rgba(0,181,105,1)" : Percentage >= 0.5 ? "rgba(237,199,0,1)" : "rgba(255, 0, 0,1)"}` }}>{totalPercentage}
-                                                <Text style={{ fontSize: 36 }}>%</Text>
+                                            <Text style={{ fontSize: 44, textAlign: "center", fontWeight: "bold", color: `${totalPercentage >= 0.7 ? "rgba(0,181,105,1)" : totalPercentage >= 0.5 ? "rgba(237,199,0,1)" : "rgba(255, 0, 0,1)"}` }}>{totalPercentage * 100}
+                                                <Text style={{ fontSize: 30 }}>%</Text>
                                             </Text>
                                         </View>
                                         <View style={{ position: "relative" }}>
                                             <ProgressChart
                                                 data={{
-                                                    data: [Percentage],
+                                                    data: [totalPercentage],
                                                     colors: [
-                                                        `${Percentage >= 0.7 ? "rgba(0,181,105,1)" : Percentage >= 0.5 ? "rgba(237,199,0,1)" : "rgba(255, 0, 0,1)"}`,
+                                                        `${totalPercentage >= 0.7 ? "rgba(0,181,105,1)" : totalPercentage >= 0.5 ? "rgba(237,199,0,1)" : "rgba(255, 0, 0,1)"}`,
                                                     ],
                                                 }}
                                                 width={Dimensions.get('window').width / 2}
@@ -330,19 +343,20 @@ const HomeScreen = () => {
                                                 chartConfig={{
                                                     backgroundGradientFromOpacity: 0.5,
                                                     backgroundGradientToOpacity: 1,
-                                                    backgroundColor: "#FFFFFF",
-                                                    backgroundGradientFrom: "#FFFFFF",
-                                                    backgroundGradientTo: "#FFFFFF",
+                                                    backgroundColor: COLORS.white2,
+                                                    backgroundGradientFrom: COLORS.white2,
+                                                    backgroundGradientTo: COLORS.white2,
                                                     color: (opacity = 1, _index) => ` rgba(0, 0, 0, ${opacity})`,
                                                 }}
-                                                style={{ marginVertical: 8, borderRadius: 10, }} />
+                                                style={{ marginVertical: 8, borderRadius: 10 }} />
                                         </View>
                                     </View>
                                 </View>
 
                                 {/* Individual Completion Percentage Bar Graph */}
-                                <View style={{ backgroundColor: "white", padding: 10, borderRadius: 10, marginTop: 16 }}>
-                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: "black", textAlign: "left" }}>Individual {buttonType} Completion Percentage</Text>
+                                <View style={styles.card}>
+                                    <Text style={styles.graphTitle}>Individual {buttonType} Completion Percentage</Text>
+                                    <View style={styles.graph_title_border} />
                                     <View>
                                         <VictoryChart
                                             maxDomain={{ y: 100 }}
@@ -390,11 +404,11 @@ const HomeScreen = () => {
                                                     { quarter: "Responsive", earnings: OverAllData.RespAvg, color: OverAllData.ResColor }
                                                 ]}
                                                 labels={({ datum }) => `${parseFloat(datum.earnings).toFixed(0)}%`}
-                                                sortOrder="ascending"
                                                 animate={{
-                                                    duration: 1000,
-                                                    onLoad: { duration: 500 },
+                                                    duration: 1500,
+                                                    onLoad: { duration: 700 },
                                                 }}
+                                                sortOrder="ascending"
                                                 x="quarter" y="earnings"
                                                 cornerRadius={{ top: 4 }}
                                                 barWidth={18}
@@ -414,43 +428,50 @@ const HomeScreen = () => {
                                 </View>
 
                                 {/* Top / Bottom Performers  */}
-                                <View style={{ backgroundColor: "white", padding: 10, borderRadius: 10, marginTop: 16 }}>
-                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: "black", textAlign: "left" }}>{buttonType} Top / Bottom Performers At Present</Text>
+                                <View style={styles.card}>
+                                    <Text style={styles.graphTitle}>{buttonType} Top / Bottom Performers At Present</Text>
+                                    <View style={styles.graph_title_border} />
                                     <View style={{ marginVertical: 12, flexDirection: "row" }}>
-                                        <TouchableOpacity style={[performanceType == "Top" ? styles.active_circle_button : styles.circle_button, { flexDirection: "row", alignItems: "center" }]}
+                                        <TouchableOpacity style={[performanceType == "Top" ? styles.active_circle_button : styles.circle_button]}
                                             onPress={() => {
                                                 setPerformanceType("Top")
                                             }}>
                                             <Image source={images.top_icon} style={{ width: 16, height: 16, marginRight: 4 }} />
-                                            <Text style={{ fontSize: 16, fontWeight: "bold", color: `${performanceType == "Top" ? "#00b569" : "#898B9A"}` }}>Top Performers</Text>
+                                            <Text style={{ fontSize: 16, fontWeight: "bold", color: `${performanceType == "Top" ? "#00b569" : "#898B9A"}` }}>
+                                                Top Performers
+                                            </Text>
                                         </TouchableOpacity>
-                                        <TouchableOpacity style={[performanceType == "Bottom" ? styles.active_circle_button : styles.circle_button, { flexDirection: "row", alignItems: "center" }]}
+                                        <TouchableOpacity style={[performanceType == "Bottom" ? styles.active_circle_button : styles.circle_button]}
                                             onPress={() => {
                                                 setPerformanceType("Bottom")
                                             }}>
                                             <Image source={images.down_arrow_icon} style={{ width: 16, height: 16, marginRight: 4 }} />
-                                            <Text style={{ fontSize: 16, fontWeight: "bold", color: `${performanceType == "Bottom" ? "#ff0000" : "#898B9A"}` }}>Bottom Performers</Text>
+                                            <Text style={{ fontSize: 16, fontWeight: "bold", color: `${performanceType == "Bottom" ? "#ff0000" : "#898B9A"}` }}>
+                                                Bottom Performers
+                                            </Text>
                                         </TouchableOpacity>
                                     </View>
                                     <View>
                                         {performanceType === "Top" && topPerformance.map((aa, idx) => (
-                                            <View key={idx} style={{ borderColor: Colors.lighter, borderRadius: 6, padding: 6, margin: 4, borderWidth: 2, flexDirection: "row", alignItems: "center" }}>
-                                                <Image source={images.up_arrow_icon} style={{ marginRight: 8, width: 20, height: 20 }} />
-                                                <Text style={{ fontSize: 16, fontWeight: "bold", color: "#004C6B" }}>{aa}</Text>
+                                            <View key={idx} style={styles.top_bottom_performer_card}>
+                                                <Image source={images.up_arrow_icon} style={styles.top_bottom_performer_icon} />
+                                                <Text style={styles.top_bottom_performer_text}>{aa}</Text>
                                             </View>
                                         ))}
                                         {performanceType === "Bottom" && bottomPerformance.map((aa, idx) => {
                                             return (
                                                 <View key={idx}>
                                                     {aa !== "No record exist" ? (
-                                                        <View style={{ borderColor: Colors.lighter, borderRadius: 6, padding: 6, margin: 4, borderWidth: 2, flexDirection: "row", alignItems: "center" }}>
-                                                            {aa !== "No record exist" && <Image source={images.double_down_arrow_icon} style={{ marginRight: 8, width: 20, height: 20 }} />}
-                                                            <Text style={{ fontSize: 16, fontWeight: "bold", color: "#004C6B" }}>{aa}</Text>
+                                                        <View style={styles.top_bottom_performer_card}>
+                                                            {aa !== "No record exist" &&
+                                                                <Image source={images.double_down_arrow_icon} style={styles.top_bottom_performer_icon} />
+                                                            }
+                                                            <Text style={styles.top_bottom_performer_text}>{aa}</Text>
                                                         </View>
                                                     ) : (
                                                             <View style={{ padding: 6, margin: 4, alignItems: "center", justifyContent: "center" }}>
-                                                                <Image source={images.empty_box_icon} style={{ width: 40, height: 40, marginBottom: 8 }} />
-                                                                <Text style={{ fontSize: 16, fontWeight: "bold", color: "#004C6B" }}>{aa}</Text>
+                                                                <Image source={images.empty_box_icon} style={styles.top_bottom_performer_icon} />
+                                                                <Text style={styles.top_bottom_performer_text}>{aa}</Text>
                                                             </View>
                                                         )
                                                     }
@@ -461,10 +482,13 @@ const HomeScreen = () => {
                                 </View>
 
                                 {/* Training Summary Line and Scatter Graph */}
-                                <View style={{ backgroundColor: "white", padding: 10, borderRadius: 10, marginTop: 16, flex: 1 }}>
-                                    <View style={{ flexDirection: "row", flex: 1, justifyContent: "space-between", alignItems: "center" }}>
+                                <View style={styles.card}>
+                                    <View style={{ flexDirection: "row", flex: 1, justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                                         <View style={{ flex: 0.6 }}>
-                                            <Text style={{ fontSize: 16, fontWeight: "bold", color: "black", textAlign: "left" }}>Training Summary Over The Last</Text>
+                                            <Text style={{ fontSize: 20, fontWeight: "bold", color: COLORS.primary, textAlign: "left", marginBottom: 6 }}>
+                                                Training Summary Over The Last
+                                            </Text>
+                                            <View style={{ width: 120, borderBottomWidth: 2.5, alignSelf: "flex-start", borderColor: COLORS.gray2 }} />
                                         </View>
                                         <View style={{ flex: 0.4, alignItems: "flex-end" }}>
                                             <SelectDropdown
@@ -543,18 +567,17 @@ const HomeScreen = () => {
                                                 data={selectedDays === "30 Days" ? day30LineData : selectedDays === "60 Days" ? day60LineData : selectedDays === "90 Days" ? day90LineData : day90LineData}
                                                 x="date" y="value"
                                                 interpolation="natural"
-                                                animate={{
-                                                    duration: 3000,
-                                                    onLoad: { duration: 2000 },
-
-                                                }}
+                                            // animate={{
+                                            //     duration: 1000,
+                                            //     onLoad: { duration: 500 },
+                                            // }}
                                             />
                                             <VictoryScatter
                                                 name="scatter"
-                                                animate={{
-                                                    duration: 3000,
-                                                    onLoad: { duration: 2000 },
-                                                }}
+                                                // animate={{
+                                                //     duration: 1200,
+                                                //     onLoad: { duration: 700 },
+                                                // }}
                                                 style={{ data: { fill: "#c43a31" } }}
                                                 size={6}
                                                 x="date"
@@ -567,8 +590,9 @@ const HomeScreen = () => {
                                 </View>
 
                                 {/* Training Due / Overdue Bar Graph */}
-                                <View style={{ backgroundColor: "white", padding: 10, borderRadius: 10, marginTop: 16 }}>
-                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: "black", textAlign: "left" }}>Training Due / Overdue Days</Text>
+                                <View style={styles.card}>
+                                    <Text style={styles.graphTitle}>Training Due / Overdue Days</Text>
+                                    <View style={styles.graph_title_border} />
                                     <View>
                                         <VictoryChart
                                             maxDomain={{ y: 100 }}
@@ -642,13 +666,31 @@ const HomeScreen = () => {
 
                                 {/* Import & Export Days */}
                                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                                    <View style={{ backgroundColor: "#003140", padding: 8, borderRadius: 10, marginTop: 16, flex: 1, marginRight: 10 }}>
+                                    <View style={{
+                                        backgroundColor: "#003140", padding: 8, borderRadius: 10, marginTop: 16, flex: 1, marginRight: 10, shadowColor: '#000',
+                                        shadowOffset: {
+                                            width: 0,
+                                            height: 6,
+                                        },
+                                        shadowOpacity: 0.25,
+                                        shadowRadius: 10,
+                                        elevation: 8,
+                                    }}>
                                         <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", textAlign: "left" }}>Days Since Last Import</Text>
                                         <Text style={{ marginVertical: 12, fontSize: 28, fontWeight: "bold", color: importExportData.ImportColor }}>
                                             {importExportData.ImportDays}
                                         </Text>
                                     </View>
-                                    <View style={{ backgroundColor: "#003140", padding: 8, borderRadius: 10, marginTop: 16, flex: 1 }}>
+                                    <View style={{
+                                        backgroundColor: "#003140", padding: 8, borderRadius: 10, marginTop: 16, flex: 1, shadowColor: '#000',
+                                        shadowOffset: {
+                                            width: 0,
+                                            height: 6,
+                                        },
+                                        shadowOpacity: 0.25,
+                                        shadowRadius: 6,
+                                        elevation: 6,
+                                    }}>
                                         <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", textAlign: "left" }}>Days Since Last Export</Text>
                                         <Text style={{ marginVertical: 12, fontSize: 28, fontWeight: "bold", color: importExportData.ExportColor }}>
                                             {importExportData.ExportDays}
@@ -707,34 +749,76 @@ const HomeScreen = () => {
 }
 
 const styles = StyleSheet.create({
+    card: {
+        marginVertical: 10,
+        backgroundColor: COLORS.white2,
+        borderWidth: 1,
+        borderColor: COLORS.lightGray1,
+        padding: 10,
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 6,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 10,
+        elevation: 8,
+    },
+    graphTitle: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: COLORS.primary,
+        textAlign: "center",
+        marginBottom: 6
+    },
     circle_button: {
         margin: 4,
         padding: 4,
+        flexDirection: "row",
+        alignItems: "center"
     },
     active_circle_button: {
         borderColor: "#004C6B",
         borderBottomWidth: 2,
         margin: 4,
         padding: 4,
+        flexDirection: "row",
+        alignItems: "center"
     },
-    dropdown2RowStyle: { borderBottomColor: '#C5C5C5', height: 30 },
+    graph_title_border: {
+        width: 120,
+        borderBottomWidth: 2.5,
+        alignSelf: "center",
+        borderColor: COLORS.gray2
+    },
+    dropdown2RowStyle: {
+        borderBottomColor: '#C5C5C5',
+        height: 30
+    },
     dropdown2RowTxtStyle: {
         textAlign: 'center',
         fontSize: 14,
     },
-    elevation: {
-        elevation: 20,
-        shadowColor: '#52006A',
+    top_bottom_performer_card: {
+        borderColor: Colors.lighter,
+        borderRadius: 6,
+        padding: 6,
+        margin: 4,
+        borderWidth: 2,
+        flexDirection: "row",
+        alignItems: "center"
     },
-    shadowProp: {
-        shadowColor: COLORS.white,
-        shadowOffset: {
-            width: 120,
-            height: 120
-        },
-        shadowRadius: 120,
-        shadowOpacity: 1.0
+    top_bottom_performer_icon: {
+        marginRight: 8,
+        width: 20,
+        height: 20
     },
+    top_bottom_performer_text: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: COLORS.primary
+    }
 })
 
 export default HomeScreen

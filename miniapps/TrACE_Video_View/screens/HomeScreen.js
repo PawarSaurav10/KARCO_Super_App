@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, Image, FlatList, ActivityIndicator, BackHandler, Dimensions, ScrollView, } from 'react-native'
-import { COLORS, SIZES } from '../../../Constants/theme';
+import { COLORS } from '../../../Constants/theme';
 import axios from 'axios';
 import CustomSearch from '../../../Components/CustomSearch';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
@@ -10,7 +10,6 @@ import { getURL } from "../../../baseUrl"
 import VideoListView from '../../../Components/VideoListView';
 import NoDataFound from '../../../Components/NoDataFound';
 import images from '../../../Constants/images';
-import LinearGradient from "react-native-linear-gradient";
 
 const HomeScreen = (props) => {
     const navigation = useNavigation();
@@ -21,7 +20,7 @@ const HomeScreen = (props) => {
     const [searchedVideoData, setSearchedVideoData] = useState([])
     const [searchedVideo, setSearchedVideo] = useState("")
     const [orientation, setOrientation] = useState()
-    const [viewShadow, setViewShadow] = useState(false)
+    const [connected, setConnected] = useState(null)
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -51,9 +50,11 @@ const HomeScreen = (props) => {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
                     setIsView(false)
+                    setConnected(true)
                 } else {
                     setIsLoading(false)
                     setIsView(true)
+                    setConnected(false)
                 }
             });
         } else {
@@ -162,7 +163,7 @@ const HomeScreen = (props) => {
                         </View>
                     </View>
 
-                    <View style={{ flex: 1, marginBottom: orientation === "landscape" ? 110 : 0, position: "relative" }}>
+                    <View style={{ flex: 1, marginBottom: orientation === "landscape" ? 110 : 0 }}>
                         {/* Search Input */}
                         {!isView &&
                             <View style={{ margin: 8, padding: 8, }}>
@@ -176,10 +177,9 @@ const HomeScreen = (props) => {
                                 />
                             </View >
                         }
-
-                        <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }}>
-                            <View style={{ flex: 1 }}>
-                                {!isView &&
+                        {!isView &&
+                            <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }}>
+                                <View style={{ flex: 1 }}>
                                     <View style={{ flex: 1, marginHorizontal: 6 }}>
                                         {!searchedVideo &&
                                             <FlatList
@@ -225,15 +225,14 @@ const HomeScreen = (props) => {
                                             />
                                         }
                                         {searchedVideo && searchedVideoData && searchedVideoData.length === 0 &&
-                                            <View style={{ flex: 1, justifyContent: "center", backgroundColor: "red", marginBottom: 70 }}>
+                                            <View style={{ flex: 1, justifyContent: "center", marginBottom: 70 }}>
                                                 <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
                                             </View>
                                         }
                                     </View>
-                                }
-                            </View>
-                        </ScrollView>
-
+                                </View>
+                            </ScrollView>
+                        }
                         {isView === true && (
                             <NoInternetComponent />
                         )}

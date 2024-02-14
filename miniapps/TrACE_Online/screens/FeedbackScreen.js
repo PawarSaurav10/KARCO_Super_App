@@ -894,37 +894,10 @@ const FeedbackScreen = ({ navigation, route }) => {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        // backgroundColor: '#98B3B7',
-        justifyContent: 'center',
-
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
     headerText: {
         color: COLORS.primary,
         fontSize: 20,
         fontWeight: "bold"
-    },
-    noteHeader: {
-        backgroundColor: '#42f5aa',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderTopLeftRadius: 50,
-        borderTopRightRadius: 50,
-    },
-    footer: {
-        flex: 1,
-        backgroundColor: Colors.lighter,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 10,
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
     },
     textInput: {
         alignSelf: 'stretch',

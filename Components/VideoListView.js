@@ -122,10 +122,14 @@ const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, i
 
 const styles = StyleSheet.create({
     shadowProp: {
-        shadowColor: 'red',
-        shadowOffset: { width: 10, height: 40 },
-        shadowOpacity: 1,
-        shadowRadius: 3,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 6,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 10,
+        elevation: 6,
     },
     elevation: {
         elevation: 20,

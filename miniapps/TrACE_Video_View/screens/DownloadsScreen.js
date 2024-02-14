@@ -3,7 +3,7 @@ import { View, TouchableOpacity, FlatList, Image, ActivityIndicator, Dimensions,
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import Header from '../../../Components/Header';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
-import { COLORS, SIZES } from '../../../Constants/theme';
+import { COLORS } from '../../../Constants/theme';
 import NoDataFound from '../../../Components/NoDataFound';
 import VideoListView from '../../../Components/VideoListView';
 import CustomSearch from '../../../Components/CustomSearch';
@@ -115,7 +115,7 @@ const DownloadsScreen = (props) => {
             }
 
             {!isLoading &&
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, marginBottom: props.ScreenName === "Downloads" ? Dimensions.get("window").height - (Dimensions.get("window").height - (orientation === "landscape" ? 110 : 60)) : 0 }}>
                     {directory.length > 0 &&
                         <View style={{ margin: 6, padding: 8 }}>
                             <CustomSearch
@@ -128,52 +128,56 @@ const DownloadsScreen = (props) => {
                             />
                         </View>
                     }
-                    <View style={{ flex: 1, marginHorizontal: 6, padding: 6 }}>
-                        {!searchedVideo && directory.length > 0 &&
-                            <FlatList
-                                data={directory}
-                                keyExtractor={item => item.filename}
-                                renderItem={({ item, index }) => (
-                                    <VideoListView
-                                        videoName={item.filename}
-                                        createdDate={item.lastModified}
-                                        listType={"Downloads"}
-                                        item={item}
-                                        onDelete={deleteFile}
-                                        orientationType={orientation}
-                                    />
-                                )}
-                            />
-                        }
+                    <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }}>
+                        {/* <View style={{ flex: 1 }}> */}
+                        <View style={{ flex: 1, marginHorizontal: 6, padding: 6 }}>
+                            {!searchedVideo && directory.length > 0 &&
+                                <FlatList
+                                    data={directory}
+                                    keyExtractor={item => item.filename}
+                                    renderItem={({ item, index }) => (
+                                        <VideoListView
+                                            videoName={item.filename}
+                                            createdDate={item.lastModified}
+                                            listType={"Downloads"}
+                                            item={item}
+                                            onDelete={deleteFile}
+                                            orientationType={orientation}
+                                        />
+                                    )}
+                                />
+                            }
 
-                        {!searchedVideo && directory.length === 0 &&
-                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                <NoDataFound title={"No Data Available"} desc="Please Download Videos to view Downloaded Videos." imageType="NoData" />
-                            </View>
-                        }
+                            {!searchedVideo && directory.length === 0 &&
+                                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                    <NoDataFound title={"No Data Available"} desc="Please Download Videos to view Downloaded Videos." imageType="NoData" />
+                                </View>
+                            }
 
-                        {searchedVideo && searchedVideoData && searchedVideoData.length > 0 &&
-                            <FlatList
-                                data={searchedVideoData}
-                                keyExtractor={item => item.filename}
-                                renderItem={({ item, index }) => (
-                                    <VideoListView
-                                        videoName={item.filename}
-                                        createdDate={item.lastModified}
-                                        listType={"Downloads"}
-                                        item={item}
-                                        onDelete={deleteFile}
-                                    />
-                                )}
-                            />
-                        }
+                            {searchedVideo && searchedVideoData && searchedVideoData.length > 0 &&
+                                <FlatList
+                                    data={searchedVideoData}
+                                    keyExtractor={item => item.filename}
+                                    renderItem={({ item, index }) => (
+                                        <VideoListView
+                                            videoName={item.filename}
+                                            createdDate={item.lastModified}
+                                            listType={"Downloads"}
+                                            item={item}
+                                            onDelete={deleteFile}
+                                        />
+                                    )}
+                                />
+                            }
 
-                        {searchedVideo && searchedVideoData.length === 0 &&
-                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginVertical: orientation === "landscape" ? 0 : 110 }}>
-                                <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
-                            </View>
-                        }
-                    </View>
+                            {searchedVideo && searchedVideoData.length === 0 &&
+                                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginVertical: orientation === "landscape" ? 0 : 110 }}>
+                                    <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
+                                </View>
+                            }
+                        </View>
+                        {/* </View> */}
+                    </ScrollView>
                 </View>
             }
 

@@ -386,7 +386,6 @@ const AssessmentScreen = ({ navigation, route }) => {
                     <View style={{ flex: 1 }}>
                         {questionToShow !== null &&
                             <ScrollView style={{ flex: 1 }} contentInsetAdjustmentBehavior="automatic">
-
                                 <View style={{ backgroundColor: "white", padding: 14 }}>
                                     {/* <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: COLORS.blue }}> */}
                                     {/* <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

@@ -48,6 +48,8 @@ const delete_icon = require("../Images/trash.png")
 const up_arrow_icon = require("../Images/up-arrow.png")
 const welcome_trace_gif = require("../Images/welcome_trace.gif")
 const view_icon = require("../Images/show.png")
+const certificate_icon = require("../Images/certificate.png")
+const certificate_black_icon = require("../Images/certificate_black.png")
 
 export default {
     arrow_down_icon,
@@ -99,5 +101,7 @@ export default {
     delete_icon,
     up_arrow_icon,
     welcome_trace_gif,
-    view_icon
+    view_icon,
+    certificate_icon,
+    certificate_black_icon
 }

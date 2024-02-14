@@ -11,7 +11,8 @@ const GridViewCard = ({ VideoName, VideoCategory, CourseNo, onPress, isVideoComp
         <TouchableOpacity
             onPress={onPress}
             style={[styles.video_card_container, styles.borderRadius, {
-                width: orientationType === "landscape" ? Dimensions.get("screen").width / 4.35 : Dimensions.get('window').width / 2.2, shadowColor: '#000',
+                width: orientationType === "landscape" ? Dimensions.get("screen").width / 4.35 : Dimensions.get('window').width / 2.2,
+                shadowColor: '#000',
                 shadowOffset: {
                     width: 0,
                     height: 6,
@@ -75,10 +76,18 @@ const GridViewCard = ({ VideoName, VideoCategory, CourseNo, onPress, isVideoComp
                     borderBottomLeftRadius: 10,
                     borderBottomRightRadius: 10,
                     paddingVertical: 4,
-                    backgroundColor: Status === "Expired" ? "#edc700" : Status === "Completed" ? "#00b569" : Status === "Pending" ? "#ff0000" : "", justifyContent: "center", alignItems: "center"
+                    backgroundColor: Status === "Expired" ? "#edc700" :
+                        Status === "Completed" ? "#00b569" :
+                            Status === "Pending" ? "#ff0000" :
+                                "",
+                    justifyContent: "center",
+                    alignItems: "center"
                 }}>
                     <Text style={{ fontSize: 12, fontWeight: 700, color: COLORS.white }}>
-                        {Status === "Expired" ? "Expired" : Status === "Completed" ? "Completed" : Status === "Pending" ? "Pending" : ""}
+                        {Status === "Expired" ? "Expired" :
+                            Status === "Completed" ? "Completed" :
+                                Status === "Pending" ? "Pending" :
+                                    ""}
                     </Text>
                 </View>
             )}
@@ -100,16 +109,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         backgroundColor: "white",
         flexDirection: "column"
-    },
-    shadowProp: {
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.30,
-        shadowRadius: 8,
-        shadowColor: COLORS.lightGray1,
-        elevation: 8,
     },
 })
 

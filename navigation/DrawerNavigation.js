@@ -225,29 +225,16 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                                 }}
                             />
 
-                            {/* <CustomDrawerItem
-                                label="Settings"
-                                icon={SettingsIcon}
-                                onPress={() => {
-                                    navigation.closeDrawer();
-                                }}
-                            /> */}
-
-                            {/* <CustomDrawerItem
-                                label="Help Center"
-                                icon={SupportIcon}
-                                onPress={() => {
-                                    navigation.closeDrawer();
-                                }}
-                            /> */}
-
-                            {/* <CustomDrawerItem
-                                label="FAQ"
-                                icon={FAQIcon}
-                                onPress={() => {
-                                    navigation.closeDrawer();
-                                }}
-                            /> */}
+                            {appName === "TrACE Online" &&
+                                <CustomDrawerItem
+                                    label="Certificates"
+                                    icon={images.certificate_icon}
+                                    onPress={() => {
+                                        navigation.navigate("Certificates");
+                                        navigation.closeDrawer();
+                                    }}
+                                />
+                            }
                         </View>
 
                         <View>
@@ -290,7 +277,6 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                                 />
                             }
 
-
                             {/* Line Divider */}
                             <View
                                 style={{
@@ -301,36 +287,21 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                                 }}
                             />
 
-                            {/* <CustomDrawerItem
-                                label="Settings"
-                                icon={SettingsIcon}
-                                onPress={() => {
-                                    navigation.closeDrawer();
-                                }}
-                            /> */}
-
-                            {/* <CustomDrawerItem
-                                label="Help Center"
-                                icon={SupportIcon}
-                                onPress={() => {
-                                    navigation.closeDrawer();
-                                }}
-                            /> */}
-
-                            {/* <CustomDrawerItem
-                                label="FAQ"
-                                icon={FAQIcon}
-                                onPress={() => {
-                                    navigation.closeDrawer();
-                                }}
-                            /> */}
+                            {appName === "TrACE Online" &&
+                                <CustomDrawerItem
+                                    label="Certificates"
+                                    icon={images.certificate_black_icon}
+                                    isFocused={selectedTab == "Certificates"}
+                                    onPress={() => {
+                                        navigation.navigate("Certificates");
+                                        setSelectedTab("Certificates");
+                                        navigation.closeDrawer();
+                                    }}
+                                />
+                            }
                         </View>
 
-                        <View
-                        // style={{
-                        //   // marginBottom: SIZES.height > 800 ? SIZES.padding : 0,
-                        // }}
-                        >
+                        <View>
                             <CustomDrawerItem
                                 label={"Logout"}
                                 icon={images.logout_icon}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, TouchableOpacity, Image } from 'react-native'
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
 import { COLORS } from '../Constants/theme';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 import moment from "moment"
@@ -11,16 +11,7 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
 
     return (
         <TouchableOpacity
-            style={{
-                padding: 8, marginVertical: 6, borderWidth: 1, borderRadius: 10, borderColor: COLORS.lightGray1, backgroundColor: "white", shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 6,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 6,
-                elevation: 4,
-            }}
+            style={styles.card_container}
             onPress={onPress}
         >
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1 }}>
@@ -33,9 +24,9 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
                                 setPosterImage("https://testtrace.karco.in/videos/poster/default.jpg")
                             }} />
                     </View>
-                    <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, marginRight: 6 }}>
                         <View style={{ alignSelf: "flex-start", marginBottom: 6 }}>
-                            <View style={{ justifyContent: "center", alignItems: "center", borderColor: COLORS.lightBlue, borderWidth: 1, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 20, }}>
+                            <View style={styles.course_No_container}>
                                 <Text style={{ fontSize: 12, fontWeight: "bold", color: COLORS.lightBlue1 }}>{CourseNo}</Text>
                             </View>
                         </View>
@@ -104,5 +95,33 @@ const ListViewCard = ({ VideoName, VideoCategory, CourseNo, TimeLeft, onPress, P
         </TouchableOpacity>
     )
 }
+
+const styles = StyleSheet.create({
+    card_container: {
+        padding: 8,
+        marginVertical: 6,
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: COLORS.lightGray1,
+        backgroundColor: "white",
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 6,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 6,
+        elevation: 4,
+    },
+    course_No_container: {
+        justifyContent: "center",
+        alignItems: "center",
+        borderColor: COLORS.lightBlue,
+        borderWidth: 1,
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        borderRadius: 20,
+    }
+})
 
 export default ListViewCard

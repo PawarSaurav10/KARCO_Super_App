@@ -14,6 +14,8 @@ import { getURL } from "../../../baseUrl"
 import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
+import RNFetchBlob from 'react-native-blob-util';
+import { checkMultiple, PERMISSIONS } from '../../../node_modules/react-native-permissions';
 
 const VideoDetailScreen = ({ navigation, route }) => {
     const webViewRef = useRef(null);
@@ -146,7 +148,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
     // };
 
     const togglePlayPause = () => {
-        console.log("object");
         const apiKey = route.params.item.videokeypromo;
         const runFirst = `
             document.body.style.backgroundColor = 'red';
@@ -164,6 +165,36 @@ const VideoDetailScreen = ({ navigation, route }) => {
         `;
         webViewRef.current.injectJavaScript(runFirst)
     };
+
+    const downloadFile = async () => {
+        CheckConnectivity()
+        checkMultiple([PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+        PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE]).then((statuses) => {
+            // if (statuses[PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE] === "denied" || statuses[PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE] === "denied") {
+            //     setViewAlert({
+            //         isShow: true,
+            //         AlertType: "Permissions"
+            //     })
+            // } else {
+            // setToastHide(true)
+            // let dirs = RNFetchBlob.fs.dirs
+            // RNFetchBlob.fs.appendFile(dirs.DownloadDir + `/${"testcertificate.pdf"}`, 'foo', 'utf8')
+            //     .then((res) => { })
+            RNFetchBlob
+                .config({
+                    fileCache: true,
+                    path: dirs.DownloadDir + `/${"testcertificate.pdf"}`,
+                    transform: true
+                })
+                .fetch('GET', `https://testtrace.karco.in/Certificate/Online_2755/Mobile%20Testing_8_12-02-2024_Certificate.pdf`)
+                .then((res) => {
+                    console.log(res,"res");
+                    // setDownloaded("Yes")
+                    // setToastHide(true)
+                    // setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
+                })
+        });
+    }
 
     return (
         <View style={{ flex: 1 }}>
@@ -200,7 +231,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         // mediaPlaybackRequiresUserAction={true}
                                         startInLoadingState={<ActivityIndicator />}
                                         minimumFontSize={12}
-                                        // injectJavaScript={true}
+                                    // injectJavaScript={true}
                                     // onLoad={runSpotlightrAPI}
                                     // injectedJavaScript={`
                                     //     function togglePlay() {
@@ -395,6 +426,26 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         onPress={() => {
                                             CheckConnectivity()
                                             navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
+                                        }}
+                                        containerStyle={{
+                                            backgroundColor: COLORS.darkBlue,
+                                            width: "100%",
+                                            padding: 16,
+                                            alignItems: "center",
+                                            borderRadius: 5,
+                                        }}
+                                        iconStyle={{ marginRight: 6 }}
+                                    />
+                                }
+
+                                {route.params.item.AssessmentStatus == "Completed" &&
+                                    <CustomIconButton
+                                        label={"Download Certificate"}
+                                        icon={images.downloading_icon}
+                                        onPress={() => {
+                                            CheckConnectivity()
+                                            downloadFile()
+                                            // navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
                                         }}
                                         containerStyle={{
                                             backgroundColor: COLORS.darkBlue,

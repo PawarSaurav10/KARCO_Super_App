@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from "../screens/HomeScreen"
 import LoginScreen from '../../../MainAppScreens/LoginScreen';
 import VideoDetailScreen from '../screens/VideoDetailScreen';
 import AssessmentScreen from '../screens/AssessmentScreen';
@@ -10,6 +8,7 @@ import ViewAllScreen from '../screens/ViewAllScreen';
 const Online = createStackNavigator();
 import { getOnlineScreenVisited } from "../../../Utils/getScreenVisisted"
 import DrawerNavigation from '../../../navigation/DrawerNavigation';
+import CertificatesScreen from '../screens/CertificatesScreen';
 
 const OnlineNavigation = ({ route }) => {
     const [initialRoute, setInitialRoute] = useState()
@@ -42,6 +41,7 @@ const OnlineNavigation = ({ route }) => {
                     <Online.Screen name={"AssessmentNew"} component={AssessmentScreen} />
                     <Online.Screen name={"Feedback Form"} component={FeedbackScreen} />
                     <Online.Screen name={"View All"} component={ViewAllScreen} />
+                    <Online.Screen name={"Certificates"} component={CertificatesScreen} />
                 </Online.Navigator>
             )}
         </>

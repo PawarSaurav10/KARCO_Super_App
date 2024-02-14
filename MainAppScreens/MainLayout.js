@@ -36,7 +36,6 @@ const TabButton = ({
     onPress,
     textContainerStyle
 }) => {
-    console.log(textContainerStyle, "textContainerStyle")
     return (
         <TouchableWithoutFeedback onPress={onPress}>
             <Animated.View
@@ -258,6 +257,7 @@ const MainLayout = ({
                         {appName === "KARCO Videos" &&
                             <>
                                 <FlatList
+                                    nestedScrollEnabled={true}
                                     ref={flatListRef}
                                     horizontal={orientation === "landscape" ? false : true}
                                     scrollEnabled={false}

@@ -18,7 +18,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '../../../Constants/theme';
 import CustomSearch from '../../../Components/CustomSearch';
-import { getUserData, getScreenVisited, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
+import {  getScreenVisited, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
 import axios from 'axios';
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import NoDataFound from '../../../Components/NoDataFound';
@@ -30,9 +30,6 @@ import NetInfo from "@react-native-community/netinfo";
 import _ from "lodash"
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
-import * as Progress from 'react-native-progress';
-import { CountdownCircleTimer } from '../../../node_modules/react-native-countdown-circle-timer/lib';
-import moment from "moment"
 import InProgressCard from '../../../Components/InProgressCard';
 
 const HomePage = (props) => {
@@ -59,38 +56,11 @@ const HomePage = (props) => {
         isShow: false,
         AlertType: ""
     })
-
     const [assessmentData, setAssessmentData] = useState(null)
-    const [reversedArray, setReversedArray] = useState()
-
-    async function fetchOnlineAssessmentData() {
-        if (userLoginData.userId !== null) {
-            await axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment`, {
-                params: {
-                    VideoId: revArray[0].Id,
-                    username: userLoginData.userId,
-                    password: revArray[0].Password,
-                    CrewId: userLoginData.crewId,
-                    VesselId: userLoginData.vesselId,
-                }
-            }).then((res) => {
-                setAssessmentData(res.data)
-            }).catch((error) => {
-                throw error
-            })
-        }
-    }
-
-
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
         return dim.height >= dim.width;
-    };
-
-    const isLandscape = () => {
-        const dim = Dimensions.get('screen');
-        return dim.width >= dim.height;
     };
 
     useEffect(() => {
@@ -168,6 +138,25 @@ const HomePage = (props) => {
         }
     }
 
+    async function fetchOnlineAssessmentData() {
+        if (userLoginData.userId !== null) {
+            await axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment`, {
+                params: {
+                    VideoId: revArray[0].Id,
+                    username: userLoginData.userId,
+                    password: revArray[0].Password,
+                    CrewId: userLoginData.crewId,
+                    VesselId: userLoginData.vesselId,
+                }
+            }).then((res) => {
+                setAssessmentData(res.data)
+                // setIsLoading(false)
+            }).catch((error) => {
+                throw error
+            })
+        }
+    }
+
     const onRefresh = async () => {
         setIsLoading(true);
         fetchData()
@@ -207,7 +196,6 @@ const HomePage = (props) => {
             return () => {
                 backHandler.remove();
                 setVideoData([])
-                setIsLoading(false)
             }
         }
     }, [userLoginData, isFocused])
@@ -251,8 +239,10 @@ const HomePage = (props) => {
     // let remainingSeconds = moment(reversedArray[0].TimeLeft, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds')
 
     useEffect(() => {
-        fetchOnlineAssessmentData()
-    }, [revArray,qusetionAnswered])
+        if (ShowContinueAssessmentSection) {
+            fetchOnlineAssessmentData()
+        }
+    }, [revArray])
 
     let qusetionAnswered = assessmentData && assessmentData ?.QuestionList.length - assessmentData ?.QStatusNCount;
     let totalQuestion = assessmentData && assessmentData ?.QuestionList.length;
@@ -313,67 +303,6 @@ const HomePage = (props) => {
                             }}
                         />
                     </View>
-                    {ShowContinueAssessmentSection && revArray.length > 0 &&
-                        <View>
-                            <View style={[styles.section_header_container, { marginVertical: 8 }]}>
-                                <Text style={{ fontSize: 18, fontWeight: "700", color: COLORS.primary }}>Lift-Off ! Submit your work</Text>
-                            </View>
-                            <InProgressCard
-                                VideoCategory={revArray[0].Category}
-                                VideoId={revArray[0].Id}
-                                VideoName={revArray[0].VideoName}
-                                videoPassword={revArray[0].Password}
-                                remainingTime={revArray[0].TimeLeft}
-                                userLoginData={userLoginData}
-                                NoOfQuestionAnswered={qusetionAnswered}
-                                // ProgressNo={progress}
-                                Percentage={percentage}
-                                TotalQuestion={totalQuestion} />
-                        </View>
-                    }
-
-                    <View style={{ margin: 4, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                        <Pressable
-                            style={[videoType == "TODOLIST" ? styles.active_circle_button : styles.circle_button, {
-                                shadowColor: '#000',
-                                shadowOffset: {
-                                    width: 0,
-                                    height: 6,
-                                },
-                                shadowOpacity: 0.25,
-                                shadowRadius: 6,
-                                elevation: 5,
-                            }]}
-                            onPress={() => {
-                                setVideoType("TODOLIST")
-                                setSearchedCompVideo("")
-                            }}>
-                            <View style={{ marginRight: 4 }}>
-                                <Image source={images.to_do_list_icon} style={{ height: 22, width: 22, }} />
-                            </View>
-                            <View>
-                                <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>To Do List</Text>
-                            </View>
-                        </Pressable>
-                        <Pressable
-                            style={[videoType == "COMPLIST" ? styles.active_circle_button : styles.circle_button, {
-                                shadowColor: '#000',
-                                shadowOffset: {
-                                    width: 0,
-                                    height: 6,
-                                },
-                                shadowOpacity: 0.25,
-                                shadowRadius: 6,
-                                elevation: 5,
-                            }]}
-                            onPress={() => {
-                                setVideoType("COMPLIST")
-                                setSearchedTodoVideo("")
-                            }}>
-                            <Image source={images.completed_icon} style={{ height: 22, width: 22, marginRight: 4 }} />
-                            <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>Completed List</Text>
-                        </Pressable>
-                    </View>
                     <ScrollView
                         contentInsetAdjustmentBehavior="automatic"
                         nestedScrollEnabled={true}
@@ -381,6 +310,71 @@ const HomePage = (props) => {
                             <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
                         }
                     >
+                        {assessmentData != null && ShowContinueAssessmentSection && isLoading === false && (
+                            <>
+                                <View style={[styles.section_header_container, { marginVertical: 8 }]}>
+                                    <Text style={{ fontSize: 18, fontWeight: "700", color: COLORS.primary }}>Lift-Off ! Submit your work</Text>
+                                </View>
+                                <InProgressCard
+                                    VideoCategory={revArray[0].Category}
+                                    VideoId={revArray[0].Id}
+                                    VideoName={revArray[0].VideoName}
+                                    videoPassword={revArray[0].Password}
+                                    remainingTime={revArray[0].TimeLeft}
+                                    userLoginData={userLoginData}
+                                    NoOfQuestionAnswered={qusetionAnswered}
+                                    // ProgressNo={progress}
+                                    OnPress={() => {
+                                        navigation.navigate("Video Detail", { item: revArray[0] })
+                                    }}
+                                    Percentage={percentage}
+                                    TotalQuestion={totalQuestion} />
+                            </>
+                        )}
+
+                        <View style={{ margin: 4, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                            <Pressable
+                                style={[videoType == "TODOLIST" ? styles.active_circle_button : styles.circle_button, {
+                                    shadowColor: '#000',
+                                    shadowOffset: {
+                                        width: 0,
+                                        height: 6,
+                                    },
+                                    shadowOpacity: 0.25,
+                                    shadowRadius: 6,
+                                    elevation: 5,
+                                }]}
+                                onPress={() => {
+                                    setVideoType("TODOLIST")
+                                    setSearchedCompVideo("")
+                                }}>
+                                <View style={{ marginRight: 4 }}>
+                                    <Image source={images.to_do_list_icon} style={{ height: 22, width: 22, }} />
+                                </View>
+                                <View>
+                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>To Do List</Text>
+                                </View>
+                            </Pressable>
+                            <Pressable
+                                style={[videoType == "COMPLIST" ? styles.active_circle_button : styles.circle_button, {
+                                    shadowColor: '#000',
+                                    shadowOffset: {
+                                        width: 0,
+                                        height: 6,
+                                    },
+                                    shadowOpacity: 0.25,
+                                    shadowRadius: 6,
+                                    elevation: 5,
+                                }]}
+                                onPress={() => {
+                                    setVideoType("COMPLIST")
+                                    setSearchedTodoVideo("")
+                                }}>
+                                <Image source={images.completed_icon} style={{ height: 22, width: 22, marginRight: 4 }} />
+                                <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.primary }}>Completed List</Text>
+                            </Pressable>
+                        </View>
+
                         <View>
                             {videoType == "TODOLIST" &&
                                 <View style={styles.section_header_container}>
@@ -401,7 +395,6 @@ const HomePage = (props) => {
                                     showsHorizontalScrollIndicator={false}
                                     style={{ flex: 1, width: windowWidth }}
                                 >
-
                                     <View>
                                         {!searchedTodoVideo &&
                                             <FlatList
@@ -474,11 +467,11 @@ const HomePage = (props) => {
                             }
 
                             {videoType == "COMPLIST" &&
-                                <ScrollView
-                                    nestedScrollEnabled={true}
-                                    contentInsetAdjustmentBehavior="automatic"
-                                    showsHorizontalScrollIndicator={false}
-                                    style={{ flex: 1, width: windowWidth, flexDirection: "row" }}>
+                                // <ScrollView
+                                //     nestedScrollEnabled={true}
+                                //     contentInsetAdjustmentBehavior="automatic"
+                                //     showsHorizontalScrollIndicator={false}
+                                //     style={{ flex: 1, width: windowWidth, flexDirection: "row" }}>
                                     <View style={{ flex: 1 }}>
                                         {!searchedCompVideo &&
                                             <FlatList
@@ -547,7 +540,7 @@ const HomePage = (props) => {
                                             </View>
                                         }
                                     </View>
-                                </ScrollView>
+                                // </ScrollView>
                             }
 
                             {videoType == "TODOLIST" && (
@@ -677,27 +670,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center"
     },
-    rowContainer: {
-        flex: 1,
-        marginVertical: 20,
-        paddingHorizontal: 10,
-    },
-    rowTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    item: {
-        padding: 10,
-        backgroundColor: '#f2f2f2',
-        marginRight: 10,
-        borderRadius: 5,
-    },
-    icon: {
-        height: 20,
-        width: 20,
-        padding: 4,
-    },
     icon_container: {
         borderRadius: 35,
         height: 35,
@@ -709,11 +681,30 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: COLORS.white2,
     },
-    shadowProp: {
-        shadowColor: COLORS.white2,
-        shadowOffset: { width: -4, height: 8 },
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
+
+    //  Tour guide changes in style.js of tourgide node module
+    tooltipText: {
+        textAlign: 'center',
+        fontWeight: "600",
+        fontSize: 14,
+        color: "#004C6B"
+    },
+    tooltipContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        width: '80%',
+    },
+    button: {
+        backgroundColor: "#004C6B",
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        margin: 10,
+        borderRadius: 6
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: "700"
     },
 })
 

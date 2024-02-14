@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import {
-    View,
-    Image,
-    ScrollView,
-    FlatList,
-    Dimensions,
-    TouchableOpacity,
-} from "react-native"
+import { View, Image, ScrollView, FlatList, Dimensions, TouchableOpacity } from "react-native"
 import CustomSearch from '../../../Components/CustomSearch';
 import NoDataFound from '../../../Components/NoDataFound';
 import Header from '../../../Components/Header';
@@ -215,7 +208,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                         )}
                     </View>
                 }
-                
+
                 {viewAlert.isShow && (
                     <CustomAlert
                         isView={viewAlert.isShow}
