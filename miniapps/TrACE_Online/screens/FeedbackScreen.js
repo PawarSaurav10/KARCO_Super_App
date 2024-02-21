@@ -139,6 +139,7 @@ const FeedbackScreen = ({ navigation, route }) => {
     const [isVisibleModal, setIsVisibleModal] = useState(false)
     const [orientation, setOrientation] = useState()
     const [viewRef, setViewRef] = useState(null);
+    const [percentage, setPercentage] = useState(0)
 
     /**
     * Returns true if the screen is in portrait mode
@@ -202,6 +203,7 @@ const FeedbackScreen = ({ navigation, route }) => {
             })
                 .then((res) => {
                     setResultData(res.data)
+                    setPercentage(100 * res.data ?.Scores ?.ObtainedMarks) / res.data ?.Scores ?.TotalMarks;
                 })
                 .catch((error) => {
                     throw error
@@ -238,11 +240,7 @@ const FeedbackScreen = ({ navigation, route }) => {
         }
     }, [userLoginData, isFocused])
 
-    const ratingCompleted = (ratingData) => {
-        setRating(ratingData)
-    }
 
-    const Percentage = (100 * resultData ?.Scores ?.ObtainedMarks) / resultData ?.Scores ?.TotalMarks;
 
     function validateString(string) {
         let strRegex = new RegExp(/^[a-zA-Z0-9\(\)\-\]\[\?\.\,\!\s*]*$/);
@@ -398,7 +396,7 @@ const FeedbackScreen = ({ navigation, route }) => {
     return (
         <View style={{ flex: 1 }}>
             <ScrollView>
-                <View style={{ padding: 8, display: "flex", justifyContent: "center", backgroundColor: COLORS.white2 }}>
+                <View style={{ padding: 8, justifyContent: "center", backgroundColor: COLORS.white2 }}>
                     <View style={{ marginTop: 10 }}>
                         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16, flex: 1 }}>
                             <TouchableOpacity
@@ -420,7 +418,7 @@ const FeedbackScreen = ({ navigation, route }) => {
 
                     <View style={styles.titleContainer}>
                         <Text style={{ textTransform: "uppercase", fontSize: 18, color: COLORS.white, fontWeight: "700" }}>Presentation</Text>
-                         <Image source={images.raters_icon} style={{ width: 140, height: 60, objectFit: "fill" }} />
+                        <Image source={images.raters_icon} style={{ width: 140, height: 60, objectFit: "fill" }} />
                         {/* <View style={{ flexDirection: "row" }}>
                             <Text style={{ color: "#ff0000", fontWeight: "700", margin: 4, fontSize: 12 }}>NA</Text>
                             <Text style={{ color: "#ff8f00", fontWeight: "700", margin: 4, fontSize: 12  }}>Un-acc</Text>
@@ -677,7 +675,7 @@ const FeedbackScreen = ({ navigation, route }) => {
                                 imageSize={24}
                                 // tintColor="#004C6B"
                                 // style={{ paddingVertical: 10, backgroundColor: "#004C6B" }}
-                                onFinishRating={(ratingData) => ratingCompleted(ratingData)}
+                                onFinishRating={(ratingData) => setRating(ratingData)}
                             />
                         </View>
                     </View>
@@ -782,12 +780,12 @@ const FeedbackScreen = ({ navigation, route }) => {
                                                 <Text style={{
                                                     fontSize: 34,
                                                     fontWeight: "bold",
-                                                    color: Percentage > 70 ? "green"
-                                                        : Percentage > 50 ? "#edc700"
-                                                            : Percentage < 50 ? "red"
+                                                    color: percentage > 70 ? "green"
+                                                        : percentage > 50 ? "#edc700"
+                                                            : percentage < 50 ? "red"
                                                                 : "red"
                                                 }}>
-                                                    {parseFloat(Percentage).toFixed(0)}%
+                                                    {parseFloat(percentage).toFixed(0)}%
                                             </Text>
                                                 <Text style={{ fontSize: 22, fontWeight: "600", color: COLORS.darkBlue }}>Total Percentage</Text>
                                             </View>
@@ -930,6 +928,16 @@ const styles = StyleSheet.create({
         borderRadius: 4
         // backgroundColor: "#f5f5f5"
         // backgroundColor: COLORS.lightGray1
+    },
+    footer: {
+        flex: 1,
+        backgroundColor: Colors.lighter,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10,
+        borderTopLeftRadius: 40,
+        borderTopRightRadius: 40,
     },
     questionContainer: {
         paddingVertical: 6,

@@ -183,7 +183,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         }
                     });
             }
-
         } else {
             setViewAlert(true)
         }

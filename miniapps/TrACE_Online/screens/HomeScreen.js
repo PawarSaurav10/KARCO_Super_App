@@ -18,7 +18,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '../../../Constants/theme';
 import CustomSearch from '../../../Components/CustomSearch';
-import {  getScreenVisited, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
+import { getUserData_1 } from "../../../Utils/getScreenVisisted"
 import axios from 'axios';
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import NoDataFound from '../../../Components/NoDataFound';
@@ -67,7 +67,7 @@ const HomePage = (props) => {
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
             setOrientation(
-                isPortrait() ? 'portrait' : 'landscape'
+                isPortrait() ? 'protrait' : 'landscape'
             );
         });
     }, [orientation])
@@ -236,7 +236,6 @@ const HomePage = (props) => {
 
     let MinimumTimeLeft = videoData && videoData.lstToDo && videoData.lstToDo.filter((xx) => xx.AssessmentStatus == "Continue" || xx.AssessmentStatus == "Feedback")
     let revArray = _.reverse(MinimumTimeLeft);
-    // let remainingSeconds = moment(reversedArray[0].TimeLeft, 'HH:mm:ss').diff(moment().startOf('day'), 'seconds')
 
     useEffect(() => {
         if (ShowContinueAssessmentSection) {
@@ -248,6 +247,8 @@ const HomePage = (props) => {
     let totalQuestion = assessmentData && assessmentData ?.QuestionList.length;
     let progress = (qusetionAnswered / totalQuestion)
     let percentage = progress * 100
+
+    // console.log(revArray,"revArray[0]");
 
     return (
         <View style={{ flex: 1 }}>
@@ -316,19 +317,22 @@ const HomePage = (props) => {
                                     <Text style={{ fontSize: 18, fontWeight: "700", color: COLORS.primary }}>Lift-Off ! Submit your work</Text>
                                 </View>
                                 <InProgressCard
+                                    orientationType={orientation}
+                                    data={revArray[0]}
                                     VideoCategory={revArray[0].Category}
-                                    VideoId={revArray[0].Id}
                                     VideoName={revArray[0].VideoName}
-                                    videoPassword={revArray[0].Password}
                                     remainingTime={revArray[0].TimeLeft}
-                                    userLoginData={userLoginData}
                                     NoOfQuestionAnswered={qusetionAnswered}
-                                    // ProgressNo={progress}
                                     OnPress={() => {
-                                        navigation.navigate("Video Detail", { item: revArray[0] })
+                                        if (revArray[0].AssessmentStatus === "Feedback") {
+                                            navigation.replace("Feedback Form", { Id: revArray[0].Id, videoPassword: revArray[0].Password })
+                                        } else {
+                                            navigation.replace("AssessmentNew", { Id: revArray[0].Id, videoPassword: revArray[0].Password, ModuleType: revArray[0].ModuleType })
+                                        }
                                     }}
                                     Percentage={percentage}
-                                    TotalQuestion={totalQuestion} />
+                                    TotalQuestion={totalQuestion}
+                                />
                             </>
                         )}
 
@@ -472,74 +476,74 @@ const HomePage = (props) => {
                                 //     contentInsetAdjustmentBehavior="automatic"
                                 //     showsHorizontalScrollIndicator={false}
                                 //     style={{ flex: 1, width: windowWidth, flexDirection: "row" }}>
-                                    <View style={{ flex: 1 }}>
-                                        {!searchedCompVideo &&
-                                            <FlatList
-                                                key={orientation === "landscape" ? 4 : 2}
-                                                nestedScrollEnabled={true}
-                                                scrollEnabled={false}
-                                                columnWrapperStyle={{ justifyContent: 'space-between' }}
-                                                numColumns={orientation === "landscape" ? 4 : 2}
-                                                data={CompletedList}
-                                                renderItem={({ item, index }) => (
-                                                    <View key={index}>
-                                                        <GridViewCard
-                                                            isVideoCompleted={true}
-                                                            Status={item.AssessmentStatus}
-                                                            VideoCategory={item.Category}
-                                                            CourseNo={item.CourseNo}
-                                                            VideoName={item.VideoName}
-                                                            onPress={() => navigation.navigate("Video Detail", { item: item, type: "COMPLIST" })}
-                                                            orientationType={orientation}
-                                                            PosterImage={item.PosterPath}
-                                                        />
-                                                    </View>
-                                                )}
-                                                keyExtractor={item => item.Id}
-                                                style={{ margin: 4, padding: 4, flexDirection: "row" }}
-                                            // extraData={videoType}
-                                            />
-                                        }
+                                <View style={{ flex: 1 }}>
+                                    {!searchedCompVideo &&
+                                        <FlatList
+                                            key={orientation === "landscape" ? 4 : 2}
+                                            nestedScrollEnabled={true}
+                                            scrollEnabled={false}
+                                            columnWrapperStyle={{ justifyContent: 'space-between' }}
+                                            numColumns={orientation === "landscape" ? 4 : 2}
+                                            data={CompletedList}
+                                            renderItem={({ item, index }) => (
+                                                <View key={index}>
+                                                    <GridViewCard
+                                                        isVideoCompleted={true}
+                                                        Status={item.AssessmentStatus}
+                                                        VideoCategory={item.Category}
+                                                        CourseNo={item.CourseNo}
+                                                        VideoName={item.VideoName}
+                                                        onPress={() => navigation.navigate("Video Detail", { item: item, type: "COMPLIST" })}
+                                                        orientationType={orientation}
+                                                        PosterImage={item.PosterPath}
+                                                    />
+                                                </View>
+                                            )}
+                                            keyExtractor={item => item.Id}
+                                            style={{ margin: 4, padding: 4, flexDirection: "row" }}
+                                        // extraData={videoType}
+                                        />
+                                    }
 
-                                        {videoType == "COMPLIST" && searchedCompVideo && searchedCompVideoData && searchedCompVideoData.length > 0 &&
-                                            <FlatList
-                                                key={orientation === "landscape" ? 4 : 2}
-                                                nestedScrollEnabled={true}
-                                                scrollEnabled={false}
-                                                columnWrapperStyle={{ justifyContent: 'space-between' }}
-                                                numColumns={orientation === "landscape" ? 4 : 2}
-                                                data={searchedCompVideoData}
-                                                renderItem={({ item, index }) => (
-                                                    <View key={index}>
-                                                        <GridViewCard
-                                                            isVideoCompleted={true}
-                                                            Status={item.AssessmentStatus}
-                                                            VideoCategory={item.Category}
-                                                            CourseNo={item.CourseNo}
-                                                            VideoName={item.VideoName}
-                                                            onPress={() => navigation.navigate("Video Detail", { item: item, type: "COMPLIST" })}
-                                                            orientationType={orientation}
-                                                            PosterImage={item.PosterPath}
-                                                        />
-                                                    </View>
-                                                )}
-                                                keyExtractor={item => item.Id}
-                                                style={{ margin: 4, padding: 4, flexDirection: "row" }}
-                                            />
-                                        }
+                                    {videoType == "COMPLIST" && searchedCompVideo && searchedCompVideoData && searchedCompVideoData.length > 0 &&
+                                        <FlatList
+                                            key={orientation === "landscape" ? 4 : 2}
+                                            nestedScrollEnabled={true}
+                                            scrollEnabled={false}
+                                            columnWrapperStyle={{ justifyContent: 'space-between' }}
+                                            numColumns={orientation === "landscape" ? 4 : 2}
+                                            data={searchedCompVideoData}
+                                            renderItem={({ item, index }) => (
+                                                <View key={index}>
+                                                    <GridViewCard
+                                                        isVideoCompleted={true}
+                                                        Status={item.AssessmentStatus}
+                                                        VideoCategory={item.Category}
+                                                        CourseNo={item.CourseNo}
+                                                        VideoName={item.VideoName}
+                                                        onPress={() => navigation.navigate("Video Detail", { item: item, type: "COMPLIST" })}
+                                                        orientationType={orientation}
+                                                        PosterImage={item.PosterPath}
+                                                    />
+                                                </View>
+                                            )}
+                                            keyExtractor={item => item.Id}
+                                            style={{ margin: 4, padding: 4, flexDirection: "row" }}
+                                        />
+                                    }
 
-                                        {videoType == "COMPLIST" && searchedCompVideo && searchedCompVideoData && searchedCompVideoData.length == 0 &&
-                                            <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
-                                                <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
-                                            </View>
-                                        }
+                                    {videoType == "COMPLIST" && searchedCompVideo && searchedCompVideoData && searchedCompVideoData.length == 0 &&
+                                        <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
+                                            <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
+                                        </View>
+                                    }
 
-                                        {videoType == "COMPLIST" && CompletedList && CompletedList.length == 0 &&
-                                            <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
-                                                <NoDataFound title={"No Data Available"} desc="You had not completed any videos yet." imageType="NoData" />
-                                            </View>
-                                        }
-                                    </View>
+                                    {videoType == "COMPLIST" && CompletedList && CompletedList.length == 0 &&
+                                        <View style={{ width: windowWidth, margin: 4, padding: 8 }}>
+                                            <NoDataFound title={"No Data Available"} desc="You had not completed any videos yet." imageType="NoData" />
+                                        </View>
+                                    }
+                                </View>
                                 // </ScrollView>
                             }
 

@@ -20,7 +20,6 @@ const HomeScreen = (props) => {
     const [searchedVideoData, setSearchedVideoData] = useState([])
     const [searchedVideo, setSearchedVideo] = useState("")
     const [orientation, setOrientation] = useState()
-    const [connected, setConnected] = useState(null)
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -50,11 +49,11 @@ const HomeScreen = (props) => {
             NetInfo.fetch().then(xx => {
                 if (xx.isConnected) {
                     setIsView(false)
-                    setConnected(true)
+                    // setConnected(true)
                 } else {
                     setIsLoading(false)
                     setIsView(true)
-                    setConnected(false)
+                    // setConnected(false)
                 }
             });
         } else {
@@ -79,10 +78,19 @@ const HomeScreen = (props) => {
         }
     };
 
+    const fetchData = () => {
+        return new Promise((resolve, reject) => {
+            axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
+                .then((response) => response)
+                .then((data) => resolve(data))
+                .catch((error) => reject(error))
+        })
+    }
+
     const onRefresh = async () => {
         setIsLoading(true)
         CheckConnectivity()
-        axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
+        fetchData()
             .then((res) => {
                 setVideoList(res.data.videos.data)
                 setIsLoading(false)
@@ -99,7 +107,8 @@ const HomeScreen = (props) => {
             }
             setIsLoading(true)
             CheckConnectivity()
-            axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
+            // axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
+            fetchData()
                 .then((res) => {
                     setVideoList(res.data.videos.data)
                     setIsLoading(false)
@@ -226,7 +235,11 @@ const HomeScreen = (props) => {
                                         }
                                         {searchedVideo && searchedVideoData && searchedVideoData.length === 0 &&
                                             <View style={{ flex: 1, justifyContent: "center", marginBottom: 70 }}>
-                                                <NoDataFound title={"No Data Found"} desc="Try searching for something else or try with a different spelling" imageType="searchData" />
+                                                <NoDataFound
+                                                    title={"No Data Found"}
+                                                    desc="Try searching for something else or try with a different spelling"
+                                                    imageType="searchData"
+                                                />
                                             </View>
                                         }
                                     </View>

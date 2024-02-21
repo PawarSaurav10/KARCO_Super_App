@@ -29,7 +29,7 @@ const HomePageLoader = ({ orientationType }) => {
             <View style={{ margin: 8, padding: 8 }}>
                 <View style={{ paddingVertical: 6, borderRadius: 20, paddingHorizontal: 10, height: 40, width: "100%" }} />
             </View>
-            <View style={{ margin: 4, padding: 8, display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", }}>
+            <View style={{ margin: 4, padding: 8, flexDirection: "row", justifyContent: "center", alignItems: "center", }}>
                 <View style={{
                     flex: 1,
                     flexDirection: "row",
@@ -63,7 +63,7 @@ const HomePageLoader = ({ orientationType }) => {
             <View style={{
                 marginHorizontal: 10,
                 paddingHorizontal: 8,
-                display: "flex",
+            
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center"
@@ -89,7 +89,7 @@ const HomePageLoader = ({ orientationType }) => {
                             <Text style={{ fontSize: 14, marginBottom: 6, }} />
                             <Text style={{ fontSize: 14, paddingBottom: 6, width: 60 }} />
                         </View>
-                        <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" }}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" }}>
                             <View style={{ alignSelf: "baseline" }}>
                                 <View style={{
                                     justifyContent: "center",
@@ -123,7 +123,7 @@ const HomePageLoader = ({ orientationType }) => {
                             <Text style={{ fontSize: 14, marginBottom: 6, }} />
                             <Text style={{ fontSize: 14, paddingBottom: 6, width: 60 }} />
                         </View>
-                        <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" }}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" }}>
                             <View style={{ alignSelf: "baseline" }}>
                                 <View style={{
                                     justifyContent: "center",
@@ -144,7 +144,7 @@ const HomePageLoader = ({ orientationType }) => {
             <View style={{
                 marginHorizontal: 10,
                 paddingHorizontal: 8,
-                display: "flex",
+            
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center"
@@ -156,7 +156,7 @@ const HomePageLoader = ({ orientationType }) => {
                 <View
                     style={{ padding: 10, marginVertical: 4, borderWidth: 1, borderRadius: 10, borderColor: COLORS.lightGray1, backgroundColor: "white" }}
                 >
-                    <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
 
                         <View style={{ height: 60, width: 60, marginBottom: 4, borderRadius: 10 }} />
                         <View style={{ paddingLeft: 12, flex: 1 }}>
@@ -175,7 +175,7 @@ const HomePageLoader = ({ orientationType }) => {
                                     width: 120,
                                     height: 16
                                 }} />
-                                <View style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "flex-end" }}>
+                                <View style={{ flexDirection: "column", justifyContent: "space-between", alignItems: "flex-end" }}>
                                     <View style={{ width: 20, height: 20 }} />
                                 </View>
                             </View>
@@ -185,7 +185,7 @@ const HomePageLoader = ({ orientationType }) => {
                 <View
                     style={{ padding: 10, marginVertical: 4, borderWidth: 1, borderRadius: 10, borderColor: COLORS.lightGray1, backgroundColor: "white" }}
                 >
-                    <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
 
                         <View style={{ height: 60, width: 60, marginBottom: 4, borderRadius: 10 }} />
                         <View style={{ paddingLeft: 12, flex: 1 }}>
@@ -204,7 +204,7 @@ const HomePageLoader = ({ orientationType }) => {
                                     width: 120,
                                     height: 16
                                 }} />
-                                <View style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "flex-end" }}>
+                                <View style={{ flexDirection: "column", justifyContent: "space-between", alignItems: "flex-end" }}>
                                     <View style={{ width: 20, height: 20 }} />
                                 </View>
                             </View>

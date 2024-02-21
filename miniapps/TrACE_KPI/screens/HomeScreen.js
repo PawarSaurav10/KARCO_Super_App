@@ -470,7 +470,7 @@ const HomeScreen = () => {
                                                         </View>
                                                     ) : (
                                                             <View style={{ padding: 6, margin: 4, alignItems: "center", justifyContent: "center" }}>
-                                                                <Image source={images.empty_box_icon} style={styles.top_bottom_performer_icon} />
+                                                                <Image source={images.empty_box_icon} style={{ width: 30, height: 30 }} />
                                                                 <Text style={styles.top_bottom_performer_text}>{aa}</Text>
                                                             </View>
                                                         )

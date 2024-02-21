@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { View, Text, Dimensions, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Alert, Modal, ScrollView, BackHandler, PermissionsAndroid } from 'react-native'
+import { View, Text, Dimensions, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Modal, ScrollView, BackHandler } from 'react-native'
 import { WebView } from 'react-native-webview';
 import { COLORS } from '../../../Constants/theme';
 import CustomIconButton from '../../../Components/CustomIconButton';
 import Header from '../../../Components/Header';
 import axios from 'axios';
-import { getUserData, getUserData_1, getAppLaunched, setAppLaunched } from '../../../Utils/getScreenVisisted';
+import { getUserData_1 } from '../../../Utils/getScreenVisisted';
 import PDFViewer from '../../../Components/PDFViewer';
 import { useIsFocused } from '@react-navigation/native';
 import VideoScreenLoader from '../../../Components/VideoScreenLoader';
@@ -15,7 +15,6 @@ import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import RNFetchBlob from 'react-native-blob-util';
-import { checkMultiple, PERMISSIONS } from '../../../node_modules/react-native-permissions';
 
 const VideoDetailScreen = ({ navigation, route }) => {
     const webViewRef = useRef(null);
@@ -168,32 +167,16 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
     const downloadFile = async () => {
         CheckConnectivity()
-        checkMultiple([PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-        PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE]).then((statuses) => {
-            // if (statuses[PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE] === "denied" || statuses[PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE] === "denied") {
-            //     setViewAlert({
-            //         isShow: true,
-            //         AlertType: "Permissions"
-            //     })
-            // } else {
-            // setToastHide(true)
-            // let dirs = RNFetchBlob.fs.dirs
-            // RNFetchBlob.fs.appendFile(dirs.DownloadDir + `/${"testcertificate.pdf"}`, 'foo', 'utf8')
-            //     .then((res) => { })
-            RNFetchBlob
-                .config({
-                    fileCache: true,
-                    path: dirs.DownloadDir + `/${"testcertificate.pdf"}`,
-                    transform: true
-                })
-                .fetch('GET', `https://testtrace.karco.in/Certificate/Online_2755/Mobile%20Testing_8_12-02-2024_Certificate.pdf`)
-                .then((res) => {
-                    console.log(res,"res");
-                    // setDownloaded("Yes")
-                    // setToastHide(true)
-                    // setMessage({ message: "Your Video is Downloaded", icon: images.downloaded_icon, isHide: true })
-                })
-        });
+        RNFetchBlob
+            .config({
+                fileCache: true,
+                path: dirs.DownloadDir + `/${"testcertificate.pdf"}`,
+                transform: true
+            })
+            .fetch('GET', `https://testtrace.karco.in/Certificate/Online_2755/Mobile%20Testing_8_12-02-2024_Certificate.pdf`)
+            .then((res) => {
+                console.log(res, "res");
+            })
     }
 
     return (
@@ -231,7 +214,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         // mediaPlaybackRequiresUserAction={true}
                                         startInLoadingState={<ActivityIndicator />}
                                         minimumFontSize={12}
-                                    // injectJavaScript={true}
+                                        injectJavaScript={true}
                                     // onLoad={runSpotlightrAPI}
                                     // injectedJavaScript={`
                                     //     function togglePlay() {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Alert, BackHandler, Image, ActivityIndicator, Modal, ProgressBarAndroid } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, BackHandler, Image, ActivityIndicator, Modal } from 'react-native'
 import { COLORS } from '../../../Constants/theme';
 import axios from 'axios';
-import { getUserData, getUserData_1, getAppLaunched, setAppLaunched } from "../../../Utils/getScreenVisisted"
+import { getUserData_1 } from "../../../Utils/getScreenVisisted"
 import { WebView } from 'react-native-webview';
 import { useIsFocused } from '@react-navigation/native';
 import Header from '../../../Components/Header';
@@ -286,7 +286,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                             </View>
                         </View>
                         <View style={{ width: Dimensions.get("window").width, marginBottom: 10 }}>
-                            <Progress.Bar progress={progress} animationType="timing" width={300} height={6} color="green" borderWidth={1} />
+                            <Progress.Bar progress={progress} animationType="timing" width={Dimensions.get("window").width - 40} height={6} color="green" borderWidth={1} />
                         </View>
                         <View style={styles.question_container}>
                             <Text style={styles.question_text}>{initialData ?.Question}</Text>
@@ -453,7 +453,24 @@ const AssessmentScreen = ({ navigation, route }) => {
                                                     overlayColor={'rgba(0,0,0,0.6)'}
                                                 />
                                             }
-                                            <View style={styles.modal_container}>
+                                            <View style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: orientation === "landscape" ? 0 : 10,
+                                                // right: 0,
+                                                bottom: 0,
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                width: Dimensions.get('screen').width - 20,
+                                                shadowColor: '#000',
+                                                shadowOffset: {
+                                                    width: 10,
+                                                    height: 10,
+                                                },
+                                                shadowOpacity: 0.50,
+                                                shadowRadius: 6,
+                                                elevation: 5,
+                                            }}>
                                                 <TouchableOpacity
                                                     style={{ flex: orientation === "landscape" ? 0.6 : 0.07, marginLeft: "auto", padding: 4 }}
                                                     onPress={() => {
@@ -678,17 +695,6 @@ const styles = StyleSheet.create({
         color: COLORS.primary,
         textAlign: "left"
     },
-    footer: {
-        flex: 1,
-        backgroundColor: Colors.lighter,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        top: "50%",
-        zIndex: 10,
-        // justifyContent: "center", 
-        // alignItems: 'center'
-    },
     triangle: {
         backgroundColor: "transparent",
         borderRightWidth: Dimensions.get("window").width - 60,
@@ -698,24 +704,6 @@ const styles = StyleSheet.create({
         borderRightColor: "transparent",
         borderTopColor: COLORS.primary,
     },
-    modal_container: {
-        position: 'absolute',
-        top: 0,
-        left: 10,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: Dimensions.get('screen').width - 20,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 10,
-            height: 10,
-        },
-        shadowOpacity: 0.50,
-        shadowRadius: 6,
-        elevation: 5,
-    }
 })
 
 export default AssessmentScreen

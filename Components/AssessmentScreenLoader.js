@@ -7,7 +7,7 @@ const AssessmentScreenLoader = () => {
     return (
         <SkeletonPlaceholder borderRadius={6}>
             <View style={{ padding: 14 }}>
-                <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingBottom: 6, borderBottomWidth: 1, }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingBottom: 6, borderBottomWidth: 1, }}>
                     <Text style={{ fontSize: 14, width: 40 }} />
                     <Text style={{ fontSize: 16, width: 100 }} />
                     <View style={{

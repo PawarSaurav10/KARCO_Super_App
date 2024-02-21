@@ -124,7 +124,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                     />
                                 )}
                                 keyExtractor={item => item.Id}
-                                style={{ margin: 4, padding: 4, display: "flex", flexDirection: "row" }}
+                                style={{ margin: 4, padding: 4,  flexDirection: "row" }}
                             />
                         }
                         {searchedVideo && searchedTodoVideoData && searchedTodoVideoData.length > 0 &&
@@ -146,7 +146,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                     />
                                 )}
                                 keyExtractor={item => item.Id}
-                                style={{ margin: 4, padding: 4, display: "flex", flexDirection: "row" }}
+                                style={{ margin: 4, padding: 4, flexDirection: "row" }}
                             />
                         }
                         {searchedVideo && searchedTodoVideoData && searchedTodoVideoData.length == 0 &&
