@@ -10,6 +10,7 @@ import { getURL } from "../../../baseUrl"
 import VideoListView from '../../../Components/VideoListView';
 import NoDataFound from '../../../Components/NoDataFound';
 import images from '../../../Constants/images';
+import RNFetchBlob from 'react-native-blob-util';
 
 const HomeScreen = (props) => {
     const navigation = useNavigation();
@@ -99,6 +100,11 @@ const HomeScreen = (props) => {
 
     useEffect(() => {
         if (isFocused) {
+            let dirs = RNFetchBlob.fs.dirs
+            if (dirs.DocumentDir + "/Videos") { } else {
+                RNFetchBlob.fs.mkdir(dirs.DownloadDir + "/Videos")
+            }
+
             const dim = Dimensions.get('screen');
             if (dim.height >= dim.width) {
                 setOrientation("protrait")

@@ -43,7 +43,7 @@ const DownloadsScreen = (props) => {
     const docPath = ReactNativeBlobUtil.fs.dirs.DownloadDir;
     const getDirectoryList = async () => {
         await ReactNativeBlobUtil.fs
-            .lstat(docPath)
+            .lstat(docPath + "/Videos")
             .then(response => {
                 setDirectory(response);
                 setIsLoading(false)

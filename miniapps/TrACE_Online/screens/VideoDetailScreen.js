@@ -15,17 +15,20 @@ import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import RNFetchBlob from 'react-native-blob-util';
+import moment from "moment"
 
 const VideoDetailScreen = ({ navigation, route }) => {
     const webViewRef = useRef(null);
     const isFocused = useIsFocused();
     const [videoType, setVideoType] = useState("")
     const [isLoading, setIsLoading] = useState(true)
+    const [pdfView, setPdfView] = useState(false)
     const [userLoginData, setUserLoginData] = useState({
         userId: null,
         password: null,
         crewId: null,
         vesselId: null,
+        companyId: null,
     })
     const [viewPdf, setViewPdf] = useState(false)
     const [htmlContent, setHtmlContent] = useState(htmlContentPromo)
@@ -34,7 +37,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
         isShow: false,
         AlertType: ""
     })
-
+    const [pdfURL, setPdfURL] = useState("")
     const backAction = () => {
         navigation.replace("Online_Home", { type: route.params.type })
         return true;
@@ -44,6 +47,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
         const dim = Dimensions.get('screen');
         return dim.height >= dim.width;
     };
+
+    const CompletedDate = moment(route.params.item.CompletedDate, "DD MMM YYYY").format("YYYY-MM-DD")
 
     useEffect(() => {
         // Event Listener for orientation changes
@@ -84,6 +89,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     password: res.userPassword,
                     crewId: res.userData.CrewListId,
                     vesselId: res.userData.VesselId,
+                    companyId: res.userData.CompanyId
                 })
             });
             const backHandler = BackHandler.addEventListener(
@@ -165,19 +171,38 @@ const VideoDetailScreen = ({ navigation, route }) => {
         webViewRef.current.injectJavaScript(runFirst)
     };
 
-    const downloadFile = async () => {
+    const viewCertificate = async () => {
         CheckConnectivity()
-        RNFetchBlob
-            .config({
-                fileCache: true,
-                path: dirs.DownloadDir + `/${"testcertificate.pdf"}`,
-                transform: true
-            })
-            .fetch('GET', `https://testtrace.karco.in/Certificate/Online_2755/Mobile%20Testing_8_12-02-2024_Certificate.pdf`)
+        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${userLoginData.companyId}&EmpId=${userLoginData.userId}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}&VideoId=${route.params.item.Id}&dateOn=${CompletedDate}`)
             .then((res) => {
-                console.log(res, "res");
+                setPdfURL(res.data)
+                setViewPdf(true)
             })
     }
+
+    const downloadCertificate = async () => {
+        CheckConnectivity()
+        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${userLoginData.companyId}&EmpId=${userLoginData.userId}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}&VideoId=${route.params.item.Id}&dateOn=${CompletedDate}`)
+            .then((res) => {
+                setPdfURL(res.data)
+                let dirs = RNFetchBlob.fs.dirs
+                if (dirs.DocumentDir + "/Documents") { } else {
+                    RNFetchBlob.fs.mkdir(dirs.DownloadDir + "/Documents")
+                }
+                RNFetchBlob
+                    .config({
+                        fileCache: true,
+                        path: dirs.DownloadDir + "/Documents" + `/${route.params.item.VideoName}_certificate.pdf`,
+                        transform: true
+                    })
+                    .fetch('GET', `https://testtrace.karco.in/${res.data}`)
+                    .then((res) => {
+                        setIsLoading(false)
+                    })
+            })
+    }
+
+    console.log(pdfView, "pdfView");
 
     return (
         <View style={{ flex: 1 }}>
@@ -423,11 +448,12 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
                                 {route.params.item.AssessmentStatus == "Completed" &&
                                     <CustomIconButton
-                                        label={"Download Certificate"}
-                                        icon={images.downloading_icon}
+                                        label={"View Certificate"}
+                                        icon={images.view_icon}
                                         onPress={() => {
                                             CheckConnectivity()
-                                            downloadFile()
+                                            viewCertificate()
+                                            setPdfView(true)
                                             // navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
                                         }}
                                         containerStyle={{
@@ -436,6 +462,28 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             padding: 16,
                                             alignItems: "center",
                                             borderRadius: 5,
+                                            marginVertical: 6,
+                                        }}
+                                        iconStyle={{ marginRight: 6, tintColor: "white" }}
+                                    />
+                                }
+
+                                {route.params.item.AssessmentStatus == "Completed" &&
+                                    <CustomIconButton
+                                        label={"Download Certificate"}
+                                        icon={images.downloading_icon}
+                                        onPress={() => {
+                                            CheckConnectivity()
+                                            downloadCertificate()
+                                            // navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
+                                        }}
+                                        containerStyle={{
+                                            backgroundColor: COLORS.darkBlue,
+                                            width: "100%",
+                                            padding: 16,
+                                            alignItems: "center",
+                                            borderRadius: 5,
+                                            marginVertical: 6,
                                         }}
                                         iconStyle={{ marginRight: 6 }}
                                     />
@@ -453,12 +501,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         width: "100%",
                                         height: '100%',
                                         marginTop: 'auto',
-                                        backgroundColor: 'transparent',
+                                        backgroundColor: COLORS.white2,
                                     }}>
                                     <View style={{ justifyContent: "flex-end", position: "absolute", top: 16, left: 16, zIndex: 10 }}>
                                         <TouchableOpacity
                                             onPress={() => {
                                                 setViewPdf(false)
+                                                setPdfView(false)
                                             }}>
                                             <Image source={images.close_icon} style={{ width: 20, height: 20 }} />
                                         </TouchableOpacity>
@@ -468,7 +517,11 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         scale={1.0}
                                         minScale={1.0}
                                         trustAllCerts={false}
-                                        source={{ uri: `${route.params.item.ModuleType === "Circular" ? `${getURL.view_PDF_URL}/${route.params.item.VideoPath}` : `${getURL.view_Synopsis_URL}/${route.params.item.SynopsisPath}`}` }}
+                                        source={{
+                                            uri: `${(route.params.item.ModuleType === "Circular" && pdfView === false) ? `${getURL.view_PDF_URL}/${route.params.item.VideoPath}`
+                                                : (route.params.item.ModuleType === "Video" && pdfView === false) ? `${getURL.view_Synopsis_URL}/${route.params.item.SynopsisPath}`
+                                                    : pdfView === true ? `https://testtrace.karco.in/${pdfURL}` : ""}`
+                                        }}
                                         style={[styles.pdf, { position: "relative" }]}
                                         onError={(error) => {
                                             setViewAlert({

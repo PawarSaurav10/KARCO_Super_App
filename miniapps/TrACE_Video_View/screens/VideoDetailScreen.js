@@ -89,7 +89,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
     const docPath = ReactNativeBlobUtil.fs.dirs.DownloadDir;
     const getDirectoryList = async () => {
         await ReactNativeBlobUtil.fs
-            .lstat(docPath)
+            .lstat(docPath + "/Videos")
             .then(response => {
                 setDirectory(response);
             })
@@ -133,12 +133,12 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     .then((result) => {
                         console.log(result);
                         if (result === "granted") {
-                            setToastHide(true)
                             let dirs = RNFetchBlob.fs.dirs
+                            setToastHide(true)
                             RNFetchBlob
                                 .config({
                                     fileCache: true,
-                                    path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
+                                    path: dirs.DownloadDir + "/Videos" + `/${videoDetail.name}.bin`,
                                     transform: true
                                 })
                                 .fetch('GET', `${videoDetail.originalFileURL}`)
@@ -171,7 +171,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             RNFetchBlob
                                 .config({
                                     fileCache: true,
-                                    path: dirs.DownloadDir + `/${videoDetail.name}.bin`,
+                                    path: dirs.DownloadDir + "/Videos" + `/${videoDetail.name}.bin`,
                                     transform: true
                                 })
                                 .fetch('GET', `${videoDetail.originalFileURL}`)
