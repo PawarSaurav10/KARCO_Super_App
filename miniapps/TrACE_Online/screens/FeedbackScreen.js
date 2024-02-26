@@ -128,18 +128,12 @@ const FeedbackScreen = ({ navigation, route }) => {
     const [courseFormdata, setCourseFormData] = useState(courseData);
     const [courseObjtFormData, setCourseObjtFormData] = useState(courseObjtData);
     const [rating, setRating] = useState("");
-    const [userLoginData, setUserLoginData] = useState({
-        userId: null,
-        password: null,
-        crewId: null,
-        vesselId: null,
-        companyId: null
-    })
     const [resultData, setResultData] = useState(null)
     const [isVisibleModal, setIsVisibleModal] = useState(false)
     const [orientation, setOrientation] = useState()
     const [viewRef, setViewRef] = useState(null);
     const [percentage, setPercentage] = useState(0)
+    const l_loginReducer = useSelector(state => state.loginReducer)
 
     /**
     * Returns true if the screen is in portrait mode
@@ -191,14 +185,14 @@ const FeedbackScreen = ({ navigation, route }) => {
 
     async function fetchResultData() {
         CheckConnectivity()
-        if (userLoginData.userId !== null) {
+        if (l_loginReducer.userData.EmployeeId) {
             await axios.get(`${getURL.base_URL}/AppFeedback/GetOnlineFeedback`, {
                 params: {
                     VideoId: route.params.Id,
-                    username: userLoginData.userId,
+                    username: l_loginReducer.userData.EmployeeId,
                     password: route.params.videoPassword,
-                    CrewId: userLoginData.crewId,
-                    VesselId: userLoginData.vesselId,
+                    CrewId: l_loginReducer.userData.CrewListId,
+                    VesselId: l_loginReducer.userData.VesselId,
                 }
             })
                 .then((res) => {
@@ -218,15 +212,6 @@ const FeedbackScreen = ({ navigation, route }) => {
         } else {
             setOrientation("landscape")
         }
-        getUserData_1().then((res) => {
-            setUserLoginData({
-                userId: res.userData.EmployeeId,
-                password: res.userPassword,
-                crewId: res.userData.CrewListId,
-                vesselId: res.userData.VesselId,
-                companyId: res.userData.CompanyId
-            })
-        });
         const backHandler = BackHandler.addEventListener(
             'hardwareBackPress',
             backAction,
@@ -238,9 +223,7 @@ const FeedbackScreen = ({ navigation, route }) => {
         if (isFocused) {
             fetchResultData()
         }
-    }, [userLoginData, isFocused])
-
-
+    }, [l_loginReducer, isFocused])
 
     function validateString(string) {
         let strRegex = new RegExp(/^[a-zA-Z0-9\(\)\-\]\[\?\.\,\!\s*]*$/);
@@ -364,7 +347,7 @@ const FeedbackScreen = ({ navigation, route }) => {
             tempData.CourseContent != null
         ) {
             try {
-                axios.get(`${getURL.base_URL}/AppFeedback/SaveFeedbackActivity?FeedbackData=${JSON.stringify(tempSaveData)}&VideoId=${route.params.Id}&username=${userLoginData.userId}&password=${route.params.videoPassword}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}&CompanyId=${userLoginData.companyId}`)
+                axios.get(`${getURL.base_URL}/AppFeedback/SaveFeedbackActivity?FeedbackData=${JSON.stringify(tempSaveData)}&VideoId=${route.params.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${route.params.videoPassword}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&CompanyId=${l_loginReducer.userData.CompanyId}`)
                     .then((res) => {
                         if (res.status === 200) {
                             setViewAlert({

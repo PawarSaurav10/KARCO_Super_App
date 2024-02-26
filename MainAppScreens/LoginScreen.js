@@ -13,8 +13,11 @@ import LoginScreenLoader from "../Components/LoginScreenLoader"
 import NetInfo from "@react-native-community/netinfo";
 import images from '../Constants/images';
 import CustomAlert from '../Components/CustomAlert';
+import { useDispatch } from 'react-redux';
+import { login } from '../store/actions/loginActions';
 
 const LoginScreen = ({ navigation, route }) => {
+    const dispatch = useDispatch()
     const { passwordVisibility, rightIcon, handlePasswordVisibility } = useTogglePasswordVisibility();
     const isFocused = useIsFocused()
     const [loginData, setLoginData] = useState({
@@ -83,32 +86,38 @@ const LoginScreen = ({ navigation, route }) => {
                             }
                         })
                 } else {
-                    axios.get(`${getURL.base_URL}/applogin/userlogin?username=${loginData.userId.trimStart("").trimEnd("")}&password=${loginData.password.trimStart("").trimEnd("")}`)
-                        .then((response) => {
-                            if (response.data.CrewListId > 0) {
-                                setIsLoading(true)
-                                saveUserDataToStorage(response.data, loginData.password.trimStart("").trimEnd(""))
-                                // let data = [];
-                                // data.push({
-                                //     code: "SIGNIN",
-                                //     isVisited: true,
-                                //     screenName: "LoginScreen",
-                                // });
-                                setOnlineScreenVisited("Yes");
-                                navigation.reset({
-                                    index: 0,
-                                    routes: [{ name: "Online_Home" }],
-                                });
-                                setIsLoading(false)
-                            } else {
-                                setIsLoading(false)
-                                setViewAlert({
-                                    isShow: true,
-                                    AlertType: "WrongValues"
-                                })
-                                // alert("Couldn't Sign In, Your Username and Password Does'nt Match.")
-                            }
-                        })
+                    dispatch(login(loginData.userId, loginData.password))
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: "Online_Home" }],
+                    });
+                    setIsLoading(false)
+                    // axios.get(`${getURL.base_URL}/applogin/userlogin?username=${loginData.userId.trimStart("").trimEnd("")}&password=${loginData.password.trimStart("").trimEnd("")}`)
+                    //     .then((response) => {
+                    //         if (response.data.CrewListId > 0) {
+                    //             setIsLoading(true)
+                    //             saveUserDataToStorage(response.data, loginData.password.trimStart("").trimEnd(""))
+                    //             // let data = [];
+                    //             // data.push({
+                    //             //     code: "SIGNIN",
+                    //             //     isVisited: true,
+                    //             //     screenName: "LoginScreen",
+                    //             // });
+                    //             setOnlineScreenVisited("Yes");
+                    //             navigation.reset({
+                    //                 index: 0,
+                    //                 routes: [{ name: "Online_Home" }],
+                    //             });
+                    //             setIsLoading(false)
+                    //         } else {
+                    //             setIsLoading(false)
+                    //             setViewAlert({
+                    //                 isShow: true,
+                    //                 AlertType: "WrongValues"
+                    //             })
+                    //             // alert("Couldn't Sign In, Your Username and Password Does'nt Match.")
+                    //         }
+                    //     })
                 }
             } catch (error) {
                 throw error

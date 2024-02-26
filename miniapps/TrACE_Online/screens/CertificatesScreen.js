@@ -109,7 +109,8 @@ const CertificatesScreen = ({ navigation }) => {
                 visible={viewPdf}
                 onRequestClose={() => {
                     setViewPdf(false)
-                }}>
+                }}
+            >
                 <View
                     style={{
                         width: "100%",

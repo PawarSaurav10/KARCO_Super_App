@@ -57,7 +57,6 @@ const CustomDrawerItem = ({ label, icon, isFocused, onPress }) => {
 };
 
 const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName }) => {
-    const [userProfileData, setUserProfileData] = useState()
     const [orientation, setOrientation] = useState()
     const [companyLoginData, setCompanyLoginData] = useState({
         companyId: null,
@@ -66,6 +65,7 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
         companyLogoPath: null,
         NoOfShips: null
     })
+    const l_loginReducer = useSelector(state => state.loginReducer)
 
     useEffect(() => {
         if (appName === "TrACE KPI") {
@@ -96,18 +96,13 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
     }, [orientation])
 
     useEffect(() => {
-        if (appName === "TrACE Online") {
-            getUserData_1().then((res) => {
-                setUserProfileData(res.userData)
-            });
-        }
         const dim = Dimensions.get('screen');
         if (dim.height >= dim.width) {
             setOrientation("protrait")
         } else {
             setOrientation("landscape")
         }
-    }, [appName === "TrACE Online"])
+    }, [])
 
     const OnlinelogOut = async () => {
         await AsyncStorage.removeItem("online_screen_visited")
@@ -163,10 +158,10 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                         </TouchableOpacity>
                         <View>
                             <Text style={{ color: COLORS.white, fontSize: 20, textAlign: "left", marginBottom: 2 }}>
-                                {userProfileData && userProfileData.Name}
+                                {l_loginReducer && l_loginReducer.userData.Name}
                             </Text>
                             <Text style={{ color: COLORS.gray2, fontSize: 14, textAlign: "left" }}>
-                                {userProfileData && userProfileData.VesselName}
+                                {l_loginReducer && l_loginReducer.userData.VesselName}
                             </Text>
                         </View>
                     </View>

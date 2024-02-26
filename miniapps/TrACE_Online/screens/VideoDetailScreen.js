@@ -5,7 +5,6 @@ import { COLORS } from '../../../Constants/theme';
 import CustomIconButton from '../../../Components/CustomIconButton';
 import Header from '../../../Components/Header';
 import axios from 'axios';
-import { getUserData_1 } from '../../../Utils/getScreenVisisted';
 import PDFViewer from '../../../Components/PDFViewer';
 import { useIsFocused } from '@react-navigation/native';
 import VideoScreenLoader from '../../../Components/VideoScreenLoader';
@@ -16,6 +15,9 @@ import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import RNFetchBlob from 'react-native-blob-util';
 import moment from "moment"
+import CustomToast from '../../../Components/CustomToast';
+import AsyncStorage from '../../../node_modules/@react-native-async-storage/async-storage';
+import { useSelector } from '../../../node_modules/react-redux';
 
 const VideoDetailScreen = ({ navigation, route }) => {
     const webViewRef = useRef(null);
@@ -23,13 +25,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
     const [videoType, setVideoType] = useState("")
     const [isLoading, setIsLoading] = useState(true)
     const [pdfView, setPdfView] = useState(false)
-    const [userLoginData, setUserLoginData] = useState({
-        userId: null,
-        password: null,
-        crewId: null,
-        vesselId: null,
-        companyId: null,
-    })
     const [viewPdf, setViewPdf] = useState(false)
     const [htmlContent, setHtmlContent] = useState(htmlContentPromo)
     const [orientation, setOrientation] = useState()
@@ -38,6 +33,14 @@ const VideoDetailScreen = ({ navigation, route }) => {
         AlertType: ""
     })
     const [pdfURL, setPdfURL] = useState("")
+    const [toastHide, setToastHide] = useState(false)
+    const [message, setMessage] = useState({
+        message: "Your Certificate is Downloading",
+        icon: images.downloading_icon,
+        isHide: false
+    })
+    const l_loginReducer = useSelector(state => state.loginReducer)
+
     const backAction = () => {
         navigation.replace("Online_Home", { type: route.params.type })
         return true;
@@ -76,50 +79,39 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         if (isFocused) {
+            CheckConnectivity()
+            const timer = setTimeout(() => {
+                setIsLoading(false)
+            }, 1500);
             const dim = Dimensions.get('screen');
             if (dim.height >= dim.width) {
                 setOrientation("protrait")
             } else {
                 setOrientation("landscape")
             }
-            // CheckConnectivity()
-            getUserData_1().then((res) => {
-                setUserLoginData({
-                    userId: res.userData.EmployeeId,
-                    password: res.userPassword,
-                    crewId: res.userData.CrewListId,
-                    vesselId: res.userData.VesselId,
-                    companyId: res.userData.CompanyId
-                })
-            });
             const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
             );
-            return () => backHandler.remove();
+            return () => {
+                backHandler.remove();
+                clearTimeout(timer)
+            }
         }
-    }, [isFocused])
-
-    useEffect(() => {
-        CheckConnectivity()
-        const timer = setTimeout(() => {
-            setIsLoading(false)
-        }, 1500);
-        return () => clearTimeout(timer);
-    }, []);
+    }, [])
 
     const onPromoViewVideoClick = () => {
-        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoPreViewActivity?VideoId=${route.params.item.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
+        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoPreViewActivity?VideoId=${route.params.item.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${l_loginReducer.password}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
             .then((response) => { })
     }
 
     const onFullViewVideoClick = () => {
-        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoViewActivity?VideoId=${route.params.item.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
+        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoViewActivity?VideoId=${route.params.item.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${l_loginReducer.password}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
             .then((response) => { })
     }
 
     const onClickPlayVideo = () => {
-        axios.get(`${getURL.base_URL}/AppVideo/UpdateCrewActivity?VideoId=${route.params.item.Id}&username=${userLoginData.userId}&password=${userLoginData.password}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
+        axios.get(`${getURL.base_URL}/AppVideo/UpdateCrewActivity?VideoId=${route.params.item.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${l_loginReducer.password}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
             .then((response) => { })
     }
 
@@ -173,22 +165,21 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
     const viewCertificate = async () => {
         CheckConnectivity()
-        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${userLoginData.companyId}&EmpId=${userLoginData.userId}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}&VideoId=${route.params.item.Id}&dateOn=${CompletedDate}`)
+        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${l_loginReducer.userData.CompanyId}&EmpId=${l_loginReducer.userData.EmployeeId}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&VideoId=${route.params.item.Id}&dateOn=${CompletedDate}`)
             .then((res) => {
                 setPdfURL(res.data)
                 setViewPdf(true)
+                setIsLoading(false)
             })
     }
 
     const downloadCertificate = async () => {
         CheckConnectivity()
-        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${userLoginData.companyId}&EmpId=${userLoginData.userId}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}&VideoId=${route.params.item.Id}&dateOn=${CompletedDate}`)
+        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${l_loginReducer.userData.CompanyId}&EmpId=${l_loginReducer.userData.EmployeeId}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&VideoId=${route.params.item.Id}&dateOn=${CompletedDate}`)
             .then((res) => {
                 setPdfURL(res.data)
                 let dirs = RNFetchBlob.fs.dirs
-                if (dirs.DocumentDir + "/Documents") { } else {
-                    RNFetchBlob.fs.mkdir(dirs.DownloadDir + "/Documents")
-                }
+                setToastHide(true)
                 RNFetchBlob
                     .config({
                         fileCache: true,
@@ -198,11 +189,11 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     .fetch('GET', `https://testtrace.karco.in/${res.data}`)
                     .then((res) => {
                         setIsLoading(false)
+                        setToastHide(true)
+                        setMessage({ message: "Your Certificate is Downloaded", icon: images.downloaded_icon, isHide: true })
                     })
             })
     }
-
-    console.log(pdfView, "pdfView");
 
     return (
         <View style={{ flex: 1 }}>
@@ -451,8 +442,10 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         label={"View Certificate"}
                                         icon={images.view_icon}
                                         onPress={() => {
+                                            setIsLoading(true)
                                             CheckConnectivity()
                                             viewCertificate()
+                                            // setViewPdf(true)
                                             setPdfView(true)
                                             // navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
                                         }}
@@ -568,10 +561,33 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     ]}
                                 />
                             )}
+
                         </ScrollView>
                     </View>
                 }
             </ScrollView>
+            {toastHide === true &&
+                <CustomToast
+                    icon={message.icon}
+                    iconStyle={{
+                        tintColor: COLORS.white,
+                        marginRight: 10,
+                    }}
+                    containerStyle={{
+                        backgroundColor: COLORS.primary,
+                    }}
+                    labelStyle={{
+                        color: COLORS.white,
+                        fontWeight: "bold",
+                    }}
+                    message={message.message}
+                    onHide={async () => {
+                        await AsyncStorage.removeItem("downloaded")
+                        setToastHide(!toastHide)
+                    }}
+                    ViewPoint={-20}
+                />
+            }
         </View>
     )
 }

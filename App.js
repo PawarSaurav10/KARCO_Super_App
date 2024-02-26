@@ -18,26 +18,42 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
 import rootReducer from './store/rootReducer';
 import { getScreenVisited } from './Utils/getOnBoardingScreenVisited';
 import { TourGuideProvider } from "rn-tourguide"
 import { COLORS } from './Constants/theme';
 import MainAppNavigation from './navigation/MainAppNavigation';
+import { thunk } from './node_modules/redux-thunk';
+import { compose, createStore, applyMiddleware } from './node_modules/redux';
+import { getcache, setcache } from './store/statecache';
+import { persistReducer, persistStore } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
+import AsyncStorage from './node_modules/@react-native-async-storage/async-storage';
 // import { requestMultiple, PERMISSIONS } from 'react-native-permissions';
 
-const middleware = [thunk];
-const composeEnhancer = window.__REDUX_DEVTOOLS_ENTENSION_COMPOSE__ || compose;
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  // Specify the reducers you want to persist
+  whitelist: ['loginReducer'], // In this example, we persist the 'user' reducer
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+const middleware = [thunk]
+const composeEnhancer = compose
 
 const store = createStore(
-  rootReducer,
-  // getcache(),
+  persistedReducer,
+  getcache(),
   composeEnhancer(applyMiddleware(...middleware))
-);
-store.subscribe(() => store.getState());
+)
 
-function App() {
+store.subscribe(() => setcache(store.getState()))
+
+const persistor = persistStore(store)
+
+const App = () => {
   const [initialRoute, setInitialRoute] = useState()
   const OsVer = Platform.constants['Release'];
 
@@ -89,21 +105,23 @@ function App() {
 
   return (
     <Provider store={store}>
-      <SafeAreaView
-        style={{ flex: 1 }}
-      >
-        <StatusBar
-          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-          backgroundColor={backgroundStyle.backgroundColor}
-        />
-        <TourGuideProvider {...{ borderRadius: 10, verticalOffset: 28, color: COLORS.primary, wrapperStyle: style, preventOutsideInteraction: true }}>
-          <NavigationContainer>
-            {initialRoute &&
-              <MainAppNavigation initialRoute={initialRoute} />
-            }
-          </NavigationContainer>
-        </TourGuideProvider>
-      </SafeAreaView>
+      <PersistGate loading={null} persistor={persistor}>
+        <SafeAreaView
+          style={{ flex: 1 }}
+        >
+          <StatusBar
+            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            backgroundColor={backgroundStyle.backgroundColor}
+          />
+          <TourGuideProvider {...{ borderRadius: 10, verticalOffset: 28, color: COLORS.primary, wrapperStyle: style, preventOutsideInteraction: true }}>
+            <NavigationContainer>
+              {initialRoute &&
+                <MainAppNavigation initialRoute={initialRoute} />
+              }
+            </NavigationContainer>
+          </TourGuideProvider>
+        </SafeAreaView>
+      </PersistGate>
     </Provider>
   );
 };

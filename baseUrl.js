@@ -8,4 +8,5 @@ export const getURL = {
     vooKey: "DFckqdC6mQy9lKNVNtFkYKH80",
     KPI_base_URL: "https://trace.karco.in/api/AppKPI",
     KPI_login_base_URL: "https://trace.karco.in/api/applogin",
+    view_Certificate: "https://testtrace.karco.in/api/AppAssessment"
 }

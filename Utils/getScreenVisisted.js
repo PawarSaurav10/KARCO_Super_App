@@ -145,3 +145,11 @@ export function getDownloaded() {
             .catch((err) => reject(err));
     });
 }
+
+
+export const updateObject = (oldObject, updatedProperties) => {
+    return {
+        ...oldObject,
+        ...updatedProperties,
+    };
+};

@@ -18,7 +18,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '../../../Constants/theme';
 import CustomSearch from '../../../Components/CustomSearch';
-import { getUserData_1 } from "../../../Utils/getScreenVisisted"
 import axios from 'axios';
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import NoDataFound from '../../../Components/NoDataFound';
@@ -31,6 +30,8 @@ import _ from "lodash"
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import InProgressCard from '../../../Components/InProgressCard';
+import RNFetchBlob from "react-native-blob-util"
+import { useSelector } from '../../../node_modules/react-redux';
 
 const HomePage = (props) => {
     const navigation = useNavigation();
@@ -43,20 +44,13 @@ const HomePage = (props) => {
     const [searchedCompVideoData, setSearchedCompVideoData] = useState([])
     const [searchedTodoVideo, setSearchedTodoVideo] = useState()
     const [searchedCompVideo, setSearchedCompVideo] = useState()
-    const [userLoginData, setUserLoginData] = useState({
-        userId: null,
-        password: null,
-        crewId: null,
-        vesselId: null,
-        companyId: null
-    })
-    const [userData, setUserData] = useState()
     const [orientation, setOrientation] = useState()
     const [viewAlert, setViewAlert] = useState({
         isShow: false,
         AlertType: ""
     })
     const [assessmentData, setAssessmentData] = useState(null)
+    const l_loginReducer = useSelector((state) => state.loginReducer)
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -118,14 +112,14 @@ const HomePage = (props) => {
     }
 
     async function fetchData() {
-        if (userLoginData.userId !== null) {
+        if (l_loginReducer) {
             await axios.get(`${getURL.base_URL}/AppVideo/GetVideoList`, {
                 params: {
-                    companyId: userLoginData.companyId,
-                    username: userLoginData.userId,
-                    password: userLoginData.password,
-                    CrewId: userLoginData.crewId,
-                    VesselId: userLoginData.vesselId
+                    companyId: l_loginReducer.userData.CompanyId,
+                    username: l_loginReducer.userData.EmployeeId,
+                    password: l_loginReducer.password,
+                    CrewId: l_loginReducer.userData.CrewListId,
+                    VesselId: l_loginReducer.userData.VesselId
                 }
             })
                 .then((res) => {
@@ -139,14 +133,14 @@ const HomePage = (props) => {
     }
 
     async function fetchOnlineAssessmentData() {
-        if (userLoginData.userId !== null) {
+        if (l_loginReducer) {
             await axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment`, {
                 params: {
                     VideoId: revArray[0].Id,
-                    username: userLoginData.userId,
+                    username: l_loginReducer.userData.EmployeeId,
                     password: revArray[0].Password,
-                    CrewId: userLoginData.crewId,
-                    VesselId: userLoginData.vesselId,
+                    CrewId: l_loginReducer.userData.CrewListId,
+                    VesselId: l_loginReducer.userData.VesselId
                 }
             }).then((res) => {
                 setAssessmentData(res.data)
@@ -164,28 +158,19 @@ const HomePage = (props) => {
 
     useEffect(() => {
         if (isFocused) {
+            let dirs = RNFetchBlob.fs.dirs
+            RNFetchBlob.fs.exists(dirs.DownloadDir + "/Documents")
+                .then((exist) => {
+                    if (!exist) {
+                        RNFetchBlob.fs.mkdir(dirs.DownloadDir + "/Documents")
+                    }
+                })
             const dim = Dimensions.get('screen');
             if (dim.height >= dim.width) {
                 setOrientation("protrait")
             } else {
                 setOrientation("landscape")
             }
-            getUserData_1().then((res) => {
-                setUserData(res.userData)
-                setUserLoginData({
-                    userId: res.userData.EmployeeId,
-                    password: res.userPassword,
-                    crewId: res.userData.CrewListId,
-                    vesselId: res.userData.VesselId,
-                    companyId: res.userData.CompanyId
-                })
-            });
-        }
-    }, [])
-
-
-    useEffect(() => {
-        if (isFocused) {
             CheckConnectivity()
             setIsLoading(true)
             const backHandler = BackHandler.addEventListener(
@@ -198,7 +183,7 @@ const HomePage = (props) => {
                 setVideoData([])
             }
         }
-    }, [userLoginData, isFocused])
+    }, [l_loginReducer])
 
     const CompletedList = _.sortBy(videoData && videoData.lstCompleted, ["lstCompleted"])
 
@@ -248,8 +233,6 @@ const HomePage = (props) => {
     let progress = (qusetionAnswered / totalQuestion)
     let percentage = progress * 100
 
-    // console.log(revArray,"revArray[0]");
-
     return (
         <View style={{ flex: 1 }}>
             {isLoading &&
@@ -281,7 +264,7 @@ const HomePage = (props) => {
                                     color: COLORS.primary
                                 }}
                                     numberOfLines={1}>
-                                    Hello {userData.Name} !
+                                    Hello {l_loginReducer.userData.Name} !
                                         </Text>
                             </View>
                         </View>

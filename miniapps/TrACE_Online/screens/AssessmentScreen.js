@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, BackHandler, Image, ActivityIndicator, Modal } from 'react-native'
 import { COLORS } from '../../../Constants/theme';
 import axios from 'axios';
-import { getUserData_1 } from "../../../Utils/getScreenVisisted"
 import { WebView } from 'react-native-webview';
 import { useIsFocused } from '@react-navigation/native';
 import Header from '../../../Components/Header';
@@ -23,23 +22,16 @@ import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import * as Progress from 'react-native-progress';
 import CustomRadioButton from '../../../Components/CustomRadioButton';
+import { useSelector } from '../../../node_modules/react-redux';
 
 const AssessmentScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused()
     const [playVideo, setPlayVideo] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState("")
     const [isLoading, setIsLoading] = useState(true)
-    const [userLoginData, setUserLoginData] = useState({
-        userId: null,
-        password: null,
-        crewId: null,
-        vesselId: null,
-        companyId: null
-    })
     const [assessmentData, setAssessmentData] = useState(null)
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [orientation, setOrientation] = useState()
-
     const [showBlur, setShowBlur] = useState(true);
     const [viewRef, setViewRef] = useState(null);
     const [blurType, setBlurType] = useState('light');
@@ -47,6 +39,7 @@ const AssessmentScreen = ({ navigation, route }) => {
         isShow: false,
         AlertType: ""
     })
+    const l_loginReducer = useSelector((state) => state.loginReducer)
 
     const tintColor = ['#ffffff', '#000000'];
     if (blurType === 'xlight') {
@@ -92,14 +85,14 @@ const AssessmentScreen = ({ navigation, route }) => {
 
     async function fetchOnlineAssessmentData() {
         CheckConnectivity()
-        if (userLoginData.userId !== null) {
+        if (l_loginReducer.userData.EmployeeId) {
             await axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment`, {
                 params: {
                     VideoId: route.params.Id,
-                    username: userLoginData.userId,
+                    username: l_loginReducer.userData.EmployeeId,
                     password: route.params.videoPassword,
-                    CrewId: userLoginData.crewId,
-                    VesselId: userLoginData.vesselId,
+                    CrewId: l_loginReducer.userData.CrewListId,
+                    VesselId: l_loginReducer.userData.VesselId,
                 }
             }).then((res) => {
                 if (res.data.QuestionList.length === 0) {
@@ -127,15 +120,17 @@ const AssessmentScreen = ({ navigation, route }) => {
                 setOrientation("landscape")
             }
             CheckConnectivity()
-            getUserData_1().then((res) => {
-                setUserLoginData({
-                    userId: res.userData.EmployeeId,
-                    password: res.userPassword,
-                    crewId: res.userData.CrewListId,
-                    vesselId: res.userData.VesselId,
-                    companyId: res.userData.CompanyId
-                })
-            });
+            setIsLoading(true)
+            const backHandler = BackHandler.addEventListener(
+                'hardwareBackPress',
+                backAction,
+            );
+            fetchOnlineAssessmentData()
+            return () => {
+                backHandler.remove();
+                setAssessmentData(null)
+                setIsLoading(false)
+            }
         }
     }, [isFocused])
 
@@ -153,7 +148,7 @@ const AssessmentScreen = ({ navigation, route }) => {
     }
 
     const callGetOnlineAssessmentApi = () => {
-        axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment?VideoId=${route.params.Id}&username=${userLoginData.userId}&password=${route.params.videoPassword}&CrewId=${userLoginData.crewId}&VesselId=${userLoginData.vesselId}`)
+        axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment?VideoId=${route.params.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${route.params.videoPassword}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
             .then((res) => { })
     }
 
@@ -203,11 +198,11 @@ const AssessmentScreen = ({ navigation, route }) => {
             params: {
                 FeedbackData: JSON.stringify(tempData),
                 VideoId: Id,
-                username: userLoginData.userId,
+                username: l_loginReducer.userData.EmployeeId,
                 password: videoPassword,
-                CrewId: userLoginData.crewId,
-                VesselId: userLoginData.vesselId,
-                CompanyId: userLoginData.companyId
+                CrewId: l_loginReducer.userData.CrewListId,
+                VesselId: l_loginReducer.userData.VesselId,
+                CompanyId: l_loginReducer.userData.CompanyId
             }
         })
     }
@@ -222,29 +217,13 @@ const AssessmentScreen = ({ navigation, route }) => {
                 answer: data.AnswerOption,
                 QueIndex: questionIndex,
                 VideoId: route.params.Id,
-                username: userLoginData.userId,
-                password: userLoginData.password,
-                CrewId: userLoginData.crewId,
-                VesselId: userLoginData.vesselId
+                username: l_loginReducer.userData.EmployeeId,
+                password: l_loginReducer.password,
+                CrewId: l_loginReducer.userData.CrewListId,
+                VesselId: l_loginReducer.userData.VesselId
             }
         })
     }
-
-    useEffect(() => {
-        if (isFocused) {
-            setIsLoading(true)
-            const backHandler = BackHandler.addEventListener(
-                'hardwareBackPress',
-                backAction,
-            );
-            fetchOnlineAssessmentData()
-            return () => {
-                backHandler.remove();
-                setAssessmentData(null)
-                setIsLoading(false)
-            }
-        }
-    }, [userLoginData.userId, isFocused])
 
     const questionToShow = assessmentData && assessmentData.QuestionList.filter((xx) => xx.Status === "N")[currentQuestion]
     const questioncountIndex = assessmentData && assessmentData.QuestionList.length - assessmentData.QStatusNCount

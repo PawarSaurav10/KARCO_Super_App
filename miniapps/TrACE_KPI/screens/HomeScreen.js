@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, useColorScheme, BackHandler, StatusBar, TouchableOpacity, Image, StyleSheet, ScrollView, Dimensions, Alert } from 'react-native'
+import { View, Text, useColorScheme, BackHandler, StatusBar, TouchableOpacity, Image, StyleSheet, ScrollView, Dimensions } from 'react-native'
 import { useNavigation, useIsFocused } from '@react-navigation/core';
 import { getCompanyUserData } from '../../../Utils/getScreenVisisted';
 import axios from 'axios';

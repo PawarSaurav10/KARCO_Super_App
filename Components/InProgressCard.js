@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         position: "absolute",
         width: Dimensions.get("window").width - 40,
-        height: 180,
+        minHeight: 180,
         justifyContent: "space-between"
     },
     videoName_text: {
