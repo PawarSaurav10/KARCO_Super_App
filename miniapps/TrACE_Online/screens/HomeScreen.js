@@ -31,9 +31,11 @@ import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import InProgressCard from '../../../Components/InProgressCard';
 import RNFetchBlob from "react-native-blob-util"
-import { useSelector } from '../../../node_modules/react-redux';
+import { useSelector, useDispatch } from '../../../node_modules/react-redux';
+import { fetchVideoData } from '../../../store/actions/videoDtlActions';
 
 const HomePage = (props) => {
+    const dispatch = useDispatch()
     const navigation = useNavigation();
     const isFocused = useIsFocused();
     const windowWidth = Dimensions.get('window').width;
@@ -115,11 +117,11 @@ const HomePage = (props) => {
         if (l_loginReducer) {
             await axios.get(`${getURL.base_URL}/AppVideo/GetVideoList`, {
                 params: {
-                    companyId: l_loginReducer.userData.CompanyId,
-                    username: l_loginReducer.userData.EmployeeId,
+                    companyId: l_loginReducer.userData ?.CompanyId,
+                    username: l_loginReducer.userData ?.EmployeeId,
                     password: l_loginReducer.password,
-                    CrewId: l_loginReducer.userData.CrewListId,
-                    VesselId: l_loginReducer.userData.VesselId
+                    CrewId: l_loginReducer.userData ?.CrewListId,
+                    VesselId: l_loginReducer.userData ?.VesselId
                 }
             })
                 .then((res) => {
@@ -161,7 +163,7 @@ const HomePage = (props) => {
             let dirs = RNFetchBlob.fs.dirs
             RNFetchBlob.fs.exists(dirs.DownloadDir + "/Documents")
                 .then((exist) => {
-                    if (!exist) {
+                    if (exist !== true) {
                         RNFetchBlob.fs.mkdir(dirs.DownloadDir + "/Documents")
                     }
                 })
@@ -307,10 +309,11 @@ const HomePage = (props) => {
                                     remainingTime={revArray[0].TimeLeft}
                                     NoOfQuestionAnswered={qusetionAnswered}
                                     OnPress={() => {
+                                        dispatch(fetchVideoData(revArray[0], revArray[0].Id, revArray[0].Password))
                                         if (revArray[0].AssessmentStatus === "Feedback") {
-                                            navigation.replace("Feedback Form", { Id: revArray[0].Id, videoPassword: revArray[0].Password })
+                                            navigation.replace("Feedback Form")
                                         } else {
-                                            navigation.replace("AssessmentNew", { Id: revArray[0].Id, videoPassword: revArray[0].Password, ModuleType: revArray[0].ModuleType })
+                                            navigation.replace("AssessmentNew")
                                         }
                                     }}
                                     Percentage={percentage}
@@ -397,7 +400,10 @@ const HomePage = (props) => {
                                                             VideoCategory={item.Category}
                                                             CourseNo={item.CourseNo}
                                                             VideoName={item.VideoName}
-                                                            onPress={() => navigation.navigate("Video Detail", { item: item, type: "TODOLIST" })}
+                                                            onPress={() => {
+                                                                navigation.navigate("Video Detail", { type: "TODOLIST" })
+                                                                dispatch(fetchVideoData(item, item.Id, item.Password))
+                                                            }}
                                                             Status={item.AssessmentStatus}
                                                             PosterImage={item.PosterPath}
                                                             orientationType={orientation}
@@ -425,7 +431,10 @@ const HomePage = (props) => {
                                                             VideoCategory={item.Category}
                                                             CourseNo={item.CourseNo}
                                                             VideoName={item.VideoName}
-                                                            onPress={() => navigation.navigate("Video Detail", { item: item, type: "TODOLIST" })}
+                                                            onPress={() => {
+                                                                navigation.navigate("Video Detail", { type: "TODOLIST" })
+                                                                dispatch(fetchVideoData(item, item.Id, item.Password))
+                                                            }}
                                                             Status={item.AssessmentStatus}
                                                             PosterImage={item.PosterPath}
                                                             orientationType={orientation}
@@ -476,7 +485,10 @@ const HomePage = (props) => {
                                                         VideoCategory={item.Category}
                                                         CourseNo={item.CourseNo}
                                                         VideoName={item.VideoName}
-                                                        onPress={() => navigation.navigate("Video Detail", { item: item, type: "COMPLIST" })}
+                                                        onPress={() => {
+                                                            navigation.navigate("Video Detail", { type: "COMPLIST" })
+                                                            dispatch(fetchVideoData(item, item.Id, item.Password))
+                                                        }}
                                                         orientationType={orientation}
                                                         PosterImage={item.PosterPath}
                                                     />
@@ -504,7 +516,10 @@ const HomePage = (props) => {
                                                         VideoCategory={item.Category}
                                                         CourseNo={item.CourseNo}
                                                         VideoName={item.VideoName}
-                                                        onPress={() => navigation.navigate("Video Detail", { item: item, type: "COMPLIST" })}
+                                                        onPress={() => {
+                                                            navigation.navigate("Video Detail", { type: "COMPLIST" })
+                                                            dispatch(fetchVideoData(item, item.Id, item.Password))
+                                                        }}
                                                         orientationType={orientation}
                                                         PosterImage={item.PosterPath}
                                                     />
@@ -556,7 +571,8 @@ const HomePage = (props) => {
                                                         CourseNo={xx.CourseNo}
                                                         PosterImage={xx.PosterPath}
                                                         onPress={() => {
-                                                            navigation.navigate("Video Detail", { item: xx })
+                                                            navigation.navigate("Video Detail")
+                                                            dispatch(fetchVideoData(xx, xx.Id, xx.Password))
                                                         }} />
                                                 </View>
                                             )
@@ -564,49 +580,50 @@ const HomePage = (props) => {
                                     </View>
                                 </>
                             )}
-                            {viewAlert.isShow && (
-                                <CustomAlert
-                                    isView={viewAlert.isShow}
-                                    Title={viewAlert.AlertType === "Internet" ? "Oops !!" : "Hold on!"}
-                                    Content={viewAlert.AlertType === "Internet" ? "Your Device is not Connected to Internet, Please Check your Internet Connectivity" : "Are you sure you want to exit App you will get logout of the App?"}
-                                    buttonContainerStyle={{
-                                        flexDirection: "row",
-                                        justifyContent: "flex-end"
-                                    }}
-                                    ButtonsToShow={[
-                                        {
-                                            text: "CANCEL",
-                                            onPress: () => {
-                                                setViewAlert({
-                                                    isShow: false,
-                                                    AlertType: ""
-                                                })
-                                            },
-                                            toShow: viewAlert.AlertType !== "Internet" ? true : false
-                                        },
-                                        {
-                                            text: 'OK',
-                                            onPress: () => {
-                                                if (viewAlert.AlertType === "Internet") {
-                                                    navigation.reset({
-                                                        index: 0,
-                                                        routes: [{ name: "Home" }],
-                                                    })
-                                                } else {
-                                                    logOut()
-                                                }
-                                                setViewAlert({
-                                                    isShow: false,
-                                                    AlertType: ""
-                                                })
-                                            },
-                                            toShow: true,
-                                        },
-                                    ]}
-                                />
-                            )}
+
                         </View>
                     </ScrollView>
+                    {viewAlert.isShow && (
+                        <CustomAlert
+                            isView={viewAlert.isShow}
+                            Title={viewAlert.AlertType === "Internet" ? "Oops !!" : "Hold on!"}
+                            Content={viewAlert.AlertType === "Internet" ? "Your Device is not Connected to Internet, Please Check your Internet Connectivity" : "Are you sure you want to exit App you will get logout of the App?"}
+                            buttonContainerStyle={{
+                                flexDirection: "row",
+                                justifyContent: "flex-end"
+                            }}
+                            ButtonsToShow={[
+                                {
+                                    text: "CANCEL",
+                                    onPress: () => {
+                                        setViewAlert({
+                                            isShow: false,
+                                            AlertType: ""
+                                        })
+                                    },
+                                    toShow: viewAlert.AlertType !== "Internet" ? true : false
+                                },
+                                {
+                                    text: 'OK',
+                                    onPress: () => {
+                                        if (viewAlert.AlertType === "Internet") {
+                                            navigation.reset({
+                                                index: 0,
+                                                routes: [{ name: "Home" }],
+                                            })
+                                        } else {
+                                            logOut()
+                                        }
+                                        setViewAlert({
+                                            isShow: false,
+                                            AlertType: ""
+                                        })
+                                    },
+                                    toShow: true,
+                                },
+                            ]}
+                        />
+                    )}
                 </View>
             )}
         </View>

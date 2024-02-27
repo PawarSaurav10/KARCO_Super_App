@@ -24,7 +24,7 @@ import * as Progress from 'react-native-progress';
 import CustomRadioButton from '../../../Components/CustomRadioButton';
 import { useSelector } from '../../../node_modules/react-redux';
 
-const AssessmentScreen = ({ navigation, route }) => {
+const AssessmentScreen = ({ navigation }) => {
     const isFocused = useIsFocused()
     const [playVideo, setPlayVideo] = useState(false)
     const [selectedOptions, setSelectedOptions] = useState("")
@@ -40,6 +40,7 @@ const AssessmentScreen = ({ navigation, route }) => {
         AlertType: ""
     })
     const l_loginReducer = useSelector((state) => state.loginReducer)
+    const v_videoReducer = useSelector((state) => state.videoDtlReducer)
 
     const tintColor = ['#ffffff', '#000000'];
     if (blurType === 'xlight') {
@@ -88,9 +89,9 @@ const AssessmentScreen = ({ navigation, route }) => {
         if (l_loginReducer.userData.EmployeeId) {
             await axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment`, {
                 params: {
-                    VideoId: route.params.Id,
+                    VideoId: v_videoReducer.videoId,
                     username: l_loginReducer.userData.EmployeeId,
-                    password: route.params.videoPassword,
+                    password: v_videoReducer.videoPassword,
                     CrewId: l_loginReducer.userData.CrewListId,
                     VesselId: l_loginReducer.userData.VesselId,
                 }
@@ -148,7 +149,7 @@ const AssessmentScreen = ({ navigation, route }) => {
     }
 
     const callGetOnlineAssessmentApi = () => {
-        axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment?VideoId=${route.params.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${route.params.videoPassword}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
+        axios.get(`${getURL.base_URL}/AppAssessment/GetOnlineAssessment?VideoId=${v_videoReducer.videoId}&username=${l_loginReducer.userData.EmployeeId}&password=${v_videoReducer.videoPassword}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
             .then((res) => { })
     }
 
@@ -216,7 +217,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                 selected: selected,
                 answer: data.AnswerOption,
                 QueIndex: questionIndex,
-                VideoId: route.params.Id,
+                VideoId: v_videoReducer.videoId,
                 username: l_loginReducer.userData.EmployeeId,
                 password: l_loginReducer.password,
                 CrewId: l_loginReducer.userData.CrewListId,
@@ -592,7 +593,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                                 onPress: () => {
                                     setIsLoading(false)
                                     callGetOnlineAssessmentApi()
-                                    navigation.replace("Feedback Form", { Id: route.params.Id, videoPassword: route.params.videoPassword })
+                                    navigation.replace("Feedback Form", { Id: v_videoReducer.videoId, videoPassword: v_videoReducer.videoPassword })
                                     setViewAlert({
                                         isShow: false,
                                         AlertType: ""
@@ -605,7 +606,7 @@ const AssessmentScreen = ({ navigation, route }) => {
                                 onPress: () => {
                                     setIsLoading(false)
                                     callGetOnlineAssessmentApi()
-                                    callFeedbackAPI(route.params.Id, route.params.videoPassword)
+                                    callFeedbackAPI(v_videoReducer.videoId, v_videoReducer.videoPassword)
                                     navigation.replace("Online_Home")
                                     setViewAlert({
                                         isShow: false,

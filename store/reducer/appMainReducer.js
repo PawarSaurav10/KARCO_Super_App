@@ -27,7 +27,6 @@ const fetchUserInfoStart = (state, action) => {
 };
 
 const fetchUserInfoSuccess = (state, action) => {
-    // console.log(state,action,"sad")
     return updateObject(state, {
         userInfo: action.userInfo,
         error: null,
@@ -36,7 +35,6 @@ const fetchUserInfoSuccess = (state, action) => {
 };
 
 const fetchUserInfoError = (state, action) => {
-    // console.log("user info reducer", action);
     return updateObject(state, {
         isLoading: false,
         userInfo: [],

@@ -40,6 +40,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
         isHide: false
     })
     const l_loginReducer = useSelector(state => state.loginReducer)
+    const v_videoData = useSelector(state => state.videoDtlReducer)
 
     const backAction = () => {
         navigation.replace("Online_Home", { type: route.params.type })
@@ -51,7 +52,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
         return dim.height >= dim.width;
     };
 
-    const CompletedDate = moment(route.params.item.CompletedDate, "DD MMM YYYY").format("YYYY-MM-DD")
+    const CompletedDate = moment(v_videoData.videoData.CompletedDate, "DD MMM YYYY").format("YYYY-MM-DD")
 
     useEffect(() => {
         // Event Listener for orientation changes
@@ -101,17 +102,17 @@ const VideoDetailScreen = ({ navigation, route }) => {
     }, [])
 
     const onPromoViewVideoClick = () => {
-        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoPreViewActivity?VideoId=${route.params.item.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${l_loginReducer.password}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
+        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoPreViewActivity?VideoId=${v_videoData.videoId}&username=${l_loginReducer.userData.EmployeeId}&password=${l_loginReducer.password}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
             .then((response) => { })
     }
 
     const onFullViewVideoClick = () => {
-        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoViewActivity?VideoId=${route.params.item.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${l_loginReducer.password}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
+        axios.get(`${getURL.base_URL}/AppVideo/UpdateVideoViewActivity?VideoId=${v_videoData.videoId}&username=${l_loginReducer.userData.EmployeeId}&password=${l_loginReducer.password}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
             .then((response) => { })
     }
 
     const onClickPlayVideo = () => {
-        axios.get(`${getURL.base_URL}/AppVideo/UpdateCrewActivity?VideoId=${route.params.item.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${l_loginReducer.password}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
+        axios.get(`${getURL.base_URL}/AppVideo/UpdateCrewActivity?VideoId=${v_videoData.videoId}&username=${l_loginReducer.userData.EmployeeId}&password=${l_loginReducer.password}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}`)
             .then((response) => { })
     }
 
@@ -119,7 +120,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
     <html>
         <body>
             <div width="100%" height="auto" allowfullscreen="true">
-                <iframe id="i_frame" class="spotlightr" allow="autoplay" src="${getURL.play_video_URL}/${route.params.item.videokeypromo}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
+                <iframe id="i_frame" class="spotlightr" allow="autoplay" src="${getURL.play_video_URL}/${v_videoData.videoData.videokeypromo}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
             </div>
             <script src="https://videojs.cdn.spotlightr.com/assets/spotlightr.js"></script>
         </body>
@@ -128,7 +129,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
     const htmlContentFull = `
         <div width="100%" height="auto" allowfullscreen="true">
-            <iframe allow="autoplay" src="${getURL.play_video_URL}/${route.params.item.videokey}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
+            <iframe allow="autoplay" src="${getURL.play_video_URL}/${v_videoData.videoData.videokey}" frameborder="0" allowfullscreen="true" watch-type="" url-params="" height="100%" name="videoPlayerframe"  scrolling="no" width="100%" allowtransparency="true" />
         </div>
     `;
 
@@ -145,7 +146,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
     // };
 
     const togglePlayPause = () => {
-        const apiKey = route.params.item.videokeypromo;
+        const apiKey = v_videoData.videoData.videokeypromo;
         const runFirst = `
             document.body.style.backgroundColor = 'red';
             // document.getElementById('i_frame').style.display = 'none';
@@ -165,7 +166,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
     const viewCertificate = async () => {
         CheckConnectivity()
-        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${l_loginReducer.userData.CompanyId}&EmpId=${l_loginReducer.userData.EmployeeId}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&VideoId=${route.params.item.Id}&dateOn=${CompletedDate}`)
+        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${l_loginReducer.userData.CompanyId}&EmpId=${l_loginReducer.userData.EmployeeId}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&VideoId=${v_videoData.videoId}&dateOn=${CompletedDate}`)
             .then((res) => {
                 setPdfURL(res.data)
                 setViewPdf(true)
@@ -175,7 +176,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
 
     const downloadCertificate = async () => {
         CheckConnectivity()
-        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${l_loginReducer.userData.CompanyId}&EmpId=${l_loginReducer.userData.EmployeeId}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&VideoId=${route.params.item.Id}&dateOn=${CompletedDate}`)
+        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${l_loginReducer.userData.CompanyId}&EmpId=${l_loginReducer.userData.EmployeeId}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&VideoId=${v_videoData.videoId}&dateOn=${CompletedDate}`)
             .then((res) => {
                 setPdfURL(res.data)
                 let dirs = RNFetchBlob.fs.dirs
@@ -183,7 +184,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                 RNFetchBlob
                     .config({
                         fileCache: true,
-                        path: dirs.DownloadDir + "/Documents" + `/${route.params.item.VideoName}_certificate.pdf`,
+                        path: dirs.DownloadDir + "/Documents" + `/${v_videoData.videoData.VideoName}_certificate.pdf`,
                         transform: true
                     })
                     .fetch('GET', `https://testtrace.karco.in/${res.data}`)
@@ -210,7 +211,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                             <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                         </TouchableOpacity>
                     }
-                    title={route.params.item.VideoName}
+                    title={v_videoData.videoData.VideoName}
                 />
                 {isLoading &&
                     <VideoScreenLoader />
@@ -220,7 +221,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                         <ScrollView
                             contentInsetAdjustmentBehavior="automatic"
                         >
-                            {route.params.item.ModuleType !== "Circular" && (videoType == "PROMOKEY" || videoType == "") &&
+                            {v_videoData.videoData.ModuleType !== "Circular" && (videoType == "PROMOKEY" || videoType == "") &&
                                 <View style={{ width: Dimensions.get('window').width, height: orientation === "landscape" ? 280 : 240 }}>
                                     <WebView
                                         ref={webViewRef}
@@ -253,15 +254,15 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 </View>
                             }
 
-                            {route.params.item.ModuleType == "Circular" && (videoType == "PDF" || videoType == "") &&
+                            {v_videoData.videoData.ModuleType == "Circular" && (videoType == "PDF" || videoType == "") &&
                                 <View style={{ width: Dimensions.get('screen').width, height: orientation === "landscape" ? 280 : 240 }}>
-                                    <PDFViewer pdf={route.params.item.VideoPath} pageNo={1} />
+                                    <PDFViewer pdf={v_videoData.videoData.VideoPath} pageNo={1} />
                                 </View>
                             }
 
                             <View style={{ margin: 20 }}>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1 }}>
-                                    <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.item.VideoName}</Text>
+                                    <Text style={{ fontSize: 20, width: 300, fontWeight: "bold", color: COLORS.darkBlue }}>{v_videoData.videoData.VideoName}</Text>
                                     {/* <View style={[styles.icon_container, styles.shadowProp]}><Image style={styles.icon} source={FavouriteIcon} /></View> */}
                                 </View>
                                 <View
@@ -276,20 +277,20 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         paddingHorizontal: 12,
                                         paddingVertical: 6,
                                         // width: "50%",
-                                        backgroundColor: `${route.params.item.Category === "OCIMF SIRE VIQ SERIES"
+                                        backgroundColor: `${v_videoData.videoData.Category === "OCIMF SIRE VIQ SERIES"
                                             ? "#FFC239" :
-                                            route.params.item.Category === "SHIP SPECIFIC SERIES"
+                                            v_videoData.videoData.Category === "SHIP SPECIFIC SERIES"
                                                 ? "#29ABE2" :
-                                                route.params.item.Category === "ACCIDENT / INCIDENT SERIES"
+                                                v_videoData.videoData.Category === "ACCIDENT / INCIDENT SERIES"
                                                     ? "#9E005D" :
-                                                    route.params.item.Category === "PERSONAL SAFETY"
+                                                    v_videoData.videoData.Category === "PERSONAL SAFETY"
                                                         ? "#f75a24" :
-                                                        route.params.item.Category === "SHIP BOARD OPERATION"
+                                                        v_videoData.videoData.Category === "SHIP BOARD OPERATION"
                                                             ? "#22B573" :
                                                             "red"
                                             }`
                                     }}>
-                                    <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.white }} numberOfLines={1}>{route.params.item.Category}</Text>
+                                    <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.white }} numberOfLines={1}>{v_videoData.videoData.Category}</Text>
                                 </View>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 4 }}>
                                     <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
@@ -299,18 +300,18 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                                 width: 16,
                                             }} source={images.calendar_icon} />
                                         </View>
-                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{route.params.item.CreatedDate}</Text>
+                                        <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.darkBlue }}>{v_videoData.videoData.CreatedDate}</Text>
                                     </View>
 
                                 </View>
-                                {/* {route.params.item.ModuleType != "Circular" && ( */}
+                                {/* {v_videoData.videoData.ModuleType != "Circular" && ( */}
                                 <View style={{ fontSize: 12, flexDirection: "row", marginBottom: 10 }}>
                                     <Text style={{ color: COLORS.darkBlue, fontWeight: "600" }}>Description : </Text>
                                     <TouchableOpacity style={{ borderBottomWidth: 1, maxWidth: "100%", color: COLORS.blue }}
                                         onPress={() => {
                                             CheckConnectivity()
                                             setViewPdf(!viewPdf)
-                                            // onSynopsisPress(`https://trace.karco.in/Uploads/Synopsis/${route.params.item.SynopsisPath}`)
+                                            // onSynopsisPress(`https://trace.karco.in/Uploads/Synopsis/${v_videoData.videoData.SynopsisPath}`)
                                         }}
                                     >
                                         <Text style={{ color: COLORS.blue }}>View Synopsis</Text>
@@ -318,7 +319,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                 </View>
                                 {/* )} */}
                                 <View style={{ borderWidth: 1, borderColor: COLORS.darkBlue, width: "100%", marginVertical: 8 }}></View>
-                                {route.params.item.ModuleType == "Circular"
+                                {v_videoData.videoData.ModuleType == "Circular"
                                     ?
                                     <CustomIconButton
                                         label={"View PDF"}
@@ -371,19 +372,19 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     />
                                 }
 
-                                {route.params.item.AssessmentStatus == "Pending" &&
+                                {v_videoData.videoData.AssessmentStatus == "Pending" &&
                                     <CustomIconButton
                                         label={"Take Assessment"}
                                         icon={images.assessment_icon}
                                         onPress={() => {
                                             CheckConnectivity()
-                                            if (route.params.item.HavingAssessment == "Y" && videoType != "") {
-                                                navigation.replace("AssessmentNew", { Id: route.params.item.Id, videoPassword: route.params.item.Password, ModuleType: route.params.item.ModuleType })
+                                            if (v_videoData.videoData.HavingAssessment == "Y" && videoType != "") {
+                                                navigation.replace("AssessmentNew", { Id: v_videoData.videoId, videoPassword: v_videoData.videoData.Password, ModuleType: v_videoData.videoData.ModuleType })
                                             } else {
-                                                if (route.params.item.HavingAssessment !== "Y") {
+                                                if (v_videoData.videoData.HavingAssessment !== "Y") {
                                                     alert("The video does not have an Assessment")
                                                 } else {
-                                                    alert(`Please First ${route.params.item.ModuleType == "Circular" ? "View Circular" : "Play Full Video"}`)
+                                                    alert(`Please First ${v_videoData.videoData.ModuleType == "Circular" ? "View Circular" : "Play Full Video"}`)
                                                 }
                                             }
                                         }}
@@ -399,13 +400,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     />
                                 }
 
-                                {route.params.item.AssessmentStatus == "Continue" &&
+                                {v_videoData.videoData.AssessmentStatus == "Continue" &&
                                     <CustomIconButton
                                         label={"Continue Assessment"}
                                         icon={images.assessment_icon}
                                         onPress={() => {
                                             CheckConnectivity()
-                                            navigation.replace("AssessmentNew", { Id: route.params.item.Id, videoPassword: route.params.item.Password, ModuleType: route.params.item.ModuleType })
+                                            navigation.replace("AssessmentNew", { Id: v_videoData.videoId, videoPassword: v_videoData.videoData.Password, ModuleType: v_videoData.videoData.ModuleType })
                                         }}
                                         containerStyle={{
                                             backgroundColor: COLORS.darkBlue,
@@ -418,13 +419,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     />
                                 }
 
-                                {route.params.item.AssessmentStatus == "Feedback" &&
+                                {v_videoData.videoData.AssessmentStatus == "Feedback" &&
                                     <CustomIconButton
                                         label={"Give Feedback"}
                                         icon={images.assessment_icon}
                                         onPress={() => {
                                             CheckConnectivity()
-                                            navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
+                                            navigation.replace("Feedback Form", { Id: v_videoData.videoId, videoPassword: v_videoData.videoData.Password })
                                         }}
                                         containerStyle={{
                                             backgroundColor: COLORS.darkBlue,
@@ -437,7 +438,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     />
                                 }
 
-                                {route.params.item.AssessmentStatus == "Completed" &&
+                                {v_videoData.videoData.AssessmentStatus == "Completed" &&
                                     <CustomIconButton
                                         label={"View Certificate"}
                                         icon={images.view_icon}
@@ -447,7 +448,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             viewCertificate()
                                             // setViewPdf(true)
                                             setPdfView(true)
-                                            // navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
+                                            // navigation.replace("Feedback Form", { Id: v_videoData.videoId, videoPassword: v_videoData.videoData.Password })
                                         }}
                                         containerStyle={{
                                             backgroundColor: COLORS.darkBlue,
@@ -461,14 +462,14 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                     />
                                 }
 
-                                {route.params.item.AssessmentStatus == "Completed" &&
+                                {v_videoData.videoData.AssessmentStatus == "Completed" &&
                                     <CustomIconButton
                                         label={"Download Certificate"}
                                         icon={images.downloading_icon}
                                         onPress={() => {
                                             CheckConnectivity()
                                             downloadCertificate()
-                                            // navigation.replace("Feedback Form", { Id: route.params.item.Id, videoPassword: route.params.item.Password })
+                                            // navigation.replace("Feedback Form", { Id: v_videoData.videoId, videoPassword: v_videoData.videoData.Password })
                                         }}
                                         containerStyle={{
                                             backgroundColor: COLORS.darkBlue,
@@ -511,8 +512,8 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         minScale={1.0}
                                         trustAllCerts={false}
                                         source={{
-                                            uri: `${(route.params.item.ModuleType === "Circular" && pdfView === false) ? `${getURL.view_PDF_URL}/${route.params.item.VideoPath}`
-                                                : (route.params.item.ModuleType === "Video" && pdfView === false) ? `${getURL.view_Synopsis_URL}/${route.params.item.SynopsisPath}`
+                                            uri: `${(v_videoData.videoData.ModuleType === "Circular" && pdfView === false) ? `${getURL.view_PDF_URL}/${v_videoData.videoData.VideoPath}`
+                                                : (v_videoData.videoData.ModuleType === "Video" && pdfView === false) ? `${getURL.view_Synopsis_URL}/${v_videoData.videoData.SynopsisPath}`
                                                     : pdfView === true ? `https://testtrace.karco.in/${pdfURL}` : ""}`
                                         }}
                                         style={[styles.pdf, { position: "relative" }]}

@@ -62,23 +62,16 @@ const App = () => {
       requestMultiple([
         PERMISSIONS.IOS.READ_EXTERNAL_STORAGE,
         PERMISSIONS.IOS.WRITE_EXTERNAL_STORAGE,
-      ]).then((statuses) => {
-        // console.log('Camera', statuses[PERMISSIONS.IOS.READ_EXTERNAL_STORAGE]);
-        // console.log('FaceID', statuses[PERMISSIONS.IOS.WRITE_EXTERNAL_STORAGE]);
-      });
+      ]).then((statuses) => { });
     } else {
       if (OsVer > 12) {
         PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO)
-          .then((result) => {
-            // console.log(result);
-          })
+          .then((result) => { })
       } else {
         PermissionsAndroid.requestMultiple(
           [PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE]
-        ).then((result) => {
-          // console.log(result);
-        })
+        ).then((result) => { })
       }
     }
 

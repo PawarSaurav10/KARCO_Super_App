@@ -131,7 +131,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
             if (OsVer > 12) {
                 check(PERMISSIONS.ANDROID.READ_MEDIA_VIDEO)
                     .then((result) => {
-                        console.log(result);
                         if (result === "granted") {
                             let dirs = RNFetchBlob.fs.dirs
                             setToastHide(true)
@@ -159,7 +158,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
                     [PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
                     PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE])
                     .then((statuses) => {
-                        console.log(statuses);
                         if (statuses[PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE] === "denied" || statuses[PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE] === "denied") {
                             setViewAlert({
                                 isShow: true,

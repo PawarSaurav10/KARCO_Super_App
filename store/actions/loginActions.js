@@ -34,24 +34,26 @@ const loginFail = (error) => {
 export const login = (username, password) => {
     return async (dispatch) => {
         dispatch(loginStart());
-        await axios.get(`${getURL.base_URL}/applogin/userlogin?username=${username.trimStart("").trimEnd("")}&password=${password.trimStart("").trimEnd("")}`)
-            .then((response) => {
-                if (response.data.CrewListId > 0) {
-                    saveUserDataToStorage(response.data, password.trimStart("").trimEnd(""))
-                    dispatch(loginSuccess(response.data, password.trimStart("").trimEnd("")));
-                    setOnlineScreenVisited("Yes");
-                } else {
-                    dispatch(loginFail("Invalid Credentials"));
-                }
-            })
-            .catch((err) => {
-                dispatch(loginFail(err))
-            });
+        try {
+            await axios.get(`${getURL.base_URL}/applogin/userlogin?username=${username.trimStart("").trimEnd("")}&password=${password.trimStart("").trimEnd("")}`)
+                .then((response) => {
+                    if (response.data.CrewListId !== 0) {
+                        saveUserDataToStorage(response.data, password.trimStart("").trimEnd(""))
+                        dispatch(loginSuccess(response.data, password.trimStart("").trimEnd("")));
+                        setOnlineScreenVisited("Yes");
+                    } else {
+                        dispatch(loginFail("Invalid Credentials"));
+                    }
+                })
+        } catch (err) {
+            dispatch(loginFail("Invalid Credentials"));
+        }
+
     };
 };
 
-export const logout = async () => {
-    await AsyncStorage.removeItem("online_screen_visited")
-    await AsyncStorage.removeItem("userData")
+export const logout = () => {
+    AsyncStorage.removeItem("online_screen_visited")
+    AsyncStorage.removeItem("userData")
     return { type: LOGOUT };
 };

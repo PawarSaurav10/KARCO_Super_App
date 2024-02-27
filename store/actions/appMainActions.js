@@ -151,7 +151,6 @@ export const saveUserLogin = (token) => {
                 });
             }
         } catch (err) {
-            console.log(err);
             dispatch({
                 type: SAVE_USERLOGIN_LOG_FAIL,
                 error: "Network error !! Check your internet connection",

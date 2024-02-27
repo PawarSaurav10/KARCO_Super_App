@@ -16,7 +16,7 @@ import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import CustomRadioButton from '../../../Components/CustomRadioButton';
 
-const FeedbackScreen = ({ navigation, route }) => {
+const FeedbackScreen = ({ navigation }) => {
     const isFocused = useIsFocused();
     const [viewWarnings, setViewWarnings] = useState(false)
     const [viewWarningsImp, setViewWarningsImp] = useState(false)
@@ -134,6 +134,7 @@ const FeedbackScreen = ({ navigation, route }) => {
     const [viewRef, setViewRef] = useState(null);
     const [percentage, setPercentage] = useState(0)
     const l_loginReducer = useSelector(state => state.loginReducer)
+    const v_videoReducer = useSelector((state) => state.videoDtlReducer)
 
     /**
     * Returns true if the screen is in portrait mode
@@ -188,9 +189,9 @@ const FeedbackScreen = ({ navigation, route }) => {
         if (l_loginReducer.userData.EmployeeId) {
             await axios.get(`${getURL.base_URL}/AppFeedback/GetOnlineFeedback`, {
                 params: {
-                    VideoId: route.params.Id,
+                    VideoId: v_videoReducer.videoId,
                     username: l_loginReducer.userData.EmployeeId,
-                    password: route.params.videoPassword,
+                    password: v_videoReducer.videoPassword,
                     CrewId: l_loginReducer.userData.CrewListId,
                     VesselId: l_loginReducer.userData.VesselId,
                 }
@@ -300,7 +301,7 @@ const FeedbackScreen = ({ navigation, route }) => {
             };
         });
         let tempData = {
-            password: route.params.videoPassword,
+            password: v_videoReducer.videoPassword,
             CBTOverAll: rating,
             CBTAssessment: data["CBT Assessment"],
             VideoQuality: data["Video Quality"],
@@ -347,7 +348,7 @@ const FeedbackScreen = ({ navigation, route }) => {
             tempData.CourseContent != null
         ) {
             try {
-                axios.get(`${getURL.base_URL}/AppFeedback/SaveFeedbackActivity?FeedbackData=${JSON.stringify(tempSaveData)}&VideoId=${route.params.Id}&username=${l_loginReducer.userData.EmployeeId}&password=${route.params.videoPassword}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&CompanyId=${l_loginReducer.userData.CompanyId}`)
+                axios.get(`${getURL.base_URL}/AppFeedback/SaveFeedbackActivity?FeedbackData=${JSON.stringify(tempSaveData)}&VideoId=${v_videoReducer.videoId}&username=${l_loginReducer.userData.EmployeeId}&password=${v_videoReducer.videoPassword}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&CompanyId=${l_loginReducer.userData.CompanyId}`)
                     .then((res) => {
                         if (res.status === 200) {
                             setViewAlert({
