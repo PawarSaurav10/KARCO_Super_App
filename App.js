@@ -40,16 +40,16 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const middleware = [thunk]
+// const middleware = [thunk]
 const composeEnhancer = compose
 
 const store = createStore(
   persistedReducer,
-  getcache(),
-  composeEnhancer(applyMiddleware(...middleware))
+  // getcache(),
+  composeEnhancer(applyMiddleware(...[thunk]))
 )
 
-store.subscribe(() => setcache(store.getState()))
+store.subscribe(() => store.getState())
 
 const persistor = persistStore(store)
 
@@ -98,10 +98,8 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <SafeAreaView
-          style={{ flex: 1 }}
-        >
+      <PersistGate persistor={persistor}>
+        <SafeAreaView style={{ flex: 1 }}>
           <StatusBar
             barStyle={isDarkMode ? 'light-content' : 'dark-content'}
             backgroundColor={backgroundStyle.backgroundColor}

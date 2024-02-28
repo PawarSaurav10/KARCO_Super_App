@@ -52,6 +52,7 @@ const HomePage = (props) => {
         AlertType: ""
     })
     const [assessmentData, setAssessmentData] = useState(null)
+    const [otpError, setOtpError] = useState()
     const l_loginReducer = useSelector((state) => state.loginReducer)
 
     const isPortrait = () => {
@@ -69,6 +70,7 @@ const HomePage = (props) => {
     }, [orientation])
 
     const logOut = async () => {
+        await AsyncStorage.removeItem("persist:root")
         await AsyncStorage.removeItem("online_screen_visited")
         await AsyncStorage.removeItem("userData")
         navigation.reset({
@@ -159,7 +161,17 @@ const HomePage = (props) => {
     };
 
     useEffect(() => {
-        if (isFocused) {
+        if (l_loginReducer.error !== null) {
+            setOtpError(l_loginReducer.error);
+        }
+    }, [l_loginReducer]);
+
+    console.log(otpError,"otpError")
+
+    useEffect(() => {
+        console.log(l_loginReducer, "l_login");
+        if (l_loginReducer.userData !== null) {
+            setIsLoading(false)
             let dirs = RNFetchBlob.fs.dirs
             RNFetchBlob.fs.exists(dirs.DownloadDir + "/Documents")
                 .then((exist) => {
@@ -184,7 +196,15 @@ const HomePage = (props) => {
                 backHandler.remove();
                 setVideoData([])
             }
+
+        } else {
+            setIsLoading(false)
+            setViewAlert({
+                isShow: true,
+                AlertType: "Internet"
+            })
         }
+
     }, [l_loginReducer])
 
     const CompletedList = _.sortBy(videoData && videoData.lstCompleted, ["lstCompleted"])
@@ -266,7 +286,7 @@ const HomePage = (props) => {
                                     color: COLORS.primary
                                 }}
                                     numberOfLines={1}>
-                                    Hello {l_loginReducer.userData.Name} !
+                                    Hello {l_loginReducer.userData ?.Name} !
                                         </Text>
                             </View>
                         </View>
@@ -609,7 +629,7 @@ const HomePage = (props) => {
                                         if (viewAlert.AlertType === "Internet") {
                                             navigation.reset({
                                                 index: 0,
-                                                routes: [{ name: "Home" }],
+                                                routes: [{ name: "Login" }],
                                             })
                                         } else {
                                             logOut()

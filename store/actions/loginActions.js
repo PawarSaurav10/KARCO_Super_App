@@ -18,6 +18,7 @@ const loginStart = () => {
 };
 
 const loginSuccess = (userData, password) => {
+    console.log("login suceess")
     return {
         type: LOGIN_SUCCESS,
         userData: userData,
@@ -34,18 +35,25 @@ const loginFail = (error) => {
 export const login = (username, password) => {
     return async (dispatch) => {
         dispatch(loginStart());
+        console.log("object")
         try {
-            await axios.get(`${getURL.base_URL}/applogin/userlogin?username=${username.trimStart("").trimEnd("")}&password=${password.trimStart("").trimEnd("")}`)
+            console.log("object1")
+            await axios.get(`${getURL.base_URL}/applogin/userlogin?username=${username}&password=${password}`)
                 .then((response) => {
-                    if (response.data.CrewListId !== 0) {
-                        saveUserDataToStorage(response.data, password.trimStart("").trimEnd(""))
-                        dispatch(loginSuccess(response.data, password.trimStart("").trimEnd("")));
-                        setOnlineScreenVisited("Yes");
+                    console.log("object2")
+                    if (response.data.CrewListId > 0) {
+                        console.log("object3")
+                        saveUserDataToStorage(response.data, password)
+                        dispatch(loginSuccess(response.data, password))
+                        setOnlineScreenVisited("Yes")
                     } else {
-                        dispatch(loginFail("Invalid Credentials"));
+                        console.log("object4")
+                        dispatch(loginFail("Invalid Credentials"))
                     }
                 })
         } catch (err) {
+            console.log("object5")
+
             dispatch(loginFail("Invalid Credentials"));
         }
 
@@ -53,6 +61,7 @@ export const login = (username, password) => {
 };
 
 export const logout = () => {
+    AsyncStorage.removeItem('persist:root')
     AsyncStorage.removeItem("online_screen_visited")
     AsyncStorage.removeItem("userData")
     return { type: LOGOUT };

@@ -86,7 +86,7 @@ const LoginScreen = ({ navigation, route }) => {
                             }
                         })
                 } else {
-                    dispatch(login(loginData.userId, loginData.password))
+                    dispatch(login((loginData.userId.trimStart("").trimEnd("")), (loginData.password.trimStart("").trimEnd(""))))
                     navigation.reset({
                         index: 0,
                         routes: [{ name: "Online_Home" }],

@@ -8,9 +8,12 @@ import KPIIcon from "../Images/screen.png"
 import ShoreOnlineIcon from "../Images/check-list-1.png"
 import VideoIcon from "../Images/video-marketing.png"
 import CustomButton from '../Components/CustomButton';
+import { useDispatch } from '../node_modules/react-redux';
+import { fetchKARCOVideoData } from '../store/actions/videoDtlActions';
 
 
 const HomeScreen = ({ navigation }) => {
+    const dispatch = useDispatch()
     const {
         canStart, // a boolean indicate if you can start tour guide
         start, // a function to start the tourguide
@@ -111,7 +114,12 @@ const HomeScreen = ({ navigation }) => {
                         >
                             <TouchableOpacity
                                 style={styles.card_container}
-                                onPress={() => navigation.navigate(app.path, app.appName)}
+                                onPress={() => {
+                                    navigation.navigate(app.path, app.appName)
+                                    if (app.appName === "KARCO Videos") {
+                                        dispatch(fetchKARCOVideoData())
+                                    }
+                                }}
                             >
                                 <View style={styles.app_logo_container}>
                                     <Image source={images.trace_logo} style={{ width: 48, height: 48, borderRadius: 40 }} />
@@ -126,7 +134,12 @@ const HomeScreen = ({ navigation }) => {
                                                 backgroundColor: "transparent",
                                                 alignSelf: "flex-start"
                                             }}
-                                            onPress={() => navigation.navigate(app.path, app.appName)}
+                                            onPress={() => {
+                                                navigation.navigate(app.path, app.appName)
+                                                if (app.appName === "KARCO Videos") {
+                                                    dispatch(fetchKARCOVideoData())
+                                                }
+                                            }}
                                             labelStyle={{ color: COLORS.primary, fontSize: 14, textTransform: "uppercase", borderBottomWidth: 2, borderBottomColor: COLORS.primary }}
                                         />
                                     </View>

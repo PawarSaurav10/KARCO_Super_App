@@ -7,16 +7,17 @@ const initialState = {
     videoPassword: null,
     isLoading: null,
     error: null,
+    karcoVideoData: []
 };
 
-const videoDateFetchStart = (state, action) => {
+const videoDataFetchStart = (state, action) => {
     return updateObject(state, {
         isLoading: true,
         error: null,
     });
 };
 
-const videoDateFetchSuccess = (state, action) => {
+const videoDataFetchSuccess = (state, action) => {
     return updateObject(state, {
         videoData: action.videoData,
         videoId: action.videoId,
@@ -26,7 +27,7 @@ const videoDateFetchSuccess = (state, action) => {
     });
 };
 
-const videoDateFetchFail = (state, action) => {
+const videoDataFetchFail = (state, action) => {
     return updateObject(state, {
         videoData: null,
         videoId: null,
@@ -36,14 +37,44 @@ const videoDateFetchFail = (state, action) => {
     });
 };
 
+const fetchVideoDataStart = (state, action) => {
+    return updateObject(state, {
+        isLoading: true,
+        error: null,
+    });
+};
+
+const fetchVideoDataSuccess = (state, action) => {
+    return updateObject(state, {
+        karcoVideoData: action.karcoVideoData,
+        isLoading: false,
+        error: null,
+    });
+};
+
+const fetchVideoDataFail = (state, action) => {
+    return updateObject(state, {
+        karcoVideoData: [],
+        isLoading: false,
+        error: action.error,
+    });
+};
+
 export default (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.VIDEO_DATA_FETCH_START:
-            return videoDateFetchStart(state, action);
+            return videoDataFetchStart(state, action);
         case actionTypes.VIDEO_DATA_FETCH_SUCCESS:
-            return videoDateFetchSuccess(state, action);
+            return videoDataFetchSuccess(state, action);
         case actionTypes.VIDEO_DATA_FETCH_FAIL:
-            return videoDateFetchFail(state, action);
+            return videoDataFetchFail(state, action);
+
+        case actionTypes.FETCH_VIDEO_DATA_START:
+            return fetchVideoDataStart(state, action);
+        case actionTypes.FETCH_VIDEO_DATA_SUCCESS:
+            return fetchVideoDataSuccess(state, action);
+        case actionTypes.FETCH_VIDEO_DATA_FAIL:
+            return fetchVideoDataFail(state, action);
         default:
             return state;
     }

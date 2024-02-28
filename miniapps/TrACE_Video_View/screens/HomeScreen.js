@@ -11,16 +11,18 @@ import VideoListView from '../../../Components/VideoListView';
 import NoDataFound from '../../../Components/NoDataFound';
 import images from '../../../Constants/images';
 import RNFetchBlob from "react-native-blob-util";
+import { useDispatch, useSelector } from '../../../node_modules/react-redux';
 
 const HomeScreen = (props) => {
     const navigation = useNavigation();
     const isFocused = useIsFocused()
     const [videoList, setVideoList] = useState()
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
     const [isView, setIsView] = useState(false)
     const [searchedVideoData, setSearchedVideoData] = useState([])
     const [searchedVideo, setSearchedVideo] = useState("")
     const [orientation, setOrientation] = useState()
+    const videoData = useSelector(state => state.videoDtlReducer.karcoVideoData)
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -79,23 +81,23 @@ const HomeScreen = (props) => {
         }
     };
 
-    const fetchData = () => {
-        return new Promise((resolve, reject) => {
-            axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
-                .then((response) => response)
-                .then((data) => resolve(data))
-                .catch((error) => reject(error))
-        })
-    }
+    // const fetchData = () => {
+    //     return new Promise((resolve, reject) => {
+    //         axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
+    //             .then((response) => response)
+    //             .then((data) => resolve(data))
+    //             .catch((error) => reject(error))
+    //     })
+    // }
 
     const onRefresh = async () => {
-        setIsLoading(true)
+        setIsLoading(videoData.length > 0 ? false : true)
         CheckConnectivity()
-        fetchData()
-            .then((res) => {
-                setVideoList(res.data.videos.data)
-                setIsLoading(false)
-            })
+        // fetchData()
+        //     .then((res) => {
+        //         setVideoList(res.data.videos.data)
+        //         setIsLoading(false)
+        //     })
     };
 
     useEffect(() => {
@@ -103,7 +105,7 @@ const HomeScreen = (props) => {
             let dirs = RNFetchBlob.fs.dirs
             RNFetchBlob.fs.exists(dirs.DownloadDir + "/Videos")
                 .then((exist) => {
-                    if (!exist) {
+                    if (exist !== true) {
                         RNFetchBlob.fs.mkdir(dirs.DownloadDir + "/Videos")
                     }
                 })
@@ -111,16 +113,16 @@ const HomeScreen = (props) => {
             if (dim.height >= dim.width) {
                 setOrientation("protrait")
             } else {
+                false
                 setOrientation("landscape")
             }
-            setIsLoading(true)
+            // setIsLoading(videoData.length > 0 ? false : true)
             CheckConnectivity()
-            // axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
-            fetchData()
-                .then((res) => {
-                    setVideoList(res.data.videos.data)
-                    setIsLoading(false)
-                })
+            // fetchData()
+            //     .then((res) => {
+            //         setVideoList(res.data.videos.data)
+            //         setIsLoading(false)
+            //     }) 
             const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
@@ -132,12 +134,12 @@ const HomeScreen = (props) => {
     useEffect(() => {
         if (searchedVideo) {
             setSearchedVideoData(
-                videoList.filter((element) =>
+                videoData.filter((element) =>
                     element.name.toLowerCase().includes(searchedVideo.toLowerCase())
                 )
             );
         } else {
-            setSearchedVideoData(videoList);
+            setSearchedVideoData(videoData);
         }
         return () => {
             setSearchedVideoData([]);
@@ -202,7 +204,7 @@ const HomeScreen = (props) => {
                                             <FlatList
                                                 refreshing={isLoading}
                                                 onRefresh={onRefresh}
-                                                data={videoList}
+                                                data={videoData}
                                                 keyExtractor={item => item.id}
                                                 showsHorizontalScrollIndicator={false}
                                                 renderItem={({ item, index }) => (

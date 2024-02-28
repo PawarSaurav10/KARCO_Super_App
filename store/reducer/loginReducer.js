@@ -36,15 +36,15 @@ const loginFail = (state, action) => {
 export default (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.LOGIN_START:
-            return loginStart(state, action);
+            return loginStart(state, action)
         case actionTypes.LOGIN_SUCCESS:
-            return loginSuccess(state, action);
+            return loginSuccess(state, action)
         case actionTypes.LOGIN_FAIL:
-            return loginFail(state, action);
+            return loginFail(state, action)
 
         case actionTypes.LOGOUT:
-            return initialState;
+            return initialState
         default:
-            return state;
+            return state
     }
 };
