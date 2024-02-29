@@ -14,7 +14,7 @@ import NetInfo from "@react-native-community/netinfo";
 import images from '../Constants/images';
 import CustomAlert from '../Components/CustomAlert';
 import { useDispatch } from 'react-redux';
-import { login } from '../store/actions/loginActions';
+import { userLogin, companyLogin } from '../store/actions/loginActions';
 
 const LoginScreen = ({ navigation, route }) => {
     const dispatch = useDispatch()
@@ -64,60 +64,38 @@ const LoginScreen = ({ navigation, route }) => {
                     axios.get(`${getURL.KPI_login_base_URL}/CompanyLogin?username=${loginData.userId.trimStart("").trimEnd("")}&password=${loginData.password.trimStart("").trimEnd("")}`)
                         .then((response) => {
                             if (response.data.CompanyId > 0) {
-                                setIsLoading(false)
-                                let companyId = response.data.CompanyId
-                                let companyName = response.data.CompanyName
-                                let companyLogoName = response.data.LogoName
-                                let companyLogoPath = response.data.LogoPath
-                                let NoOfShips = response.data.NoOfShips
-                                saveCompanyDataToStorage(companyId, companyName, companyLogoName, companyLogoPath, NoOfShips)
-                                setScreenVisited("Yes")
+                                dispatch(companyLogin(response.data))
                                 navigation.reset({
                                     index: 0,
                                     routes: [{ name: "KPI_Home" }],
                                 });
+                                setIsLoading(false)
                             } else {
                                 setIsLoading(false)
                                 setViewAlert({
                                     isShow: true,
                                     AlertType: "WrongValues"
                                 })
-                                // alert("Couldn't Sign In, Your User Name and Password Does'nt Match.")
                             }
                         })
                 } else {
-                    dispatch(login((loginData.userId.trimStart("").trimEnd("")), (loginData.password.trimStart("").trimEnd(""))))
-                    navigation.reset({
-                        index: 0,
-                        routes: [{ name: "Online_Home" }],
-                    });
-                    // setIsLoading(false)
-                    // axios.get(`${getURL.base_URL}/applogin/userlogin?username=${loginData.userId.trimStart("").trimEnd("")}&password=${loginData.password.trimStart("").trimEnd("")}`)
-                    //     .then((response) => {
-                    //         if (response.data.CrewListId > 0) {
-                    //             setIsLoading(true)
-                    //             saveUserDataToStorage(response.data, loginData.password.trimStart("").trimEnd(""))
-                    //             // let data = [];
-                    //             // data.push({
-                    //             //     code: "SIGNIN",
-                    //             //     isVisited: true,
-                    //             //     screenName: "LoginScreen",
-                    //             // });
-                    //             setOnlineScreenVisited("Yes");
-                    //             navigation.reset({
-                    //                 index: 0,
-                    //                 routes: [{ name: "Online_Home" }],
-                    //             });
-                    //             setIsLoading(false)
-                    //         } else {
-                    //             setIsLoading(false)
-                    //             setViewAlert({
-                    //                 isShow: true,
-                    //                 AlertType: "WrongValues"
-                    //             })
-                    //             // alert("Couldn't Sign In, Your Username and Password Does'nt Match.")
-                    //         }
-                    //     })
+                    axios.get(`${getURL.base_URL}/applogin/userlogin?username=${loginData.userId.trimStart("").trimEnd("")}&password=${loginData.password.trimStart("").trimEnd("")}`)
+                        .then((response) => {
+                            if (response.data.CrewListId > 0) {
+                                dispatch(userLogin(response.data, (loginData.password.trimStart("").trimEnd(""))))
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: "Online_Home" }],
+                                });
+                                setIsLoading(false)
+                            } else {
+                                setIsLoading(false)
+                                setViewAlert({
+                                    isShow: true,
+                                    AlertType: "WrongValues"
+                                })
+                            }
+                        })
                 }
             } catch (error) {
                 throw error

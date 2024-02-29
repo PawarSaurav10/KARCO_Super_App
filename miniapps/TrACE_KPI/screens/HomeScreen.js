@@ -19,14 +19,13 @@ import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import LinearGradient1 from "react-native-linear-gradient";
+import { useSelector } from '../../../node_modules/react-redux';
 
 const HomeScreen = () => {
     const isDarkMode = useColorScheme() === 'dark';
     const navigation = useNavigation();
     const isFocused = useIsFocused();
-    const [userLoginData, setUserLoginData] = useState({
-        companyId: null,
-    })
+    const company_loginReducer = useSelector(state => state.loginReducer.companyData)
     const [buttonType, setButtonType] = useState("Overall")
     const [performanceType, setPerformanceType] = useState("Top")
     const [selectedDays, setSelectedDays] = useState("90 Days")
@@ -71,20 +70,9 @@ const HomeScreen = () => {
     })
     const daysData = ["90 Days", "60 Days", "30 Days"]
 
-    /**
-    * Returns true if the screen is in portrait mode
-    */
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
         return dim.height >= dim.width;
-    };
-
-    /**
-     * Returns true of the screen is in landscape mode
-     */
-    const isLandscape = () => {
-        const dim = Dimensions.get('screen');
-        return dim.width >= dim.height;
     };
 
     useEffect(() => {
@@ -130,15 +118,6 @@ const HomeScreen = () => {
     }
 
     useEffect(() => {
-        CheckConnectivity()
-        getCompanyUserData().then((res) => {
-            setUserLoginData({
-                companyId: res.companyId,
-            })
-        });
-    }, [])
-
-    useEffect(() => {
         if (isFocused) {
             const dim = Dimensions.get('screen');
             if (dim.height >= dim.width) {
@@ -151,15 +130,14 @@ const HomeScreen = () => {
                 'hardwareBackPress',
                 backAction,
             )
-            if (userLoginData.companyId) {
-
-                axios.get(`${getURL.KPI_base_URL}/GetOverallPercByCompanyId?companyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
+            if (company_loginReducer.CompanyId) {
+                axios.get(`${getURL.KPI_base_URL}/GetOverallPercByCompanyId?companyId=${company_loginReducer.CompanyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
                     .then((res) => {
                         let percentage = res.data / 100
                         setTotalPercentage(percentage)
                     })
 
-                axios.get(`${getURL.KPI_base_URL}/GetIndividualPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
+                axios.get(`${getURL.KPI_base_URL}/GetIndividualPercByCompanyId?CompanyId=${company_loginReducer.CompanyId}&KPITypeId=${buttonType === "Overall" ? "1" : "2"}`)
                     .then((res) => {
                         setOverAllData({
                             KVAvg: res.data.KVAvg,
@@ -176,7 +154,7 @@ const HomeScreen = () => {
                         setIsLoading(false)
                     })
 
-                axios.get(`${getURL.KPI_base_URL}/GetTopBottomPercByCompanyId?CompanyId=${userLoginData.companyId}&KPITypeId=${buttonType === "Overall" ? 1 : 2}`)
+                axios.get(`${getURL.KPI_base_URL}/GetTopBottomPercByCompanyId?CompanyId=${company_loginReducer.CompanyId}&KPITypeId=${buttonType === "Overall" ? 1 : 2}`)
                     .then((res) => {
                         let topPerformanceData = res.data.TopPerformer
                         let botttomPerformanceData = res.data.BottomPerformer
@@ -186,7 +164,7 @@ const HomeScreen = () => {
                         setBottomPerformance(arryBottmPerformance)
                     })
 
-                axios.get(`${getURL.KPI_base_URL}/GetSummaryDataByCompanyId?companyId=${userLoginData.companyId}`)
+                axios.get(`${getURL.KPI_base_URL}/GetSummaryDataByCompanyId?companyId=${company_loginReducer.CompanyId}`)
                     .then((res) => {
                         let temp30Data = []
                         res.data.ChartFor30.map((aa) => {
@@ -217,7 +195,7 @@ const HomeScreen = () => {
                         setDay90LineData(temp90Data)
                     })
 
-                axios.get(`${getURL.KPI_base_URL}/GetTrainigOverdueByCompanyId?companyId=${userLoginData.companyId}`)
+                axios.get(`${getURL.KPI_base_URL}/GetTrainigOverdueByCompanyId?companyId=${company_loginReducer.CompanyId}`)
                     .then((res) => {
                         setDueData({
                             tenDays: JSON.parse(res.data.TenDays === "NaN" ? 0 : res.data.TenDays),
@@ -229,7 +207,7 @@ const HomeScreen = () => {
                         })
                     })
 
-                axios.get(`${getURL.KPI_base_URL}/GetImportExportReportByCompanyId?companyId=${userLoginData.companyId}`)
+                axios.get(`${getURL.KPI_base_URL}/GetImportExportReportByCompanyId?companyId=${company_loginReducer.CompanyId}`)
                     .then((res) => {
                         setImportExportData({
                             ImportDays: res.data.ImportDays,
@@ -243,7 +221,7 @@ const HomeScreen = () => {
                 backHandler.remove();
             }
         }
-    }, [userLoginData.companyId, buttonType])
+    }, [company_loginReducer.CompanyId, buttonType])
 
     return (
         <SafeAreaView

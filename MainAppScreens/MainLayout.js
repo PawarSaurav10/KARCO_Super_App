@@ -102,6 +102,8 @@ const TabButton = ({
 };
 
 const MainLayout = ({
+    loginReducer,
+    videoReducer,
     drawerAnimationStyle,
     navigation,
     selectedTab,
@@ -249,7 +251,7 @@ const MainLayout = ({
                     >
                         {appName !== "KARCO Videos" &&
                             <View style={{ flex: 1 }}>
-                                {appName === "TrACE Online" ? <Online_Home videoType={videoType} /> : appName === "TrACE KPI" ? <HomeScreen /> : <Video_HomeScreen />}
+                                {appName === "TrACE Online" ? <Online_Home loginReducer={loginReducer} videoType={videoType} /> : appName === "TrACE KPI" ? <HomeScreen /> : <Video_HomeScreen />}
                             </View>
                         }
 
@@ -274,8 +276,8 @@ const MainLayout = ({
                                                     width: orientation === "landscape" ? Dimensions.get("window").width : SIZES.width,
                                                 }}
                                             >
-                                                {selectedTab == "Home" && <Video_HomeScreen ScreenName={screenVisisted} />}
-                                                {selectedTab == "Downloads" && <DownloadsScreen ScreenName={screenVisisted} />}
+                                                {selectedTab == "Home" && <Video_HomeScreen ScreenName={screenVisisted} videoReducer={videoReducer} />}
+                                                {selectedTab == "Downloads" && <DownloadsScreen ScreenName={screenVisisted} videoReducer={videoReducer} />}
                                             </View>
                                         );
                                     }}
@@ -389,6 +391,8 @@ const MainLayout = ({
 function mapStateToProps(state) {
     return {
         selectedTab: state.tabReducer.selectedTab,
+        videoReducer: state.videoDtlReducer,
+        loginReducer: state.loginReducer,
     };
 }
 

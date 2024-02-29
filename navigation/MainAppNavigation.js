@@ -5,6 +5,7 @@ import MainNavigation from '../miniapps/TrACE_KPI/navigations/MainNavigation';
 import OnlineNavigation from '../miniapps/TrACE_Online/navigations/OnlineNavigation';
 import VideoNavigation from '../miniapps/TrACE_Video_View/navigation/VideoNavigation';
 import { createStackNavigator } from '@react-navigation/stack';
+import { connect } from '../node_modules/react-redux';
 const Main = createStackNavigator()
 
 const MainAppNavigation = ({ initialRoute }) => {
@@ -23,4 +24,11 @@ const MainAppNavigation = ({ initialRoute }) => {
     )
 }
 
-export default MainAppNavigation
+function mapStateToProps(state) {
+    return {
+        loginReducer: state.loginReducer,
+        videoReducer: state.videoDtlReducer
+    }
+};
+
+export default connect(mapStateToProps)(MainAppNavigation);

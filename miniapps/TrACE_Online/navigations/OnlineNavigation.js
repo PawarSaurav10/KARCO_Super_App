@@ -9,6 +9,7 @@ const Online = createStackNavigator();
 import { getOnlineScreenVisited } from "../../../Utils/getScreenVisisted"
 import DrawerNavigation from '../../../navigation/DrawerNavigation';
 import CertificatesScreen from '../screens/CertificatesScreen';
+import { connect } from '../../../node_modules/react-redux';
 
 const OnlineNavigation = ({ route }) => {
     const [initialRoute, setInitialRoute] = useState()
@@ -48,4 +49,10 @@ const OnlineNavigation = ({ route }) => {
     )
 }
 
-export default OnlineNavigation
+function mapStateToProps(state) {
+    return {
+        loginReducer: state.loginReducer,
+    };
+}
+
+export default connect(mapStateToProps)(OnlineNavigation);

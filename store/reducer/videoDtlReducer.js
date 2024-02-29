@@ -75,6 +75,10 @@ export default (state = initialState, action) => {
             return fetchVideoDataSuccess(state, action);
         case actionTypes.FETCH_VIDEO_DATA_FAIL:
             return fetchVideoDataFail(state, action);
+
+        case actionTypes.CLEAR_VIDEO_DATA:
+            return initialState
+            
         default:
             return state;
     }

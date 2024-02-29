@@ -17,7 +17,7 @@ const HomeScreen = (props) => {
     const navigation = useNavigation();
     const isFocused = useIsFocused()
     const [videoList, setVideoList] = useState()
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [isView, setIsView] = useState(false)
     const [searchedVideoData, setSearchedVideoData] = useState([])
     const [searchedVideo, setSearchedVideo] = useState("")
@@ -101,6 +101,9 @@ const HomeScreen = (props) => {
     };
 
     useEffect(() => {
+        if (props.videoReducer.karcoVideoData.length > 0) {
+            setIsLoading(false)
+        }
         if (isFocused) {
             let dirs = RNFetchBlob.fs.dirs
             RNFetchBlob.fs.exists(dirs.DownloadDir + "/Videos")
@@ -129,7 +132,7 @@ const HomeScreen = (props) => {
             );
             return () => backHandler.remove();
         }
-    }, [props.ScreenName === "Home", isFocused])
+    }, [props.ScreenName === "Home", isFocused, props.videoReducer])
 
     useEffect(() => {
         if (searchedVideo) {
@@ -145,6 +148,7 @@ const HomeScreen = (props) => {
             setSearchedVideoData([]);
         };
     }, [searchedVideo]);
+    
 
     return (
         <View style={{ flex: 1 }}>

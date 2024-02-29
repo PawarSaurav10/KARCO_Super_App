@@ -58,28 +58,7 @@ const CustomDrawerItem = ({ label, icon, isFocused, onPress }) => {
 
 const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName }) => {
     const [orientation, setOrientation] = useState()
-    const [companyLoginData, setCompanyLoginData] = useState({
-        companyId: null,
-        companyName: null,
-        companyLogoName: null,
-        companyLogoPath: null,
-        NoOfShips: null
-    })
     const l_loginReducer = useSelector(state => state.loginReducer)
-
-    useEffect(() => {
-        if (appName === "TrACE KPI") {
-            getCompanyUserData().then((res) => {
-                setCompanyLoginData({
-                    companyId: res.companyId,
-                    companyName: res.companyName,
-                    companyLogoName: res.companyLogoName,
-                    companyLogoPath: res.companyLogoPath,
-                    NoOfShips: res.NoOfShips
-                })
-            });
-        }
-    }, [])
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -158,27 +137,29 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                         </TouchableOpacity>
                         <View>
                             <Text style={{ color: COLORS.white, fontSize: 20, textAlign: "left", marginBottom: 2 }}>
-                                {l_loginReducer && l_loginReducer.userData?.Name}
+                                {l_loginReducer && l_loginReducer.userData ?.Name}
                             </Text>
                             <Text style={{ color: COLORS.gray2, fontSize: 14, textAlign: "left" }}>
-                                {l_loginReducer && l_loginReducer.userData?.VesselName}
+                                {l_loginReducer && l_loginReducer.userData ?.VesselName}
                             </Text>
                         </View>
                     </View>
-                    : <View style={{ marginTop: SIZES.radius, alignItems: "center", }}>
-                        <Image
-                            src={`https://trace.karco.in/Images/CompanyLogo/${companyLoginData.companyLogoPath}`}
-                            style={{ width: 120, height: 120, borderRadius: 100 }}
-                        />
-                        <View style={{ marginTop: 16, alignItems: "center" }}>
-                            <Text style={{ color: COLORS.white, fontSize: 20, borderBottomWidth: 2, borderBottomColor: "white", paddingBottom: 4, marginBottom: 8 }}>
-                                {companyLoginData.companyName}
-                            </Text>
-                            <Text style={{ color: COLORS.white, fontSize: 16 }}>
-                                {companyLoginData.NoOfShips} Ships
-                        </Text>
+                    : appName === "TrACE KPI" ?
+                        <View style={{ marginTop: SIZES.radius, alignItems: "center", }}>
+                            <Image
+                                src={`https://trace.karco.in/Images/CompanyLogo/${l_loginReducer.companyData.LogoPath}`}
+                                style={{ width: 120, height: 120, borderRadius: 100 }}
+                            />
+                            <View style={{ marginTop: 16, alignItems: "center" }}>
+                                <Text style={{ color: COLORS.white, fontSize: 20, borderBottomWidth: 2, borderBottomColor: "white", paddingBottom: 4, marginBottom: 8 }}>
+                                    {l_loginReducer.companyData.CompanyName}
+                                </Text>
+                                <Text style={{ color: COLORS.white, fontSize: 16 }}>
+                                    {l_loginReducer.companyData.NoOfShips} Ships
+                                    </Text>
+                            </View>
                         </View>
-                    </View>
+                        : <View></View>
                 }
 
                 {/* Line Divider */}
@@ -313,7 +294,8 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
     );
 };
 
-const DrawerNew = ({ selectedTab, setSelectedTab, route }) => {
+
+const DrawerNew = ({ selectedTab, setSelectedTab, route, videoDtlReducer }) => {
     const [progress, setProgress] = React.useState(new Animated.Value(0));
 
     return (

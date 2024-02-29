@@ -30,15 +30,11 @@ export async function setScreenVisited(screenData) {
     );
 }
 
-export async function saveCompanyDataToStorage(companyId, companyName, companyLogoName, companyLogoPath, NoOfShips) {
+export async function saveCompanyDataToStorage(companyData) {
     AsyncStorage.setItem(
         "userCompanyData_",
         JSON.stringify({
-            companyId: companyId,
-            companyName: companyName,
-            companyLogoName: companyLogoName,
-            companyLogoPath: companyLogoPath,
-            NoOfShips: NoOfShips
+            companyData: companyData
         })
     );
 };

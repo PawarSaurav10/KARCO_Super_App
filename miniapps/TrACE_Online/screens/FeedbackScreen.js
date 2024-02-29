@@ -15,6 +15,7 @@ import NetInfo from "@react-native-community/netinfo";
 import images from '../../../Constants/images';
 import CustomAlert from '../../../Components/CustomAlert';
 import CustomRadioButton from '../../../Components/CustomRadioButton';
+import { useSelector } from '../../../node_modules/react-redux';
 
 const FeedbackScreen = ({ navigation }) => {
     const isFocused = useIsFocused();

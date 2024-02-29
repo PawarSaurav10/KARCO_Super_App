@@ -1,68 +1,126 @@
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getURL } from "../../baseUrl";
-import { setOnlineScreenVisited, saveUserDataToStorage } from "../../Utils/getScreenVisisted";
-import { saveUserLogin } from "./appMainActions";
+import { setOnlineScreenVisited, saveUserDataToStorage, saveCompanyDataToStorage, setScreenVisited } from "../../Utils/getScreenVisisted";
 
-export const LOGIN_START = "LOGIN_START";
-export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
-export const LOGIN_FAIL = "LOGIN_FAIL";
+export const USER_LOGIN_START = "USER_LOGIN_START";
+export const USER_LOGIN_SUCCESS = "USER_LOGIN_UCCESS";
+export const USER_LOGIN_FAIL = "USER_LOGIN_FAIL";
 
-export const LOGOUT = "LOGOUT";
+export const USER_LOGOUT = "USER_LOGOUT";
 
-const loginStart = () => {
+export const COMPANY_LOGIN_START = "COMPANY_LOGIN_START";
+export const COMPANY_LOGIN_SUCCESS = "COMPANY_LOGIN_UCCESS";
+export const COMPANY_LOGIN_FAIL = "COMPANY_LOGIN_FAIL";
+
+export const COMPANY_LOGOUT = "COMPANY_LOGOUT";
+
+const userLoginStart = () => {
     return {
-        type: LOGIN_START,
+        type: USER_LOGIN_START,
         error: null,
     };
 };
 
-const loginSuccess = (userData, password) => {
-    console.log("login suceess")
+const userLoginSuccess = (userData, password) => {
     return {
-        type: LOGIN_SUCCESS,
+        type: USER_LOGIN_SUCCESS,
         userData: userData,
         password: password
     };
 };
-const loginFail = (error) => {
+const userLoginFail = (error) => {
     return {
-        type: LOGIN_FAIL,
+        type: USER_LOGIN_FAIL,
         error: error,
     };
 };
 
-export const login = (username, password) => {
+export const userLogin = (userData, password) => {
     return async (dispatch) => {
-        dispatch(loginStart());
-        console.log("object")
+        dispatch(userLoginStart());
         try {
-            console.log("object1")
-            await axios.get(`${getURL.base_URL}/applogin/userlogin?username=${username}&password=${password}`)
-                .then((response) => {
-                    console.log("object2")
-                    if (response.data.CrewListId > 0) {
-                        console.log("object3")
-                        saveUserDataToStorage(response.data, password)
-                        dispatch(loginSuccess(response.data, password))
-                        setOnlineScreenVisited("Yes")
-                    } else {
-                        console.log("object4")
-                        dispatch(loginFail("Invalid Credentials"))
-                    }
-                })
+            if (userData) {
+                saveUserDataToStorage(userData, password)
+                dispatch(userLoginSuccess(userData, password))
+                setOnlineScreenVisited("Yes")
+            } else {
+                dispatch(userLoginFail("Invalid Credentials"));
+            }
         } catch (err) {
-            console.log("object5")
-
-            dispatch(loginFail("Invalid Credentials"));
+            dispatch(userLoginFail(err));
         }
-
     };
 };
 
-export const logout = () => {
+// export const login = (username, password) => {
+//     return async (dispatch) => {
+//         dispatch(loginStart());
+//         try {
+//             await axios.get(`${getURL.base_URL}/applogin/userlogin?username=${username}&password=${password}`)
+//                 .then((response) => {
+//                     if (response.data.CrewListId > 0) {
+//                         saveUserDataToStorage(response.data, password)
+//                         dispatch(loginSuccess(response.data, password))
+//                         setOnlineScreenVisited("Yes")
+//                     } else {
+//                         dispatch(loginFail("Invalid Credentials"))
+//                     }
+//                 })
+//         } catch (err) {
+//             dispatch(loginFail("Invalid Credentials"));
+//         }
+//     };
+// };
+
+export const userLogout = () => {
     AsyncStorage.removeItem('persist:root')
     AsyncStorage.removeItem("online_screen_visited")
     AsyncStorage.removeItem("userData")
-    return { type: LOGOUT };
+    return { type: USER_LOGOUT };
+};
+
+const companyLoginStart = () => {
+    return {
+        type: COMPANY_LOGIN_START,
+        error: null,
+    };
+};
+
+const companyLoginSuccess = (companyData) => {
+    return {
+        type: COMPANY_LOGIN_SUCCESS,
+        // userData: userData,
+        companyData: companyData,
+    };
+};
+const companyLoginFail = (error) => {
+    return {
+        type: COMPANY_LOGIN_FAIL,
+        error: error,
+    };
+};
+
+export const companyLogin = (companyData) => {
+    return async (dispatch) => {
+        dispatch(companyLoginStart());
+        try {
+            if (companyData) {
+                saveCompanyDataToStorage(companyData)
+                dispatch(companyLoginSuccess(companyData))
+                setScreenVisited("Yes")
+            } else {
+                dispatch(companyLoginFail("Invalid Credentials"));
+            }
+        } catch (err) {
+            dispatch(companyLoginFail(err));
+        }
+    };
+};
+
+export const companyLogout = () => {
+    AsyncStorage.removeItem("screen_visited")
+    AsyncStorage.removeItem("userCompanyData_")
+    return {
+        type: COMPANY_LOGOUT,
+        companyData: null,
+    };
 };

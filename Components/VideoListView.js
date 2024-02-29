@@ -7,6 +7,7 @@ import { useNavigation } from '../node_modules/@react-navigation/core';
 import images from '../Constants/images';
 
 const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, item, onDelete, orientationType }) => {
+    // console.log(videoName,"videoName");
     const navigation = useNavigation()
     const [viewDownloadIcon, setViewDownloadIcon] = useState(false)
     const [readFIle, setReadFile] = useState(null);
@@ -15,7 +16,7 @@ const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, i
     useEffect(() => {
         if (listType !== "Downloads") {
             const docPath = ReactNativeBlobUtil.fs.dirs.DownloadDir;
-            ReactNativeBlobUtil.fs.exists(`${docPath}/${videoName}.bin`)
+            ReactNativeBlobUtil.fs.exists(`${docPath}/Videos/${videoName}.bin`)
                 .then((res) => {
                     if (res === true) {
                         // ReactNativeBlobUtil.fs.stat(`${docPath}/${videoName}.bin`)

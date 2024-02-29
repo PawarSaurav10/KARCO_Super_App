@@ -382,7 +382,7 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                                 navigation.replace("AssessmentNew", { Id: v_videoData.videoId, videoPassword: v_videoData.videoData.Password, ModuleType: v_videoData.videoData.ModuleType })
                                             } else {
                                                 if (v_videoData.videoData.HavingAssessment !== "Y") {
-                                                    alert("The video does not have an Assessment")
+                                                    alert(`The ${v_videoData.videoData.ModuleType === "Video" ? "video" : "content"} does not have an Assessment`)
                                                 } else {
                                                     alert(`Please First ${v_videoData.videoData.ModuleType == "Circular" ? "View Circular" : "Play Full Video"}`)
                                                 }

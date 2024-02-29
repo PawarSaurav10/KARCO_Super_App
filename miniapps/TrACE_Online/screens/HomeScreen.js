@@ -116,14 +116,14 @@ const HomePage = (props) => {
     }
 
     async function fetchData() {
-        if (l_loginReducer) {
+        if (l_loginReducer.userData) {
             await axios.get(`${getURL.base_URL}/AppVideo/GetVideoList`, {
                 params: {
-                    companyId: l_loginReducer.userData ?.CompanyId,
-                    username: l_loginReducer.userData ?.EmployeeId,
+                    companyId: l_loginReducer.userData.CompanyId,
+                    username: l_loginReducer.userData.EmployeeId,
                     password: l_loginReducer.password,
-                    CrewId: l_loginReducer.userData ?.CrewListId,
-                    VesselId: l_loginReducer.userData ?.VesselId
+                    CrewId: l_loginReducer.userData.CrewListId,
+                    VesselId: l_loginReducer.userData.VesselId,
                 }
             })
                 .then((res) => {
@@ -161,15 +161,6 @@ const HomePage = (props) => {
     };
 
     useEffect(() => {
-        if (l_loginReducer.error !== null) {
-            setOtpError(l_loginReducer.error);
-        }
-    }, [l_loginReducer]);
-
-    console.log(otpError,"otpError")
-
-    useEffect(() => {
-        console.log(l_loginReducer, "l_login");
         if (l_loginReducer.userData !== null) {
             setIsLoading(false)
             let dirs = RNFetchBlob.fs.dirs

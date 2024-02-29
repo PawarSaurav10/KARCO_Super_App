@@ -4,6 +4,7 @@ import HomeScreen from '../../TrACE_Video_View/screens/HomeScreen';
 import VideoDetailScreen from '../screens/VideoDetailScreen';
 import DownloadsScreen from '../screens/DownloadsScreen';
 import DrawerNavigation from '../../../navigation/DrawerNavigation';
+import { connect } from '../../../node_modules/react-redux';
 const VideoNav = createStackNavigator()
 
 const VideoNavigation = () => {
@@ -20,4 +21,10 @@ const VideoNavigation = () => {
     )
 }
 
-export default VideoNavigation
+function mapStateToProps(state) {
+    return {
+        videoReducer: state.videoDtlReducer
+    };
+}
+
+export default connect(mapStateToProps)(VideoNavigation);
