@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native'
 import { getURL } from '../baseUrl';
 import { COLORS } from '../Constants/theme';

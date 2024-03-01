@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, Image, FlatList, ActivityIndicator, BackHandler, Dimensions, ScrollView, } from 'react-native'
 import { COLORS } from '../../../Constants/theme';
-import axios from 'axios';
 import CustomSearch from '../../../Components/CustomSearch';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import NoInternetComponent from '../../../Components/NoInternetComponent';
 import NetInfo from "@react-native-community/netinfo";
-import { getURL } from "../../../baseUrl"
 import VideoListView from '../../../Components/VideoListView';
 import NoDataFound from '../../../Components/NoDataFound';
 import images from '../../../Constants/images';
 import RNFetchBlob from "react-native-blob-util";
-import { useDispatch, useSelector } from '../../../node_modules/react-redux';
+import { useSelector } from '../../../node_modules/react-redux';
 
 const HomeScreen = (props) => {
     const navigation = useNavigation();
     const isFocused = useIsFocused()
-    const [videoList, setVideoList] = useState()
     const [isLoading, setIsLoading] = useState(true)
     const [isView, setIsView] = useState(false)
     const [searchedVideoData, setSearchedVideoData] = useState([])
@@ -90,15 +87,15 @@ const HomeScreen = (props) => {
     //     })
     // }
 
-    const onRefresh = async () => {
-        setIsLoading(videoData.length > 0 ? false : true)
-        CheckConnectivity()
-        // fetchData()
-        //     .then((res) => {
-        //         setVideoList(res.data.videos.data)
-        //         setIsLoading(false)
-        //     })
-    };
+    // const onRefresh = async () => {
+    //     setIsLoading(videoData.length > 0 ? false : true)
+    //     CheckConnectivity()
+    //     // fetchData()
+    //     //     .then((res) => {
+    //     //         setVideoList(res.data.videos.data)
+    //     //         setIsLoading(false)
+    //     //     })
+    // };
 
     useEffect(() => {
         if (props.videoReducer.karcoVideoData.length > 0) {
@@ -148,7 +145,7 @@ const HomeScreen = (props) => {
             setSearchedVideoData([]);
         };
     }, [searchedVideo]);
-    
+
 
     return (
         <View style={{ flex: 1 }}>
@@ -200,14 +197,15 @@ const HomeScreen = (props) => {
                                 />
                             </View >
                         }
+
                         {!isView &&
                             <ScrollView contentContainerStyle={{ flex: orientation === "landscape" ? 0 : 1 }}>
                                 <View style={{ flex: 1 }}>
                                     <View style={{ flex: 1, marginHorizontal: 6 }}>
                                         {!searchedVideo &&
                                             <FlatList
-                                                refreshing={isLoading}
-                                                onRefresh={onRefresh}
+                                                // refreshing={isLoading}
+                                                // onRefresh={onRefresh}
                                                 data={videoData}
                                                 keyExtractor={item => item.id}
                                                 showsHorizontalScrollIndicator={false}
@@ -228,8 +226,8 @@ const HomeScreen = (props) => {
 
                                         {searchedVideo && searchedVideoData && searchedVideoData.length > 0 &&
                                             <FlatList
-                                                refreshing={isLoading}
-                                                onRefresh={onRefresh}
+                                                // refreshing={isLoading}
+                                                // onRefresh={onRefresh}
                                                 data={searchedVideo !== "" && searchedVideoData}
                                                 keyExtractor={item => item.id}
                                                 showsHorizontalScrollIndicator={false}
@@ -247,6 +245,7 @@ const HomeScreen = (props) => {
                                                 )}
                                             />
                                         }
+                                        
                                         {searchedVideo && searchedVideoData && searchedVideoData.length === 0 &&
                                             <View style={{ flex: 1, justifyContent: "center", marginBottom: 70 }}>
                                                 <NoDataFound

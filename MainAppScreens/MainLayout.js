@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
     View,
-    Text,
     TouchableWithoutFeedback,
     Image,
     FlatList,
@@ -13,7 +12,7 @@ import Animated, {
     useAnimatedStyle,
     withTiming,
 } from "react-native-reanimated";
-import { connect, useSelector } from "react-redux";
+import { connect } from "react-redux";
 import { setSelectedTab } from "../store/actions/tabActions"
 import { COLORS, SIZES } from "../Constants/theme";
 import Online_Home from "../miniapps/TrACE_Online/screens/HomeScreen";

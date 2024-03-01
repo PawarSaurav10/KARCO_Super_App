@@ -13,18 +13,17 @@ const HomePageLoader = ({ orientationType }) => {
                         height: 40,
                         width: 40,
                         marginRight: 10,
-                    }} ></View>
+                    }} />
                     <View style={{
                         height: 30,
                         width: 200,
-                    }}></View>
+                    }} />
                 </View>
                 <View style={{
                     borderRadius: 35,
                     height: 35,
                     width: 35,
-                }}>
-                </View>
+                }} />
             </View>
             <View style={{ margin: 8, padding: 8 }}>
                 <View style={{ paddingVertical: 6, borderRadius: 20, paddingHorizontal: 10, height: 40, width: "100%" }} />
@@ -63,7 +62,7 @@ const HomePageLoader = ({ orientationType }) => {
             <View style={{
                 marginHorizontal: 10,
                 paddingHorizontal: 8,
-            
+
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center"
@@ -144,7 +143,7 @@ const HomePageLoader = ({ orientationType }) => {
             <View style={{
                 marginHorizontal: 10,
                 paddingHorizontal: 8,
-            
+
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center"

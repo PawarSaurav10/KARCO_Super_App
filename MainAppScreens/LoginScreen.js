@@ -7,7 +7,6 @@ import CustomIconButton from '../Components/CustomIconButton';
 import { COLORS } from '../Constants/theme';
 import FastImage from 'react-native-fast-image';
 import axios from 'axios';
-import { saveCompanyDataToStorage, setScreenVisited, saveUserDataToStorage, setOnlineScreenVisited } from '../Utils/getScreenVisisted';
 import { getURL } from '../baseUrl';
 import LoginScreenLoader from "../Components/LoginScreenLoader"
 import NetInfo from "@react-native-community/netinfo";

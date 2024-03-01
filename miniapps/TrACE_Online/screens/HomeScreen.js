@@ -241,8 +241,8 @@ const HomePage = (props) => {
         }
     }, [revArray])
 
-    let qusetionAnswered = assessmentData && assessmentData ?.QuestionList.length - assessmentData ?.QStatusNCount;
-    let totalQuestion = assessmentData && assessmentData ?.QuestionList.length;
+    let qusetionAnswered = assessmentData && assessmentData.QuestionList.length - assessmentData.QStatusNCount;
+    let totalQuestion = assessmentData && assessmentData.QuestionList.length;
     let progress = (qusetionAnswered / totalQuestion)
     let percentage = progress * 100
 
@@ -277,7 +277,7 @@ const HomePage = (props) => {
                                     color: COLORS.primary
                                 }}
                                     numberOfLines={1}>
-                                    Hello {l_loginReducer.userData ?.Name} !
+                                    Hello {l_loginReducer.userData.Name} !
                                         </Text>
                             </View>
                         </View>

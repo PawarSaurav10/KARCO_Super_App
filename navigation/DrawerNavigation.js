@@ -137,10 +137,10 @@ const CustomDrawerContent = ({ navigation, selectedTab, setSelectedTab, appName 
                         </TouchableOpacity>
                         <View>
                             <Text style={{ color: COLORS.white, fontSize: 20, textAlign: "left", marginBottom: 2 }}>
-                                {l_loginReducer && l_loginReducer.userData ?.Name}
+                                {l_loginReducer && l_loginReducer.userData.Name}
                             </Text>
                             <Text style={{ color: COLORS.gray2, fontSize: 14, textAlign: "left" }}>
-                                {l_loginReducer && l_loginReducer.userData ?.VesselName}
+                                {l_loginReducer && l_loginReducer.userData.VesselName}
                             </Text>
                         </View>
                     </View>

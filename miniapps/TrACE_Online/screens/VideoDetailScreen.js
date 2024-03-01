@@ -26,7 +26,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(true)
     const [pdfView, setPdfView] = useState(false)
     const [viewPdf, setViewPdf] = useState(false)
-    const [htmlContent, setHtmlContent] = useState(htmlContentPromo)
     const [orientation, setOrientation] = useState()
     const [viewAlert, setViewAlert] = useState({
         isShow: false,
@@ -351,11 +350,9 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                             // spotlightrAPI('MTM1MjA5MA==', 'play')
                                             // togglePlayPause()
                                             if ((videoType === "PROMOKEY") || (videoType === "")) {
-                                                setHtmlContent(htmlContentFull)
                                                 setVideoType("FULLKEY")
                                                 onFullViewVideoClick()
                                             } else {
-                                                setHtmlContent(htmlContentPromo)
                                                 setVideoType("PROMOKEY")
                                                 onPromoViewVideoClick()
                                             }

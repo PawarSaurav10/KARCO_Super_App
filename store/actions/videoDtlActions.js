@@ -71,13 +71,7 @@ export const fetchKARCOVideoData = () => {
             await axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
                 .then((response) => {
                     const res = response.data.videos.data;
-                    let videoData = [];
-                    for (const key in res) {
-                        videoData.push({
-                            ...res[key],
-                        });
-                    }
-                    dispatch(fetchVideoDataSuccess(videoData));
+                    dispatch(fetchVideoDataSuccess(res));
                 })
         } catch (err) {
             dispatch(fetchVideoDataFail("Invalid Credentials"));

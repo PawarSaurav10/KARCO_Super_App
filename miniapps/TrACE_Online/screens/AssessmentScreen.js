@@ -141,7 +141,7 @@ const AssessmentScreen = ({ navigation }) => {
         setIsLoading(true)
         setSelectedOptions(selectedOptions)
         callUpdateCrewActivityAPI(initialData, JSON.stringify(questionIndex), selectedOptions)
-        if (selectedOptions === initialData ?.AnswerOption) {
+        if (selectedOptions === initialData.AnswerOption) {
             onCorrectOptionClick()
         } else {
             onWrongOptionClick()
@@ -231,7 +231,7 @@ const AssessmentScreen = ({ navigation }) => {
 
     const htmlContent = `
         <div width="100%" height="auto" allowfullscreen="true">
-            <iframe id="iframe" src="${getURL.play_video_URL}/${assessmentData ?.videoDetail ?.Videokey}?start=${questionToShow ?.ClipTimingFrom}&end=${questionToShow ?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
+            <iframe id="iframe" src="${getURL.play_video_URL}/${assessmentData ?.videoDetail.Videokey}?start=${questionToShow?.ClipTimingFrom}&end=${questionToShow?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
         </div>
     `
 
@@ -243,10 +243,12 @@ const AssessmentScreen = ({ navigation }) => {
                 {initialData !== null &&
                     <>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                            <Text style={{ fontSize: 16, color: COLORS.gray, fontWeight: "500" }}>QUESTION {currentQuestion === 0 ?
-                                (questioncountIndex === 0 ? 1 : questioncountIndex + (currentQuestion === 0 ? 1 : currentQuestion))
-                                : (questioncountIndex === 0 ? currentQuestion + 1 : questioncountIndex + (currentQuestion === 0 ? 1 : currentQuestion) + 1)
-                            } OF {assessmentData && assessmentData.QuestionList.length}</Text>
+                            <Text style={{ fontSize: 16, color: COLORS.gray, fontWeight: "500" }}>
+                                QUESTION {currentQuestion === 0 ?
+                                    (questioncountIndex === 0 ? 1 : questioncountIndex + (currentQuestion === 0 ? 1 : currentQuestion))
+                                    : (questioncountIndex === 0 ? currentQuestion + 1 : questioncountIndex + (currentQuestion === 0 ? 1 : currentQuestion) + 1)
+                                } OF {assessmentData && assessmentData.QuestionList.length}
+                            </Text>
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <View style={{
                                     width: 28,
@@ -254,14 +256,14 @@ const AssessmentScreen = ({ navigation }) => {
                                     borderRadius: 20,
                                     justifyContent: "center",
                                     alignItems: "center",
-                                    backgroundColor: `${questionToShow ?.Weightage === "A" ?
+                                    backgroundColor: `${questionToShow.Weightage === "A" ?
                                         "#ee3024"
-                                        : questionToShow ?.Weightage === "B" ?
+                                        : questionToShow.Weightage === "B" ?
                                             "#ea7d22"
-                                            : questionToShow ?.Weightage === "C" ?
+                                            : questionToShow.Weightage === "C" ?
                                                 "#fbb03b" : ""}`
                                 }}>
-                                    <Text style={{ color: "white" }}>{questionToShow ?.Weightage}</Text>
+                                    <Text style={{ color: "white" }}>{questionToShow.Weightage}</Text>
                                 </View>
                             </View>
                         </View>
@@ -269,7 +271,7 @@ const AssessmentScreen = ({ navigation }) => {
                             <Progress.Bar progress={progress} animationType="timing" width={Dimensions.get("window").width - 40} height={6} color="green" borderWidth={1} />
                         </View>
                         <View style={styles.question_container}>
-                            <Text style={styles.question_text}>{initialData ?.Question}</Text>
+                            <Text style={styles.question_text}>{initialData.Question}</Text>
                         </View>
                         <View style={{
                             marginBottom: 20, marginTop: -1, marginHorizontal: 6, borderRadius: 6
@@ -287,9 +289,8 @@ const AssessmentScreen = ({ navigation }) => {
                                 }} />
                             </View>
                             <View style={{ flex: 1 }}>
-                                <Text style={[styles.options_text, { color: selectedOptions == "A" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionA}</Text>
+                                <Text style={[styles.options_text, { color: selectedOptions == "A" ? COLORS.white2 : COLORS.primary }]}>{initialData.OptionA}</Text>
                             </View>
-
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "B" ? COLORS.primary : COLORS.white2 }]}
                             onPress={() => {
@@ -301,10 +302,10 @@ const AssessmentScreen = ({ navigation }) => {
                                 }} />
                             </View>
                             <View style={{ flex: 1 }}>
-                                <Text style={[styles.options_text, { color: selectedOptions == "B" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionB}</Text>
+                                <Text style={[styles.options_text, { color: selectedOptions == "B" ? COLORS.white2 : COLORS.primary }]}>{initialData.OptionB}</Text>
                             </View>
                         </TouchableOpacity>
-                        {((initialData ?.OptionC !== "NA") && (initialData ?.OptionC !== "N A") && (initialData ?.OptionC !== "") && (initialData ?.OptionC !== "NA.")) && (
+                        {((initialData.OptionC !== "NA") && (initialData.OptionC !== "N A") && (initialData.OptionC !== "") && (initialData.OptionC !== "NA.")) && (
                             <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "C" ? COLORS.primary : COLORS.white2 }]}
                                 onPress={() => {
                                     onOptionClick("C", initialData, questionIndex)
@@ -315,10 +316,10 @@ const AssessmentScreen = ({ navigation }) => {
                                     }} />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={[styles.options_text, { color: selectedOptions == "C" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionC}</Text>
+                                    <Text style={[styles.options_text, { color: selectedOptions == "C" ? COLORS.white2 : COLORS.primary }]}>{initialData.OptionC}</Text>
                                 </View>
                             </TouchableOpacity>)}
-                        {((initialData ?.OptionD !== "NA") && (initialData ?.OptionD !== "N A") && (initialData ?.OptionD !== "") && (initialData ?.OptionD !== "NA.")) && (
+                        {((initialData.OptionD !== "NA") && (initialData.OptionD !== "N A") && (initialData.OptionD !== "") && (initialData.OptionD !== "NA.")) && (
                             <TouchableOpacity style={[styles.options_container, { backgroundColor: selectedOptions == "D" ? COLORS.primary : COLORS.white2 }]}
                                 onPress={() => {
                                     onOptionClick("D", initialData, questionIndex)
@@ -329,7 +330,7 @@ const AssessmentScreen = ({ navigation }) => {
                                     }} />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={[styles.options_text, { color: selectedOptions == "D" ? COLORS.white2 : COLORS.primary }]}>{initialData ?.OptionD}</Text>
+                                    <Text style={[styles.options_text, { color: selectedOptions == "D" ? COLORS.white2 : COLORS.primary }]}>{initialData.OptionD}</Text>
                                 </View>
                             </TouchableOpacity>
                         )}
@@ -355,7 +356,7 @@ const AssessmentScreen = ({ navigation }) => {
                             <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                         </TouchableOpacity>
                     }
-                    title={assessmentData ?.videoDetail ?.VideoName}
+                    title={assessmentData ?.videoDetail.VideoName}
                 />
 
                 {isLoading &&
@@ -507,7 +508,7 @@ const AssessmentScreen = ({ navigation }) => {
                                                             AlertType: "PDF"
                                                         })
                                                     }}
-                                                    page={questionToShow ?.ClipTimingFrom}
+                                                    page={questionToShow?.ClipTimingFrom}
                                                     renderActivityIndicator={() =>
                                                         <ActivityIndicator color={COLORS.blue} size={"large"} />
                                                     }

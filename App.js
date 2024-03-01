@@ -25,11 +25,9 @@ import { COLORS } from './Constants/theme';
 import MainAppNavigation from './navigation/MainAppNavigation';
 import { thunk } from './node_modules/redux-thunk';
 import { compose, createStore, applyMiddleware } from './node_modules/redux';
-import { getcache, setcache } from './store/statecache';
 import { persistReducer, persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import AsyncStorage from './node_modules/@react-native-async-storage/async-storage';
-// import { requestMultiple, PERMISSIONS } from 'react-native-permissions';
 
 const persistConfig = {
   key: 'root',

@@ -8,13 +8,11 @@ import KPIIcon from "../Images/screen.png"
 import ShoreOnlineIcon from "../Images/check-list-1.png"
 import VideoIcon from "../Images/video-marketing.png"
 import CustomButton from '../Components/CustomButton';
-import { useDispatch, useSelector } from '../node_modules/react-redux';
+import { useDispatch } from '../node_modules/react-redux';
 import { fetchKARCOVideoData } from '../store/actions/videoDtlActions';
-
 
 const HomeScreen = ({ navigation }) => {
     const dispatch = useDispatch()
-    const videoData = useSelector(state => state.videoDtlReducer.karcoVideoData)
     const {
         canStart, // a boolean indicate if you can start tour guide
         start, // a function to start the tourguide
@@ -141,7 +139,13 @@ const HomeScreen = ({ navigation }) => {
                                                     dispatch(fetchKARCOVideoData())
                                                 }
                                             }}
-                                            labelStyle={{ color: COLORS.primary, fontSize: 14, textTransform: "uppercase", borderBottomWidth: 2, borderBottomColor: COLORS.primary }}
+                                            labelStyle={{
+                                                color: COLORS.primary,
+                                                fontSize: 14,
+                                                textTransform: "uppercase",
+                                                borderBottomWidth: 2,
+                                                borderBottomColor: COLORS.primary
+                                            }}
                                         />
                                     </View>
                                 </View>

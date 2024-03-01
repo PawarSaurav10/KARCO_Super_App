@@ -114,7 +114,6 @@ const VideoDetailScreen = ({ navigation, route }) => {
         if (route.params.type !== "Downloads") {
             CheckConnectivity()
             axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}&videoID=${route.params}`)
-
                 .then((res) => {
                     setVideoDetail(res.data.videos.data[0])
                     setIsLoading(false)

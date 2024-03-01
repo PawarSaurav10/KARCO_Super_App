@@ -26,7 +26,6 @@ const VideoScreenLoader = () => {
                     </View>
                     <View
                         style={{
-                        
                             flexDirection: "row",
                             justifyContent: "center",
                             alignItems: "center",
