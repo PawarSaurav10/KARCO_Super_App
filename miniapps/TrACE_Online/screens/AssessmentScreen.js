@@ -231,7 +231,7 @@ const AssessmentScreen = ({ navigation }) => {
 
     const htmlContent = `
         <div width="100%" height="auto" allowfullscreen="true">
-            <iframe id="iframe" src="${getURL.play_video_URL}/${assessmentData ?.videoDetail.Videokey}?start=${questionToShow?.ClipTimingFrom}&end=${questionToShow?.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
+            <iframe id="iframe" src="${getURL.play_video_URL}/${assessmentData && assessmentData.videoDetail.Videokey}?start=${questionToShow && questionToShow.ClipTimingFrom}&end=${questionToShow && questionToShow.ClipTimingTo}" allow="autoplay" width="100%" height="100%" allowtransparency="true" data-tap-disabled="false" />
         </div>
     `
 
@@ -356,7 +356,7 @@ const AssessmentScreen = ({ navigation }) => {
                             <Image source={images.left_arrow_icon} style={{ width: 20, height: 20 }} />
                         </TouchableOpacity>
                     }
-                    title={assessmentData ?.videoDetail.VideoName}
+                    title={assessmentData && assessmentData.videoDetail.VideoName}
                 />
 
                 {isLoading &&
@@ -508,7 +508,7 @@ const AssessmentScreen = ({ navigation }) => {
                                                             AlertType: "PDF"
                                                         })
                                                     }}
-                                                    page={questionToShow?.ClipTimingFrom}
+                                                    page={questionToShow && questionToShow.ClipTimingFrom}
                                                     renderActivityIndicator={() =>
                                                         <ActivityIndicator color={COLORS.blue} size={"large"} />
                                                     }
@@ -529,7 +529,7 @@ const AssessmentScreen = ({ navigation }) => {
                             "Your Device is not Connected to Internet, Please Check your Internet Connectivity"
                             : viewAlert.AlertType === "onBack" ? "Are you sure you want to leave Assessment ?"
                                 : viewAlert.AlertType === "Success" ? "You have completed the assessment. To generate your certificate, proceed to feedback."
-                                    : viewAlert.AlertType === "Correct" ? "You have provided the correct answer"
+                                    : viewAlert.AlertType === "Correct" ? "You have got the right answer"
                                         : viewAlert.AlertType === "Wrong" ? "This is not a correct option, please watch the video & try again"
                                             : viewAlert.AlertType === "PDF" ? "File is not View able or corrupted" : ""}
                         buttonContainerStyle={{
@@ -590,7 +590,7 @@ const AssessmentScreen = ({ navigation }) => {
                                 toShow: (viewAlert.AlertType === "Correct" || viewAlert.AlertType === "Wrong") && true,
                             },
                             {
-                                text: 'Proceed To Feedback',
+                                text: 'Proceed To Give Feedback',
                                 onPress: () => {
                                     setIsLoading(false)
                                     callGetOnlineAssessmentApi()
@@ -603,7 +603,7 @@ const AssessmentScreen = ({ navigation }) => {
                                 toShow: viewAlert.AlertType === "Success" ? true : false,
                             },
                             {
-                                text: 'Continue Without Feedback',
+                                text: 'Proceed Without Giving Feedback',
                                 onPress: () => {
                                     setIsLoading(false)
                                     callGetOnlineAssessmentApi()

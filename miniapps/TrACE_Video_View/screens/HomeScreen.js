@@ -10,6 +10,8 @@ import NoDataFound from '../../../Components/NoDataFound';
 import images from '../../../Constants/images';
 import RNFetchBlob from "react-native-blob-util";
 import { useSelector } from '../../../node_modules/react-redux';
+import axios from "axios"
+import { getURL } from '../../../baseUrl';
 
 const HomeScreen = (props) => {
     const navigation = useNavigation();
@@ -20,7 +22,8 @@ const HomeScreen = (props) => {
     const [searchedVideo, setSearchedVideo] = useState("")
     const [orientation, setOrientation] = useState()
     const videoData = useSelector(state => state.videoDtlReducer.karcoVideoData)
-
+    const [videoList, setVideoList] = useState(null)
+ 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
         return dim.height >= dim.width;
@@ -78,14 +81,14 @@ const HomeScreen = (props) => {
         }
     };
 
-    // const fetchData = () => {
-    //     return new Promise((resolve, reject) => {
-    //         axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
-    //             .then((response) => response)
-    //             .then((data) => resolve(data))
-    //             .catch((error) => reject(error))
-    //     })
-    // }
+    const fetchData = () => {
+        return new Promise((resolve, reject) => {
+            axios.get(`${getURL.VideoView_baseURL}?vooKey=${getURL.vooKey}`)
+                .then((response) => response)
+                .then((data) => resolve(data))
+                .catch((error) => reject(error))
+        })
+    }
 
     // const onRefresh = async () => {
     //     setIsLoading(videoData.length > 0 ? false : true)
@@ -98,9 +101,9 @@ const HomeScreen = (props) => {
     // };
 
     useEffect(() => {
-        if (props.videoReducer.karcoVideoData.length > 0) {
-            setIsLoading(false)
-        }
+        // if (props.videoReducer.karcoVideoData.length > 0) {
+        //     setIsLoading(false)
+        // }
         if (isFocused) {
             let dirs = RNFetchBlob.fs.dirs
             RNFetchBlob.fs.exists(dirs.DownloadDir + "/Videos")
@@ -118,11 +121,11 @@ const HomeScreen = (props) => {
             }
             // setIsLoading(videoData.length > 0 ? false : true)
             CheckConnectivity()
-            // fetchData()
-            //     .then((res) => {
-            //         setVideoList(res.data.videos.data)
-            //         setIsLoading(false)
-            //     }) 
+            fetchData()
+                .then((res) => {
+                    setVideoList(res.data.videos.data)
+                    setIsLoading(false)
+                })
             const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
@@ -134,12 +137,12 @@ const HomeScreen = (props) => {
     useEffect(() => {
         if (searchedVideo) {
             setSearchedVideoData(
-                videoData.filter((element) =>
+                videoList.filter((element) =>
                     element.name.toLowerCase().includes(searchedVideo.toLowerCase())
                 )
             );
         } else {
-            setSearchedVideoData(videoData);
+            setSearchedVideoData(videoList);
         }
         return () => {
             setSearchedVideoData([]);
@@ -206,7 +209,7 @@ const HomeScreen = (props) => {
                                             <FlatList
                                                 // refreshing={isLoading}
                                                 // onRefresh={onRefresh}
-                                                data={videoData}
+                                                data={videoList}
                                                 keyExtractor={item => item.id}
                                                 showsHorizontalScrollIndicator={false}
                                                 renderItem={({ item, index }) => (
@@ -245,7 +248,7 @@ const HomeScreen = (props) => {
                                                 )}
                                             />
                                         }
-                                        
+
                                         {searchedVideo && searchedVideoData && searchedVideoData.length === 0 &&
                                             <View style={{ flex: 1, justifyContent: "center", marginBottom: 70 }}>
                                                 <NoDataFound

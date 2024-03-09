@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Image, ScrollView, FlatList, Dimensions, TouchableOpacity } from "react-native"
+import { View, Image, ScrollView, FlatList, Dimensions, TouchableOpacity, BackHandler } from "react-native"
 import CustomSearch from '../../../Components/CustomSearch';
 import NoDataFound from '../../../Components/NoDataFound';
 import Header from '../../../Components/Header';
@@ -18,6 +18,11 @@ const ViewAllScreen = ({ navigation, route }) => {
         isShow: false,
         AlertType: ""
     })
+
+    const backAction = () => {
+        navigation.goBack()
+        return true
+    };
 
     const isPortrait = () => {
         const dim = Dimensions.get('screen');
@@ -55,6 +60,13 @@ const ViewAllScreen = ({ navigation, route }) => {
             setOrientation("protrait")
         } else {
             setOrientation("landscape")
+        }
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+        )
+        return () => {
+            backHandler.remove();
         }
     }, [])
 
@@ -124,7 +136,7 @@ const ViewAllScreen = ({ navigation, route }) => {
                                     />
                                 )}
                                 keyExtractor={item => item.Id}
-                                style={{ margin: 4, padding: 4,  flexDirection: "row" }}
+                                style={{ margin: 4, padding: 4, flexDirection: "row" }}
                             />
                         }
                         {searchedVideo && searchedTodoVideoData && searchedTodoVideoData.length > 0 &&

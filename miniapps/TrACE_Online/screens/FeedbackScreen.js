@@ -197,8 +197,9 @@ const FeedbackScreen = ({ navigation }) => {
                 }
             })
                 .then((res) => {
-                    setResultData(res.data)
-                    setPercentage((100 * res.data ?.Scores.ObtainedMarks) / res.data ?.Scores.TotalMarks)
+                    const data = res && res.data
+                    setResultData(data)
+                    setPercentage((100 * data.Scores.ObtainedMarks) / data.Scores.TotalMarks)
                 })
                 .catch((error) => {
                     throw error
@@ -745,7 +746,7 @@ const FeedbackScreen = ({ navigation }) => {
                                     <View style={styles.footer}>
                                         <View style={{ flexDirection: "row", paddingHorizontal: 24, paddingTop: 24, paddingBottom: 14, justifyContent: "space-between", alignItems: "center" }}>
                                             <View style={{ flex: 0.9, alignItems: "flex-start" }}>
-                                                <Text style={styles.headerText}>{resultData ?.videoInfo.VideoName}</Text>
+                                                <Text style={styles.headerText}>{resultData && resultData.videoInfo.VideoName}</Text>
                                             </View>
                                             <TouchableOpacity
                                                 style={{ flex: 0.1, alignItems: "flex-end" }}
@@ -782,7 +783,7 @@ const FeedbackScreen = ({ navigation }) => {
                                                     <Text style={{ fontSize: 22, fontWeight: "600", color: COLORS.darkBlue }}>Total Percentage</Text>
                                                 </View>
                                                 <View style={{ alignItems: 'flex-end', margin: 6 }}>
-                                                    <Text style={{ fontSize: 20, fontWeight: "bold", color: COLORS.darkBlue }}>{resultData ?.Scores.ObtainedMarks} / {resultData ?.Scores.TotalMarks}</Text>
+                                                    <Text style={{ fontSize: 20, fontWeight: "bold", color: COLORS.darkBlue }}>{resultData && resultData.Scores.ObtainedMarks} / {resultData && resultData.Scores.TotalMarks}</Text>
                                                     <Text style={{ fontSize: 16, fontWeight: "bold", color: COLORS.darkBlue }}>Marks Obtained</Text>
                                                 </View>
                                             </View>
@@ -799,8 +800,8 @@ const FeedbackScreen = ({ navigation }) => {
                                             <View style={{ marginVertical: 20, flexDirection: "row", justifyContent: "center" }}>
                                                 <View style={[styles.totalAnsweredContainer, { backgroundColor: "#ff0000" }]}>
                                                     <View style={{ flexDirection: "row", marginBottom: 6 }}>
-                                                        <Text style={styles.totalAnswerText}>{resultData ?.Scores.WAcorrect}</Text>
-                                                        <Text style={styles.outOfText}>/ {resultData ?.Scores.WA}</Text>
+                                                        <Text style={styles.totalAnswerText}>{resultData && resultData.Scores.WAcorrect}</Text>
+                                                        <Text style={styles.outOfText}>/ {resultData && resultData.Scores.WA}</Text>
                                                     </View>
                                                     <View>
                                                         <Text style={{ fontSize: 16, color: COLORS.white2, }}>A Weightage</Text>
@@ -808,8 +809,8 @@ const FeedbackScreen = ({ navigation }) => {
                                                 </View>
                                                 <View style={[styles.totalAnsweredContainer, { backgroundColor: "#ff8f00" }]}>
                                                     <View style={{ flexDirection: "row", marginBottom: 6 }}>
-                                                        <Text style={styles.totalAnswerText}>{resultData ?.Scores.WBcorrect}</Text>
-                                                        <Text style={styles.outOfText}>/ {resultData ?.Scores.WB}</Text>
+                                                        <Text style={styles.totalAnswerText}>{resultData && resultData.Scores.WBcorrect}</Text>
+                                                        <Text style={styles.outOfText}>/ {resultData && resultData.Scores.WB}</Text>
                                                     </View>
                                                     <View>
                                                         <Text style={{ fontSize: 16, color: COLORS.white2, }}>B Weightage</Text>
@@ -817,8 +818,8 @@ const FeedbackScreen = ({ navigation }) => {
                                                 </View>
                                                 <View style={[styles.totalAnsweredContainer, { backgroundColor: "#ffd500" }]}>
                                                     <View style={{ flexDirection: "row", marginBottom: 6 }}>
-                                                        <Text style={styles.totalAnswerText}>{resultData ?.Scores.WCcorrect}</Text>
-                                                        <Text style={styles.outOfText}>/ {resultData ?.Scores.WC}</Text>
+                                                        <Text style={styles.totalAnswerText}>{resultData && resultData.Scores.WCcorrect}</Text>
+                                                        <Text style={styles.outOfText}>/ {resultData && resultData.Scores.WC}</Text>
                                                     </View>
                                                     <View>
                                                         <Text style={{ fontSize: 16, color: COLORS.white2, }}>C Weightage</Text>

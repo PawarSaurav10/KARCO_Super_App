@@ -7,7 +7,6 @@ import { useNavigation } from '../node_modules/@react-navigation/core';
 import images from '../Constants/images';
 
 const VideoListView = ({ videoName, createdDate, thumbnail, OnPress, listType, item, onDelete, orientationType }) => {
-    // console.log(videoName,"videoName");
     const navigation = useNavigation()
     const [viewDownloadIcon, setViewDownloadIcon] = useState(false)
     const [readFIle, setReadFile] = useState(null);

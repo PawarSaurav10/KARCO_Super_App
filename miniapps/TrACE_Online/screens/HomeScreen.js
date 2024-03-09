@@ -80,10 +80,14 @@ const HomePage = (props) => {
     }
 
     const backAction = () => {
-        setViewAlert({
-            isShow: true,
-            AlertType: "onBack"
-        })
+        if (videoType === "COMPLIST") {
+            setVideoType("TODOLIST")
+        } else {
+            setViewAlert({
+                isShow: true,
+                AlertType: "onBack"
+            })
+        }
         return true;
     };
 
@@ -161,6 +165,18 @@ const HomePage = (props) => {
     };
 
     useEffect(() => {
+        // if (l_loginReducer.userData !== null) {
+            const backHandler = BackHandler.addEventListener(
+                'hardwareBackPress',
+                backAction,
+            )
+            return () => {
+                backHandler.remove();
+            }
+        // }
+    }, [videoType])
+
+    useEffect(() => {
         if (l_loginReducer.userData !== null) {
             setIsLoading(false)
             let dirs = RNFetchBlob.fs.dirs
@@ -178,16 +194,15 @@ const HomePage = (props) => {
             }
             CheckConnectivity()
             setIsLoading(true)
-            const backHandler = BackHandler.addEventListener(
-                'hardwareBackPress',
-                backAction,
-            )
+            // const backHandler = BackHandler.addEventListener(
+            //     'hardwareBackPress',
+            //     backAction,
+            // )
             fetchData()
             return () => {
-                backHandler.remove();
+                // backHandler.remove();
                 setVideoData([])
             }
-
         } else {
             setIsLoading(false)
             setViewAlert({
@@ -195,7 +210,6 @@ const HomePage = (props) => {
                 AlertType: "Internet"
             })
         }
-
     }, [l_loginReducer])
 
     const CompletedList = _.sortBy(videoData && videoData.lstCompleted, ["lstCompleted"])
@@ -597,8 +611,9 @@ const HomePage = (props) => {
                     {viewAlert.isShow && (
                         <CustomAlert
                             isView={viewAlert.isShow}
-                            Title={viewAlert.AlertType === "Internet" ? "Oops !!" : "Hold on!"}
-                            Content={viewAlert.AlertType === "Internet" ? "Your Device is not Connected to Internet, Please Check your Internet Connectivity" : "Are you sure you want to exit App you will get logout of the App?"}
+                            Title={viewAlert.AlertType === "Internet" ? "Oops !!" : viewAlert.AlertType === "onBack" ? "Hold on!" : ""}
+                            Content={viewAlert.AlertType === "Internet" ? "Your Device is not Connected to Internet, Please Check your Internet Connectivity" :
+                                viewAlert.AlertType === "onBack" ? "Are you sure you want to exit App you will get logout of the App?" : ""}
                             buttonContainerStyle={{
                                 flexDirection: "row",
                                 justifyContent: "flex-end"
@@ -622,7 +637,7 @@ const HomePage = (props) => {
                                                 index: 0,
                                                 routes: [{ name: "Login" }],
                                             })
-                                        } else {
+                                        } else if (viewAlert.AlertType === "onBack") {
                                             logOut()
                                         }
                                         setViewAlert({

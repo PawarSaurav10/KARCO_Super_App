@@ -89,6 +89,13 @@ const VideoDetailScreen = ({ navigation, route }) => {
             } else {
                 setOrientation("landscape")
             }
+            const CompletedDate = moment(v_videoData.videoData.CompletedDate, "DD MMM YYYY").format("YYYY-MM-DD")
+            if (v_videoData.videoData.AssessmentStatus == "Completed") {
+                axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${l_loginReducer.userData.CompanyId}&EmpId=${l_loginReducer.userData.EmployeeId}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&VideoId=${v_videoData.videoId}&dateOn=${CompletedDate}`)
+                    .then((res) => {
+                        setPdfURL(res.data)
+                    })
+            }
             const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 backAction,
@@ -163,15 +170,17 @@ const VideoDetailScreen = ({ navigation, route }) => {
         webViewRef.current.injectJavaScript(runFirst)
     };
 
-    const viewCertificate = async () => {
-        CheckConnectivity()
-        await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${l_loginReducer.userData.CompanyId}&EmpId=${l_loginReducer.userData.EmployeeId}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&VideoId=${v_videoData.videoId}&dateOn=${CompletedDate}`)
-            .then((res) => {
-                setPdfURL(res.data)
-                setViewPdf(true)
-                setIsLoading(false)
-            })
-    }
+    // const viewCertificate = async () => {
+    //     CheckConnectivity()
+    //     setViewPdf(true)
+    //     // await axios.get(`https://testtrace.karco.in/api/AppAssessment/GetCertificatePathByCrewId?CompanyId=${l_loginReducer.userData.CompanyId}&EmpId=${l_loginReducer.userData.EmployeeId}&CrewId=${l_loginReducer.userData.CrewListId}&VesselId=${l_loginReducer.userData.VesselId}&VideoId=${v_videoData.videoId}&dateOn=${CompletedDate}`)
+    //     //     .then((res) => {
+    //     //         console.log(res.data, "res")
+    //     //         setPdfURL(res.data)
+    //     //         setViewPdf(true)
+    //     //         setIsLoading(false)
+    //     //     })
+    // }
 
     const downloadCertificate = async () => {
         CheckConnectivity()
@@ -440,10 +449,10 @@ const VideoDetailScreen = ({ navigation, route }) => {
                                         label={"View Certificate"}
                                         icon={images.view_icon}
                                         onPress={() => {
-                                            setIsLoading(true)
+                                            // setIsLoading(true)
                                             CheckConnectivity()
-                                            viewCertificate()
-                                            // setViewPdf(true)
+                                            // viewCertificate()
+                                            setViewPdf(true)
                                             setPdfView(true)
                                             // navigation.replace("Feedback Form", { Id: v_videoData.videoId, videoPassword: v_videoData.videoData.Password })
                                         }}
